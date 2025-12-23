@@ -13,4 +13,5 @@ requests>=2.31.0
 # 其他工具
 python-docx>=0.8.11
 pathlib2>=2.3.7
+tqdm>=4.65.0
 

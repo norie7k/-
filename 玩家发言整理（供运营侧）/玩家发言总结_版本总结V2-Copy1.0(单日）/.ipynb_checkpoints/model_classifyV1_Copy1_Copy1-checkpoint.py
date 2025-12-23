@@ -327,6 +327,75 @@ def parse_model2_output_to_json_list(output_cluster: str, batch_idx: int = 0) ->
                 depth = 0
 
     return objs
+    
+def parse_jsonl_text_safe(text: str, label: str = "模型#3聚合输出") -> List[Dict[str, Any]]:
+    """
+    尝试把 text 按行解析为 JSON 对象：
+    - 每行独立尝试 json.loads
+    - 解析前先对“极轴”等常见错误做一次正则修复
+    - 解析失败时不会抛异常，而是打印出具体行号和原文，方便排查
+    """
+    objs: List[Dict[str, Any]] = []
+    lines = text.strip().splitlines()
+
+    for idx, raw in enumerate(lines, start=1):
+        s = (raw or "").strip()
+        if not s:
+            continue
+
+        # 跳过 ```json / ``` 等代码块标记
+        if s.startswith("```"):
+            continue
+
+        # ⭐ 先修复“极轴”相关格式错误
+        s_fixed = fix_model3_line_extreme_axis(s)
+
+        try:
+            obj = json.loads(s_fixed)
+        except JSONDecodeError as e:
+            print(f"[{label}] ❌ JSON解析失败：行#{idx} -> {e}")
+            print(f"[{label}] 该行原文(修复后)：{s_fixed}")
+            continue
+
+        objs.append(obj)
+
+    return objs
+
+def fix_model3_line_extreme_axis(s: str) -> str:
+    """
+    专门修复模型#3输出中“极轴”相关的坏格式：
+    针对以下几种情况：
+    1) "日期": "极轴": "2025-12-06"  =>  "日期": "2025-12-06"
+    2) "时间轴": "极轴": "22:30:57-22:33:57"  =>  "时间轴": "22:30:57-22:33:57"
+    3) "时间轴": "22:34:24-极轴": "22:38:33" => "时间轴": "22:34:24-22:38:33"
+    """
+
+    # 1) 修复日期字段被“极轴”污染：
+    #    "日期": "极轴": "2025-12-06"
+    s = re.sub(
+        r'"日期"\s*:\s*"极轴"\s*:\s*"([^"]+)"',
+        r'"日期": "\1"',
+        s
+    )
+
+    # 2) 修复时间轴字段完全是 "极轴": "xxx" 的情况：
+    #    "时间轴": "极轴": "22:30:57-22:33:57"
+    s = re.sub(
+        r'"时间轴"\s*:\s*"极轴"\s*:\s*"([^"]+)"',
+        r'"时间轴": "\1"',
+        s
+    )
+
+    # 3) 修复时间轴值中间带 "-极轴": " 的情况：
+    #    "时间轴": "22:34:24-极轴": "22:38:33"
+    #    -> "时间轴": "22:34:24-22:38:33"
+    s = re.sub(
+        r'"时间轴"\s*:\s*"([^"]*?)-极轴"\s*:\s*"([^"]+)"',
+        r'"时间轴": "\1-\2"',
+        s
+    )
+
+    return s
 
 #################################话提簇唯一id#################################
 

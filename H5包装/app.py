@@ -283,47 +283,93 @@ def render_time_range_selector(txt_file):
     st.markdown("#### 📅 选择分析时间范围")
     st.caption("设定要分析的时间范围，对应主循环中的 `start_time` 和 `end_time`")
     
-    col1, col2 = st.columns(2)
+    # 选择输入模式
+    input_mode = st.radio(
+        "选择时间输入方式",
+        ["📆 日期时间选择器", "✏️ 手动输入时间"],
+        horizontal=True,
+        key="time_input_mode"
+    )
     
-    # 默认日期：昨天
-    default_date = datetime.now().date() - timedelta(days=1)
-    
-    with col1:
-        st.markdown("**开始时间**")
-        start_date = st.date_input(
-            "开始日期",
-            value=default_date,
-            key="start_date",
-            label_visibility="collapsed"
-        )
-        start_time = st.time_input(
-            "开始时间",
-            value=datetime.strptime("00:00:00", "%H:%M:%S").time(),
-            key="start_time",
-            label_visibility="collapsed"
-        )
-    
-    with col2:
-        st.markdown("**结束时间**")
-        end_date = st.date_input(
-            "结束日期",
-            value=default_date + timedelta(days=1),
-            key="end_date",
-            label_visibility="collapsed"
-        )
-        end_time = st.time_input(
-            "结束时间",
-            value=datetime.strptime("00:00:00", "%H:%M:%S").time(),
-            key="end_time",
-            label_visibility="collapsed"
-        )
-    
-    # 组合成完整的时间字符串（与 top5_Q1.ipynb 格式一致）
-    start_datetime = f"{start_date} {start_time.strftime('%H:%M:%S')}"
-    end_datetime = f"{end_date} {end_time.strftime('%H:%M:%S')}"
-    
-    # 显示当前选择
-    st.info(f"📊 将分析 **{start_datetime}** 至 **{end_datetime}** 的发言数据")
+    if input_mode == "✏️ 手动输入时间":
+        # 手动输入模式
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            st.markdown("**开始时间**")
+            manual_start = st.text_input(
+                "开始时间 (格式: YYYY-MM-DD HH:MM:SS)",
+                value=st.session_state.get('manual_start', '2025-12-17 00:00:00'),
+                key="manual_start_input",
+                placeholder="例如: 2025-12-17 00:00:00"
+            )
+        
+        with col2:
+            st.markdown("**结束时间**")
+            manual_end = st.text_input(
+                "结束时间 (格式: YYYY-MM-DD HH:MM:SS)",
+                value=st.session_state.get('manual_end', '2025-12-18 00:00:00'),
+                key="manual_end_input",
+                placeholder="例如: 2025-12-18 00:00:00"
+            )
+        
+        # 验证时间格式
+        try:
+            datetime.strptime(manual_start, "%Y-%m-%d %H:%M:%S")
+            datetime.strptime(manual_end, "%Y-%m-%d %H:%M:%S")
+            start_datetime = manual_start
+            end_datetime = manual_end
+            display_date = manual_start.split(" ")[0]
+            st.success(f"✅ 将分析 **{start_datetime}** 至 **{end_datetime}** 的发言数据")
+        except ValueError:
+            st.error("⚠️ 时间格式错误，请使用 YYYY-MM-DD HH:MM:SS 格式")
+            start_datetime = None
+            end_datetime = None
+            display_date = None
+    else:
+        # 日期时间选择器模式
+        col1, col2 = st.columns(2)
+        
+        # 默认日期：昨天
+        default_date = datetime.now().date() - timedelta(days=1)
+        
+        with col1:
+            st.markdown("**开始时间**")
+            start_date = st.date_input(
+                "开始日期",
+                value=st.session_state.get('start_date', default_date),
+                key="start_date",
+                label_visibility="collapsed"
+            )
+            start_time = st.time_input(
+                "开始时间",
+                value=datetime.strptime("00:00:00", "%H:%M:%S").time(),
+                key="start_time",
+                label_visibility="collapsed"
+            )
+        
+        with col2:
+            st.markdown("**结束时间**")
+            end_date = st.date_input(
+                "结束日期",
+                value=st.session_state.get('end_date', default_date + timedelta(days=1)),
+                key="end_date",
+                label_visibility="collapsed"
+            )
+            end_time = st.time_input(
+                "结束时间",
+                value=datetime.strptime("00:00:00", "%H:%M:%S").time(),
+                key="end_time",
+                label_visibility="collapsed"
+            )
+        
+        # 组合成完整的时间字符串（与 top5_Q1.ipynb 格式一致）
+        start_datetime = f"{start_date} {start_time.strftime('%H:%M:%S')}"
+        end_datetime = f"{end_date} {end_time.strftime('%H:%M:%S')}"
+        display_date = str(start_date)
+        
+        # 显示当前选择
+        st.info(f"📊 将分析 **{start_datetime}** 至 **{end_datetime}** 的发言数据")
     
     # 快捷选择按钮
     st.markdown("**快捷选择：**")
@@ -334,6 +380,8 @@ def render_time_range_selector(txt_file):
             yesterday = datetime.now().date() - timedelta(days=1)
             st.session_state['start_date'] = yesterday
             st.session_state['end_date'] = datetime.now().date()
+            st.session_state['manual_start'] = f"{yesterday} 00:00:00"
+            st.session_state['manual_end'] = f"{datetime.now().date()} 00:00:00"
             st.rerun()
     
     with quick_col2:
@@ -341,12 +389,16 @@ def render_time_range_selector(txt_file):
             today = datetime.now().date()
             st.session_state['start_date'] = today
             st.session_state['end_date'] = today + timedelta(days=1)
+            st.session_state['manual_start'] = f"{today} 00:00:00"
+            st.session_state['manual_end'] = f"{today + timedelta(days=1)} 00:00:00"
             st.rerun()
     
     with quick_col3:
         if st.button("📅 最近3天", use_container_width=True):
             st.session_state['start_date'] = datetime.now().date() - timedelta(days=3)
             st.session_state['end_date'] = datetime.now().date()
+            st.session_state['manual_start'] = f"{datetime.now().date() - timedelta(days=3)} 00:00:00"
+            st.session_state['manual_end'] = f"{datetime.now().date()} 00:00:00"
             st.rerun()
     
     with quick_col4:
@@ -357,7 +409,7 @@ def render_time_range_selector(txt_file):
     return {
         'start_time': start_datetime,
         'end_time': end_datetime,
-        'date': str(start_date),  # 用于显示
+        'date': display_date,  # 用于显示
     }
 
 
@@ -465,19 +517,53 @@ def render_result(result):
         )
     
     with col2:
-        # 生成简易报告文本
-        report_lines = [f"# 玩家社群发言分析报告 - {result['date']}\n"]
+        # 生成完整报告文本（包含讨论点、玩家观点、代表性发言）
+        report_lines = [f"# 玩家社群发言分析报告 - {result['date']}\n\n"]
         report_lines.append(f"## 统计概览\n")
         report_lines.append(f"- 原始消息数: {result['total_messages']}\n")
         report_lines.append(f"- 游戏相关发言: {result['filtered_messages']}\n")
         report_lines.append(f"- 热门话题簇: {len(result['top5_clusters'])}\n\n")
         
         for idx, cluster in enumerate(result['top5_clusters'], 1):
-            report_lines.append(f"## {idx}. {cluster['聚合话题簇']}\n")
-            report_lines.append(f"- 热度评分: {cluster['热度评分']}\n")
-            report_lines.append(f"- 发言玩家数: {cluster['发言玩家总数']}\n")
-            report_lines.append(f"- 发言总数: {cluster['发言总数']}\n")
-            report_lines.append(f"- 时间轴: {cluster['时间轴']}\n\n")
+            report_lines.append(f"## {idx}. {cluster['聚合话题簇']}\n\n")
+            report_lines.append(f"- **热度评分**: {cluster['热度评分']}\n")
+            report_lines.append(f"- **发言玩家数**: {cluster['发言玩家总数']}\n")
+            report_lines.append(f"- **发言总数**: {cluster['发言总数']}\n")
+            report_lines.append(f"- **时间轴**: {cluster['时间轴']}\n\n")
+            
+            # 讨论点列表
+            discussion_list = cluster.get('讨论点列表', [])
+            if discussion_list:
+                report_lines.append(f"### 讨论点与玩家观点\n\n")
+                
+                for dp in discussion_list:
+                    # 获取讨论点标题
+                    dp_title = ""
+                    for key in dp.keys():
+                        if key.startswith("讨论点"):
+                            dp_title = dp[key]
+                            break
+                    
+                    if dp_title:
+                        report_lines.append(f"#### 📌 {dp_title}\n\n")
+                    
+                    # 玩家观点
+                    opinions = dp.get('玩家观点', [])
+                    if opinions:
+                        report_lines.append(f"**玩家观点:**\n")
+                        for opinion in opinions:
+                            report_lines.append(f"- {opinion}\n")
+                        report_lines.append("\n")
+                    
+                    # 代表性玩家发言示例
+                    examples = dp.get('代表性玩家发言示例', [])
+                    if examples:
+                        report_lines.append(f"**代表性发言:**\n")
+                        for example in examples:
+                            report_lines.append(f'> "{example}"\n')
+                        report_lines.append("\n")
+                
+                report_lines.append("---\n\n")
         
         report_text = "".join(report_lines)
         st.download_button(
