@@ -758,21 +758,44 @@ def main():
             use_container_width=True
         )
     
+    # 清除结果按钮（如果有旧结果）
+    if st.session_state.analysis_result:
+        with col3:
+            if st.button("🗑️ 清除结果", use_container_width=True):
+                st.session_state.analysis_result = None
+                st.rerun()
+    
     # 验证配置并执行分析
     if analyze_btn:
         if not txt_file:
             st.warning("⚠️ 请上传聊天记录文件")
         elif not mapping_file:
             st.warning("⚠️ 请上传客服映射文件")
+        elif time_range.get('start_time') is None:
+            st.warning("⚠️ 请检查时间格式是否正确")
         else:
+            # 清除旧结果，防止显示过期数据
+            st.session_state.analysis_result = None
+            
             with st.spinner("正在分析中，请稍候..."):
-                result = run_analysis(config, txt_file, mapping_file, time_range)
-                if result:
-                    st.session_state.analysis_result = result
+                try:
+                    result = run_analysis(config, txt_file, mapping_file, time_range)
+                    if result:
+                        # 在结果中记录实际分析的时间范围
+                        result['analyzed_time_range'] = time_range
+                        st.session_state.analysis_result = result
+                        st.success(f"✅ 分析完成！时间范围: {time_range['start_time']} ~ {time_range['end_time']}")
+                except Exception as e:
+                    st.error(f"❌ 分析过程出错: {str(e)}")
+                    st.session_state.analysis_result = None
     
     # 显示结果
     if st.session_state.analysis_result:
         st.markdown("---")
+        # 显示分析的时间范围提示
+        analyzed_range = st.session_state.analysis_result.get('analyzed_time_range', {})
+        if analyzed_range:
+            st.caption(f"📅 以下是 **{analyzed_range.get('start_time', '')}** 至 **{analyzed_range.get('end_time', '')}** 的分析结果")
         render_result(st.session_state.analysis_result)
 
 
