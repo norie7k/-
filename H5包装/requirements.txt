@@ -1,0 +1,16 @@
+# 玩家社群发言分析 H5 Web 应用依赖
+
+# Web 框架
+streamlit>=1.28.0
+
+# 数据处理
+pandas>=2.0.0
+openpyxl>=3.1.0
+
+# HTTP 请求
+requests>=2.31.0
+
+# 其他工具
+python-docx>=0.8.11
+pathlib2>=2.3.7
+
