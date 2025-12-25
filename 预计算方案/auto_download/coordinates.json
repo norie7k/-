@@ -1,0 +1,152 @@
+{
+  "qq_icon": {
+    "x": 946,
+    "y": 1056,
+    "action": "click"
+  },
+  "qunliao_box": {
+    "x": 744,
+    "y": 301,
+    "action": "click"
+  },
+  "group1_entry": {
+    "x": 803,
+    "y": 422,
+    "action": "click"
+  },
+  "group1_right": {
+    "x": 803,
+    "y": 422,
+    "action": "right"
+  },
+  "group1_export": {
+    "x": 851,
+    "y": 461,
+    "action": "click"
+  },
+  "group1_pc": {
+    "x": 742,
+    "y": 563,
+    "action": "double"
+  },
+  "group1_disk_e": {
+    "x": 890,
+    "y": 609,
+    "action": "double"
+  },
+  "group1_scroll1": {
+    "x": 1222,
+    "y": 620,
+    "action": "click12"
+  },
+  "group1_project": {
+    "x": 915,
+    "y": 605,
+    "action": "double"
+  },
+  "group1_player": {
+    "x": 915,
+    "y": 541,
+    "action": "double"
+  },
+  "group1_scroll2": {
+    "x": 1223,
+    "y": 619,
+    "action": "click1"
+  },
+  "group1_yunying": {
+    "x": 981,
+    "y": 607,
+    "action": "double"
+  },
+  "group1_daily": {
+    "x": 995,
+    "y": 507,
+    "action": "double"
+  },
+  "group1_format": {
+    "x": 1114,
+    "y": 691,
+    "action": "click"
+  },
+  "group1_txt": {
+    "x": 1033,
+    "y": 734,
+    "action": "click"
+  },
+  "group1_save": {
+    "x": 1190,
+    "y": 670,
+    "action": "click"
+  },
+  "group2_entry": {
+    "x": 790,
+    "y": 460,
+    "action": "click"
+  },
+  "group2_right": {
+    "x": 792,
+    "y": 459,
+    "action": "right"
+  },
+  "group2_export": {
+    "x": 821,
+    "y": 484,
+    "action": "click"
+  },
+  "group2_pc": {
+    "x": 742,
+    "y": 562,
+    "action": "double"
+  },
+  "group2_disk_e": {
+    "x": 904,
+    "y": 598,
+    "action": "double"
+  },
+  "group2_scroll1": {
+    "x": 1223,
+    "y": 623,
+    "action": "click12"
+  },
+  "group2_project": {
+    "x": 982,
+    "y": 605,
+    "action": "double"
+  },
+  "group2_player": {
+    "x": 921,
+    "y": 546,
+    "action": "double"
+  },
+  "group2_scroll2": {
+    "x": 1222,
+    "y": 621,
+    "action": "click1"
+  },
+  "group2_yunying": {
+    "x": 964,
+    "y": 608,
+    "action": "double"
+  },
+  "group2_daily": {
+    "x": 980,
+    "y": 505,
+    "action": "double"
+  },
+  "group2_format": {
+    "x": 1118,
+    "y": 692,
+    "action": "click"
+  },
+  "group2_txt": {
+    "x": 1026,
+    "y": 731,
+    "action": "click"
+  },
+  "group2_save": {
+    "x": 1184,
+    "y": 663,
+    "action": "click"
+  }
+}

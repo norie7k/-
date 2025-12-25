@@ -1,0 +1,11 @@
+# 自动点击
+pyautogui>=0.9.54
+pygetwindow>=0.0.9
+keyboard>=0.13.5
+pyperclip>=1.8.2
+Pillow>=10.0.0
+
+# 自动执行 Jupyter Notebook
+papermill>=2.4.0
+nbformat>=5.9.0
+jupyter>=1.0.0
