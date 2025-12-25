@@ -139,6 +139,80 @@ STYLE_CSS = """
         background: linear-gradient(180deg, #1e293b, #0f172a);
     }
     
+    /* 侧边栏所有文字 - 强制浅色 */
+    section[data-testid="stSidebar"] {
+        color: #e2e8f0 !important;
+    }
+    
+    section[data-testid="stSidebar"] * {
+        color: #e2e8f0 !important;
+    }
+    
+    section[data-testid="stSidebar"] h1,
+    section[data-testid="stSidebar"] h2,
+    section[data-testid="stSidebar"] h3,
+    section[data-testid="stSidebar"] h4,
+    section[data-testid="stSidebar"] h5,
+    section[data-testid="stSidebar"] h6 {
+        color: #a5b4fc !important;
+    }
+    
+    section[data-testid="stSidebar"] p,
+    section[data-testid="stSidebar"] div,
+    section[data-testid="stSidebar"] span,
+    section[data-testid="stSidebar"] label {
+        color: #e2e8f0 !important;
+    }
+    
+    /* 侧边栏 Selectbox */
+    section[data-testid="stSidebar"] .stSelectbox label {
+        color: #e2e8f0 !important;
+    }
+    
+    section[data-testid="stSidebar"] .stSelectbox > div > div {
+        color: #e2e8f0 !important;
+    }
+    
+    section[data-testid="stSidebar"] .stSelectbox [data-baseweb="select"] {
+        color: #e2e8f0 !important;
+        background-color: #1e293b !important;
+    }
+    
+    /* 侧边栏 Date Input */
+    section[data-testid="stSidebar"] .stDateInput label {
+        color: #e2e8f0 !important;
+    }
+    
+    section[data-testid="stSidebar"] .stDateInput > div > div {
+        color: #e2e8f0 !important;
+    }
+    
+    section[data-testid="stSidebar"] .stDateInput input {
+        color: #e2e8f0 !important;
+        background-color: #1e293b !important;
+    }
+    
+    /* 侧边栏 Caption */
+    section[data-testid="stSidebar"] .stCaption {
+        color: #94a3b8 !important;
+    }
+    
+    /* 侧边栏 Success/Warning/Info */
+    section[data-testid="stSidebar"] .stSuccess,
+    section[data-testid="stSidebar"] .stWarning,
+    section[data-testid="stSidebar"] .stInfo {
+        color: #e2e8f0 !important;
+    }
+    
+    /* 侧边栏 Markdown */
+    section[data-testid="stSidebar"] .stMarkdown {
+        color: #e2e8f0 !important;
+    }
+    
+    section[data-testid="stSidebar"] .stMarkdown * {
+        color: #e2e8f0 !important;
+    }
+    
     /* 按钮样式 */
     .stButton > button {
         background: linear-gradient(90deg, #6366f1, #8b5cf6);
@@ -387,6 +461,67 @@ STYLE_CSS = """
     input, textarea, select {
         color: #e2e8f0 !important;
         background-color: #1e293b !important;
+    }
+    
+    /* Baseweb 组件（Streamlit 使用的 UI 库） */
+    [data-baseweb="select"] {
+        color: #e2e8f0 !important;
+        background-color: #1e293b !important;
+    }
+    
+    [data-baseweb="select"] * {
+        color: #e2e8f0 !important;
+    }
+    
+    [data-baseweb="input"] {
+        color: #e2e8f0 !important;
+        background-color: #1e293b !important;
+    }
+    
+    [data-baseweb="input"] input {
+        color: #e2e8f0 !important;
+        background-color: #1e293b !important;
+    }
+    
+    /* 下拉菜单选项 */
+    [role="listbox"] {
+        background-color: #1e293b !important;
+    }
+    
+    [role="option"] {
+        color: #e2e8f0 !important;
+        background-color: #1e293b !important;
+    }
+    
+    [role="option"]:hover {
+        background-color: #334155 !important;
+    }
+    
+    /* 日期选择器 */
+    [data-baseweb="calendar"] {
+        background-color: #1e293b !important;
+        color: #e2e8f0 !important;
+    }
+    
+    [data-baseweb="calendar"] * {
+        color: #e2e8f0 !important;
+    }
+    
+    /* 所有 Streamlit 输入组件 */
+    .stSelectbox,
+    .stDateInput,
+    .stTextInput,
+    .stNumberInput,
+    .stTextArea {
+        color: #e2e8f0 !important;
+    }
+    
+    .stSelectbox *,
+    .stDateInput *,
+    .stTextInput *,
+    .stNumberInput *,
+    .stTextArea * {
+        color: #e2e8f0 !important;
     }
 </style>
 """
