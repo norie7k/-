@@ -27,68 +27,144 @@ GROUPS = {
 
 STYLE_CSS = """
 <style>
-.stats-overview {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    padding: 2rem;
-    border-radius: 10px;
-    color: white;
-    margin-bottom: 2rem;
-}
-
-.stats-overview h2 {
-    color: white;
-    margin-bottom: 1.5rem;
-}
-
-.stat-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 1.5rem;
-}
-
-.stat-item {
-    background: rgba(255, 255, 255, 0.2);
-    padding: 1rem;
-    border-radius: 8px;
-    text-align: center;
-}
-
-.stat-value {
-    font-size: 2rem;
-    font-weight: bold;
-    margin-bottom: 0.5rem;
-}
-
-.stat-label {
-    font-size: 0.9rem;
-    opacity: 0.9;
-}
-
-.discussion-point {
-    background: #f0f2f6;
-    padding: 1rem;
-    border-left: 4px solid #667eea;
-    margin: 1rem 0;
-    border-radius: 4px;
-}
-
-.opinion-item {
-    background: #fff;
-    padding: 0.75rem;
-    margin: 0.5rem 0;
-    border-radius: 4px;
-    border-left: 3px solid #4CAF50;
-}
-
-.example-quote {
-    background: #e3f2fd;
-    padding: 0.75rem;
-    margin: 0.5rem 0;
-    border-radius: 4px;
-    border-left: 3px solid #2196F3;
-    font-style: italic;
-    color: #1976D2;
-}
+    /* 主题颜色 */
+    :root {
+        --primary-color: #6366f1;
+        --secondary-color: #8b5cf6;
+        --accent-color: #ec4899;
+        --bg-dark: #0f172a;
+        --bg-card: #1e293b;
+        --text-primary: #f1f5f9;
+        --text-secondary: #94a3b8;
+    }
+    
+    /* 全局背景 */
+    .stApp {
+        background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #312e81 100%);
+    }
+    
+    /* 标题样式 */
+    .main-title {
+        font-family: 'Orbitron', 'Noto Sans SC', sans-serif;
+        font-size: 2.5rem;
+        font-weight: 700;
+        background: linear-gradient(90deg, #818cf8, #c084fc, #f472b6);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        text-align: center;
+        margin-bottom: 0.5rem;
+        text-shadow: 0 0 30px rgba(129, 140, 248, 0.5);
+    }
+    
+    .sub-title {
+        font-family: 'Noto Sans SC', sans-serif;
+        font-size: 1.1rem;
+        color: #94a3b8;
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+    
+    /* 统计概览 */
+    .stats-overview {
+        background: linear-gradient(145deg, #1e293b, #334155);
+        border-radius: 16px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        border: 1px solid rgba(99, 102, 241, 0.3);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    }
+    
+    .stats-overview h2 {
+        font-size: 1.8rem;
+        font-weight: 600;
+        color: #a5b4fc;
+        margin-bottom: 1.5rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid rgba(165, 180, 252, 0.3);
+    }
+    
+    .stat-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1rem;
+    }
+    
+    .stat-item {
+        background: rgba(99, 102, 241, 0.1);
+        border-radius: 12px;
+        padding: 1rem;
+        text-align: center;
+    }
+    
+    .stat-value {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: #818cf8;
+        margin-bottom: 0.5rem;
+    }
+    
+    .stat-label {
+        font-size: 0.85rem;
+        color: #94a3b8;
+    }
+    
+    /* 讨论点样式 */
+    .discussion-point {
+        background: rgba(236, 72, 153, 0.1);
+        border-left: 4px solid #ec4899;
+        padding: 1rem;
+        margin: 0.8rem 0;
+        border-radius: 0 8px 8px 0;
+    }
+    
+    .opinion-item {
+        background: rgba(34, 211, 238, 0.08);
+        padding: 0.8rem;
+        margin: 0.5rem 0;
+        border-radius: 8px;
+        color: #e2e8f0;
+    }
+    
+    .example-quote {
+        font-style: italic;
+        color: #94a3b8;
+        padding: 0.5rem;
+        border-left: 3px solid #6366f1;
+        margin: 0.3rem 0;
+        background: rgba(99, 102, 241, 0.05);
+    }
+    
+    /* 侧边栏样式 */
+    .css-1d391kg {
+        background: linear-gradient(180deg, #1e293b, #0f172a);
+    }
+    
+    /* 按钮样式 */
+    .stButton > button {
+        background: linear-gradient(90deg, #6366f1, #8b5cf6);
+        color: white;
+        border: none;
+        border-radius: 12px;
+        padding: 0.75rem 2rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+    }
+    
+    .stButton > button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 25px rgba(99, 102, 241, 0.6);
+    }
+    
+    /* 卡片样式 */
+    .result-card {
+        background: linear-gradient(145deg, #1e293b, #334155);
+        border-radius: 16px;
+        padding: 1.5rem;
+        margin: 1rem 0;
+        border: 1px solid rgba(99, 102, 241, 0.3);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    }
 </style>
 """
 
@@ -322,23 +398,28 @@ def main():
         page_title="玩家社群分析",
         page_icon="🎮",
         layout="wide",
+        initial_sidebar_state="expanded"
     )
     
     # 注入 CSS 样式
     st.markdown(STYLE_CSS, unsafe_allow_html=True)
     
-    st.title("🎮 玩家社群分析系统")
-    st.markdown("查看每日群聊话题分析结果（从 GitHub 自动同步）")
+    # 标题（与 H5包装一致）
+    st.markdown("""
+    <div class="main-title">🎮 玩家社群分析系统</div>
+    <div class="sub-title">查看每日群聊话题分析结果（从 GitHub 自动同步）</div>
+    """, unsafe_allow_html=True)
     
     # 侧边栏：选择群和日期
     with st.sidebar:
         st.header("🔍 查询条件")
         
-        # 选择群
-        group_id = st.radio(
+        # 选择群（下拉菜单）
+        group_options = {k: GROUPS[k]["name"] for k in GROUPS.keys()}
+        selected_group_key = st.selectbox(
             "选择社群",
-            options=list(GROUPS.keys()),
-            format_func=lambda x: GROUPS[x]["name"],
+            options=list(group_options.keys()),
+            format_func=lambda x: group_options[x],
             index=0,
         )
         
@@ -346,19 +427,44 @@ def main():
         
         # 加载该群的可用日期
         with st.spinner("加载数据列表..."):
-            index = load_index(group_id)
+            index = load_index(selected_group_key)
             available_dates = index.get("available_dates", [])
         
         if available_dates:
             st.success(f"✅ 共有 {len(available_dates)} 天的数据")
             
-            # 选择日期
-            selected_date = st.selectbox(
-                "选择日期",
-                options=available_dates,
-                index=0,  # 默认最新
-                format_func=lambda x: f"{x} ({'最新' if x == available_dates[0] else ''})".strip(),
-            )
+            # 日期选择（日历组件）
+            # 将字符串日期转换为 date 对象
+            date_objects = []
+            for date_str in available_dates:
+                try:
+                    date_objects.append(datetime.strptime(date_str, "%Y-%m-%d").date())
+                except:
+                    pass
+            
+            if date_objects:
+                # 默认选择最新日期
+                default_date = date_objects[0]
+                min_date = min(date_objects)
+                max_date = max(date_objects)
+                
+                selected_date_obj = st.date_input(
+                    "选择日期",
+                    value=default_date,
+                    min_value=min_date,
+                    max_value=max_date,
+                    help="选择要查看的分析日期"
+                )
+                
+                # 转换为字符串格式
+                selected_date = selected_date_obj.strftime("%Y-%m-%d")
+                
+                # 检查选择的日期是否在可用列表中
+                if selected_date not in available_dates:
+                    st.warning(f"⚠️ {selected_date} 暂无数据，已自动选择最新日期")
+                    selected_date = available_dates[0]
+            else:
+                selected_date = None
         else:
             st.warning("⚠️ 暂无数据")
             selected_date = None
@@ -374,7 +480,7 @@ def main():
     # 主内容区
     if selected_date:
         with st.spinner(f"正在加载 {selected_date} 的数据..."):
-            result = load_result(group_id, selected_date)
+            result = load_result(selected_group_key, selected_date)
         
         if result:
             render_result(result)
