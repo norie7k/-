@@ -165,6 +165,91 @@ STYLE_CSS = """
         border: 1px solid rgba(99, 102, 241, 0.3);
         box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
     }
+    
+    /* 全局文字颜色 - 确保所有文字在深色背景上清晰可见 */
+    .stApp, .main, .block-container {
+        color: #f1f5f9 !important;
+    }
+    
+    /* 段落文字 */
+    p, div, span, label {
+        color: #e2e8f0 !important;
+    }
+    
+    /* 标题文字 */
+    h1, h2, h3, h4, h5, h6 {
+        color: #a5b4fc !important;
+    }
+    
+    /* Markdown 文字 */
+    .stMarkdown, .stMarkdown p, .stMarkdown div {
+        color: #e2e8f0 !important;
+    }
+    
+    /* Expander 内容 */
+    .streamlit-expanderHeader, .streamlit-expanderContent {
+        color: #e2e8f0 !important;
+    }
+    
+    .streamlit-expanderContent p, .streamlit-expanderContent div {
+        color: #e2e8f0 !important;
+    }
+    
+    /* Metric 文字 */
+    [data-testid="stMetricValue"], [data-testid="stMetricLabel"] {
+        color: #e2e8f0 !important;
+    }
+    
+    /* Caption 文字 */
+    .stCaption {
+        color: #94a3b8 !important;
+    }
+    
+    /* 侧边栏文字 */
+    .css-1d391kg, .css-1d391kg p, .css-1d391kg div, .css-1d391kg label {
+        color: #e2e8f0 !important;
+    }
+    
+    /* Selectbox 文字 */
+    .stSelectbox label, .stSelectbox div {
+        color: #e2e8f0 !important;
+    }
+    
+    /* Date input 文字 */
+    .stDateInput label, .stDateInput div {
+        color: #e2e8f0 !important;
+    }
+    
+    /* Info/Warning/Error 文字 */
+    .stInfo, .stWarning, .stError, .stSuccess {
+        color: #e2e8f0 !important;
+    }
+    
+    /* 讨论点标题文字 */
+    .discussion-point strong {
+        color: #f1f5f9 !important;
+        font-size: 1.1rem;
+    }
+    
+    /* 玩家观点文字 */
+    .opinion-item {
+        color: #e2e8f0 !important;
+    }
+    
+    /* 代表性发言文字 */
+    .example-quote {
+        color: #cbd5e1 !important;
+    }
+    
+    /* 统计标签文字 */
+    .stat-label {
+        color: #94a3b8 !important;
+    }
+    
+    /* 所有 Streamlit 默认文字 */
+    .element-container, .element-container p, .element-container div {
+        color: #e2e8f0 !important;
+    }
 </style>
 """
 
