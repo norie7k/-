@@ -33,31 +33,53 @@ def main():
     print("=" * 60)
     print()
     
+    # 0. 检查是否有未提交的更改
+    print("0. 检查 Git 状态...")
+    result = subprocess.run(
+        "git status --porcelain",
+        shell=True,
+        cwd=PROJECT_ROOT,
+        capture_output=True,
+        text=True,
+        encoding='utf-8',
+        errors='ignore'
+    )
+    
+    has_changes = bool(result.stdout.strip())
+    
     # 1. 添加文件
     files_to_add = [
         "预计算方案/app.py",
         "预计算方案/requirements.txt",
     ]
     
-    print("1. 添加文件到 Git...")
+    print("\n1. 添加文件到 Git...")
     for file in files_to_add:
         if Path(file).exists():
             run_cmd(f'git add "{file}"')
         else:
             print(f"⚠️ 文件不存在: {file}")
     
-    # 2. 提交
+    # 2. 提交（如果有更改）
     print("\n2. 提交更改...")
     commit_msg = "[更新] 优化侧边栏文字颜色，使用更精确的CSS选择器（div[data-baseweb]）"
-    run_cmd(f'git commit -m "{commit_msg}"')
+    commit_result = run_cmd(f'git commit -m "{commit_msg}"')
+    
+    if not commit_result and not has_changes:
+        print("ℹ️ 没有需要提交的更改")
     
     # 3. 先拉取远程更改（如果有）
     print("\n3. 拉取远程更改...")
-    pull_success = run_cmd("git pull --rebase")
+    pull_success = run_cmd("git pull --no-rebase")
     
     if not pull_success:
-        print("⚠️ 拉取时可能有冲突，请手动解决后重试")
-        print("   或者使用: git pull 然后解决冲突")
+        print("\n⚠️ 拉取失败，可能有冲突")
+        print("   请手动执行以下步骤：")
+        print("   1. git stash  # 暂存本地更改")
+        print("   2. git pull   # 拉取远程更改")
+        print("   3. git stash pop  # 恢复本地更改")
+        print("   4. 解决冲突后: git add . && git commit -m '解决冲突'")
+        print("   5. git push")
         return
     
     # 4. 推送
