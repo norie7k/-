@@ -490,5 +490,105 @@ def main():
 
     # 注入 CSS
     st.markdown(STYLE_CSS, unsafe_allow_html=True)
+    
+    # 标题（与 H5包装一致）
+    st.markdown("""
+    <div class="main-title">🎮 玩家社群分析系统</div>
+    <div class="sub-title">查看每日群聊话题分析结果（从 GitHub 自动同步）</div>
+    """, unsafe_allow_html=True)
+    
+    # 侧边栏：选择群和日期
+    with st.sidebar:
+        st.header("🔍 查询条件")
+        
+        # 选择群（下拉菜单）
+        group_options = {k: GROUPS[k]["name"] for k in GROUPS.keys()}
+        selected_group_key = st.selectbox(
+            "选择社群",
+            options=list(group_options.keys()),
+            format_func=lambda x: group_options[x],
+            index=0,
+        )
+        
+        st.markdown("---")
+        
+        # 加载该群的可用日期
+        with st.spinner("加载数据列表..."):
+            index = load_index(selected_group_key)
+            available_dates = index.get("available_dates", [])
+        
+        if available_dates:
+            st.success(f"✅ 共有 {len(available_dates)} 天的数据")
+            
+            # 日期选择（日历组件）
+            # 将字符串日期转换为 date 对象
+            date_objects = []
+            for date_str in available_dates:
+                try:
+                    date_objects.append(datetime.strptime(date_str, "%Y-%m-%d").date())
+                except:
+                    pass
+            
+            if date_objects:
+                # 默认选择最新日期
+                default_date = date_objects[0]
+                min_date = min(date_objects)
+                max_date = max(date_objects)
+                
+                selected_date_obj = st.date_input(
+                    "选择日期",
+                    value=default_date,
+                    min_value=min_date,
+                    max_value=max_date,
+                    help="选择要查看的分析日期"
+                )
+                
+                # 转换为字符串格式
+                selected_date = selected_date_obj.strftime("%Y-%m-%d")
+                
+                # 检查选择的日期是否在可用列表中
+                if selected_date not in available_dates:
+                    st.warning(f"⚠️ {selected_date} 暂无数据，已自动选择最新日期")
+                    selected_date = available_dates[0]
+            else:
+                selected_date = None
+        else:
+            st.warning("⚠️ 暂无数据")
+            selected_date = None
+        
+        st.markdown("---")
+        st.caption("💡 数据每日自动更新到 GitHub")
+        
+        # 刷新按钮
+        if st.button("🔄 刷新数据", use_container_width=True):
+            st.cache_data.clear()
+            st.rerun()
+    
+    # 主内容区
+    if selected_date:
+        with st.spinner(f"正在加载 {selected_date} 的数据..."):
+            result = load_result(selected_group_key, selected_date)
+        
+        if result:
+            render_result(result)
+        else:
+            st.error(f"❌ 无法加载 {selected_date} 的数据，请检查网络连接或稍后重试")
+    else:
+        st.info("👈 请在侧边栏选择社群和日期")
+        
+        # 显示可用数据概览
+        st.markdown("### 📊 数据概览")
+        
+        for gid, group in GROUPS.items():
+            with st.spinner(f"加载 {group['name']} 数据..."):
+                idx = load_index(gid)
+                dates = idx.get("available_dates", [])
+            
+            if dates:
+                st.markdown(f"**{group['name']}**: {len(dates)} 天 (最新: {dates[0]})")
+            else:
+                st.markdown(f"**{group['name']}**: 暂无数据")
 
-    # BUILD 角标：用于确认线上是否更新到这份
+
+if __name__ == "__main__":
+    main()
