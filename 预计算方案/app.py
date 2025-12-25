@@ -250,6 +250,144 @@ STYLE_CSS = """
     .element-container, .element-container p, .element-container div {
         color: #e2e8f0 !important;
     }
+    
+    /* 强制所有文字为浅色 - 最全面的规则 */
+    * {
+        color: #e2e8f0 !important;
+    }
+    
+    /* 但保留特定元素的颜色 */
+    .main-title {
+        background: linear-gradient(90deg, #818cf8, #c084fc, #f472b6);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent !important;
+    }
+    
+    .stat-value {
+        color: #818cf8 !important;
+    }
+    
+    .stat-label {
+        color: #94a3b8 !important;
+    }
+    
+    h1, h2, h3, h4, h5, h6 {
+        color: #a5b4fc !important;
+    }
+    
+    /* Streamlit Expander 标题和内容 */
+    .streamlit-expanderHeader {
+        color: #e2e8f0 !important;
+    }
+    
+    .streamlit-expanderContent {
+        color: #e2e8f0 !important;
+    }
+    
+    .streamlit-expanderContent * {
+        color: #e2e8f0 !important;
+    }
+    
+    /* Streamlit Metric 组件 */
+    [data-testid="stMetricValue"] {
+        color: #818cf8 !important;
+    }
+    
+    [data-testid="stMetricLabel"] {
+        color: #94a3b8 !important;
+    }
+    
+    [data-testid="stMetricDelta"] {
+        color: #e2e8f0 !important;
+    }
+    
+    /* Streamlit Selectbox */
+    .stSelectbox > div > div {
+        color: #e2e8f0 !important;
+    }
+    
+    .stSelectbox label {
+        color: #e2e8f0 !important;
+    }
+    
+    /* Streamlit Date Input */
+    .stDateInput > div > div {
+        color: #e2e8f0 !important;
+    }
+    
+    .stDateInput label {
+        color: #e2e8f0 !important;
+    }
+    
+    /* Streamlit Markdown 中的所有文字 */
+    .stMarkdown {
+        color: #e2e8f0 !important;
+    }
+    
+    .stMarkdown * {
+        color: #e2e8f0 !important;
+    }
+    
+    /* 讨论点内的所有文字 */
+    .discussion-point {
+        color: #f1f5f9 !important;
+    }
+    
+    .discussion-point * {
+        color: #f1f5f9 !important;
+    }
+    
+    /* 玩家观点内的所有文字 */
+    .opinion-item {
+        color: #e2e8f0 !important;
+    }
+    
+    .opinion-item * {
+        color: #e2e8f0 !important;
+    }
+    
+    /* 代表性发言内的所有文字 */
+    .example-quote {
+        color: #cbd5e1 !important;
+    }
+    
+    .example-quote * {
+        color: #cbd5e1 !important;
+    }
+    
+    /* 侧边栏所有文字 */
+    section[data-testid="stSidebar"] {
+        color: #e2e8f0 !important;
+    }
+    
+    section[data-testid="stSidebar"] * {
+        color: #e2e8f0 !important;
+    }
+    
+    /* 主内容区所有文字 */
+    section[data-testid="stMain"] {
+        color: #e2e8f0 !important;
+    }
+    
+    section[data-testid="stMain"] * {
+        color: #e2e8f0 !important;
+    }
+    
+    /* 按钮文字保持白色 */
+    .stButton > button {
+        color: white !important;
+    }
+    
+    /* 链接文字 */
+    a {
+        color: #818cf8 !important;
+    }
+    
+    /* 输入框文字 */
+    input, textarea, select {
+        color: #e2e8f0 !important;
+        background-color: #1e293b !important;
+    }
 </style>
 """
 
