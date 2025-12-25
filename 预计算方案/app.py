@@ -523,6 +523,160 @@ STYLE_CSS = """
     .stTextArea * {
         color: #e2e8f0 !important;
     }
+    
+    /* ========== 主内容区域强制文字颜色 ========== */
+    
+    /* Expander 标题和内容 */
+    .streamlit-expanderHeader {
+        color: #e2e8f0 !important;
+    }
+    
+    .streamlit-expanderHeader * {
+        color: #e2e8f0 !important;
+    }
+    
+    .streamlit-expanderContent {
+        color: #e2e8f0 !important;
+    }
+    
+    .streamlit-expanderContent * {
+        color: #e2e8f0 !important;
+    }
+    
+    /* Metric 组件 */
+    [data-testid="stMetricValue"] {
+        color: #818cf8 !important;
+        font-weight: 700 !important;
+    }
+    
+    [data-testid="stMetricLabel"] {
+        color: #94a3b8 !important;
+    }
+    
+    [data-testid="stMetricDelta"] {
+        color: #e2e8f0 !important;
+    }
+    
+    /* 统计卡片内的所有文字 */
+    .stats-overview {
+        color: #e2e8f0 !important;
+    }
+    
+    .stats-overview * {
+        color: #e2e8f0 !important;
+    }
+    
+    .stat-item {
+        color: #e2e8f0 !important;
+    }
+    
+    .stat-item * {
+        color: #e2e8f0 !important;
+    }
+    
+    /* 所有标题 */
+    h1, h2, h3, h4, h5, h6 {
+        color: #a5b4fc !important;
+    }
+    
+    /* 所有段落和列表 */
+    p, li, ul, ol {
+        color: #e2e8f0 !important;
+    }
+    
+    /* 所有 div 和 span */
+    div, span {
+        color: #e2e8f0 !important;
+    }
+    
+    /* 讨论点文字 - 确保清晰 */
+    .discussion-point {
+        color: #f1f5f9 !important;
+        background: rgba(236, 72, 153, 0.15) !important;
+    }
+    
+    .discussion-point * {
+        color: #f1f5f9 !important;
+    }
+    
+    .discussion-point strong {
+        color: #ffffff !important;
+        font-weight: 700 !important;
+    }
+    
+    /* 玩家观点文字 */
+    .opinion-item {
+        color: #e2e8f0 !important;
+        background: rgba(34, 211, 238, 0.12) !important;
+    }
+    
+    .opinion-item * {
+        color: #e2e8f0 !important;
+    }
+    
+    /* 代表性发言文字 */
+    .example-quote {
+        color: #cbd5e1 !important;
+        background: rgba(99, 102, 241, 0.1) !important;
+    }
+    
+    .example-quote * {
+        color: #cbd5e1 !important;
+    }
+    
+    /* 时间轴文字 */
+    [data-testid="stCaption"] {
+        color: #94a3b8 !important;
+    }
+    
+    /* 所有 markdown 内容 */
+    .stMarkdown {
+        color: #e2e8f0 !important;
+    }
+    
+    .stMarkdown p {
+        color: #e2e8f0 !important;
+    }
+    
+    .stMarkdown div {
+        color: #e2e8f0 !important;
+    }
+    
+    .stMarkdown strong {
+        color: #a5b4fc !important;
+    }
+    
+    .stMarkdown em {
+        color: #cbd5e1 !important;
+    }
+    
+    /* 列表项 */
+    .stMarkdown ul li,
+    .stMarkdown ol li {
+        color: #e2e8f0 !important;
+    }
+    
+    /* 最强制规则 - 覆盖所有可能的深色文字 */
+    .block-container * {
+        color: #e2e8f0 !important;
+    }
+    
+    /* 但保留特殊元素的颜色 */
+    .main-title {
+        -webkit-text-fill-color: transparent !important;
+    }
+    
+    .stat-value {
+        color: #818cf8 !important;
+    }
+    
+    h1, h2, h3, h4, h5, h6 {
+        color: #a5b4fc !important;
+    }
+    
+    [data-testid="stMetricValue"] {
+        color: #818cf8 !important;
+    }
 </style>
 """
 
