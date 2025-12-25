@@ -172,18 +172,41 @@ STYLE_CSS = """
         color: #e2e8f0 !important;
     }
     
-    section[data-testid="stSidebar"] .stSelectbox [data-baseweb="select"],
-    section[data-testid="stSidebar"] .stDateInput input {
-        color: #e2e8f0 !important;
-        background-color: #1e293b !important;
-    }
-    
-    section[data-testid="stSidebar"] .stSelectbox [data-baseweb="select"] > div {
+    /* 侧边栏输入框/下拉框：背景变深，文字清晰 */
+    section[data-testid="stSidebar"] [data-baseweb="select"] > div {
+        background: rgba(30, 41, 59, 0.92) !important;
+        border: 1px solid rgba(148, 163, 184, 0.22) !important;
+        border-radius: 12px !important;
         color: #e2e8f0 !important;
     }
     
-    section[data-testid="stSidebar"] .stDateInput [data-baseweb="input"] input {
+    section[data-testid="stSidebar"] [data-baseweb="select"] > div > div {
         color: #e2e8f0 !important;
+    }
+    
+    section[data-testid="stSidebar"] [data-baseweb="input"] {
+        background: rgba(30, 41, 59, 0.92) !important;
+        border: 1px solid rgba(148, 163, 184, 0.22) !important;
+        border-radius: 12px !important;
+    }
+    
+    section[data-testid="stSidebar"] [data-baseweb="input"] input {
+        color: #e2e8f0 !important;
+    }
+    
+    /* 下拉菜单弹层（options）- 全局样式，包括侧边栏 */
+    div[data-baseweb="menu"] {
+        background: rgba(15, 23, 42, 0.98) !important;
+        border: 1px solid rgba(148, 163, 184, 0.20) !important;
+        border-radius: 12px !important;
+    }
+    
+    div[data-baseweb="option"] {
+        color: #e2e8f0 !important;
+    }
+    
+    div[data-baseweb="option"]:hover {
+        background: rgba(99, 102, 241, 0.18) !important;
     }
     
     /* 侧边栏 Markdown */
@@ -249,19 +272,6 @@ STYLE_CSS = """
         color: #e2e8f0 !important;
     }
     
-    /* 下拉菜单选项文字 */
-    section[data-testid="stSidebar"] [role="listbox"] {
-        background-color: #1e293b !important;
-    }
-    
-    section[data-testid="stSidebar"] [role="option"] {
-        color: #e2e8f0 !important;
-        background-color: #1e293b !important;
-    }
-    
-    section[data-testid="stSidebar"] [role="option"]:hover {
-        background-color: #334155 !important;
-    }
     
     /* 按钮样式 */
     .stButton > button {
