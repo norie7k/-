@@ -146,6 +146,32 @@ div[data-baseweb="popover"] div[role="option"]:hover{
   background: rgba(99,102,241,.18) !important;
 }
 
+/* ===== 日期选择器：禁用不可用日期 ===== */
+/* 日历中不在可用日期范围内的日期会被 Streamlit 自动禁用（灰色显示） */
+section[data-testid="stSidebar"] input[type="date"]{
+  color: var(--text) !important;
+}
+/* 日历弹窗样式 */
+div[data-baseweb="popover"] table,
+div[data-baseweb="popover"] td,
+div[data-baseweb="popover"] th{
+  color: var(--text) !important;
+}
+/* 禁用的日期（灰色，不可点击） */
+div[data-baseweb="popover"] button[disabled],
+div[data-baseweb="popover"] button[aria-disabled="true"]{
+  opacity: 0.4 !important;
+  cursor: not-allowed !important;
+  pointer-events: none !important;
+}
+/* 可用的日期（正常显示，可点击） */
+div[data-baseweb="popover"] button:not([disabled]):not([aria-disabled="true"]){
+  cursor: pointer !important;
+}
+div[data-baseweb="popover"] button:not([disabled]):not([aria-disabled="true"]):hover{
+  background: rgba(99,102,241,.18) !important;
+}
+
 /* ===== 按钮 ===== */
 .stButton > button{
   background: linear-gradient(90deg, var(--primary), var(--secondary));
@@ -543,33 +569,74 @@ def main():
         if available_dates:
             st.success(f"✅ 共有 {len(available_dates)} 天的数据")
             
-            # 日期选择（下拉选择框，只显示已上传到数据库的日期）
-            # 按日期倒序排列（最新的在前）
-            sorted_dates = sorted(available_dates, reverse=True)
-            
-            # 格式化日期显示（例如：2026-01-01 -> 2026年1月1日）
-            def format_date_display(date_str: str) -> str:
+            # 日期选择（日历组件）
+            # 将字符串日期转换为 date 对象
+            date_objects = []
+            for date_str in available_dates:
                 try:
-                    dt = datetime.strptime(date_str, "%Y-%m-%d")
-                    return dt.strftime("%Y年%m月%d日")
+                    date_objects.append(datetime.strptime(date_str, "%Y-%m-%d").date())
                 except:
-                    return date_str
+                    pass
             
-            # 创建日期选项字典（显示格式 -> 实际值）
-            date_options = {format_date_display(d): d for d in sorted_dates}
-            
-            # 默认选择最新日期（第一个）
-            default_date_display = format_date_display(sorted_dates[0])
-            
-            selected_date_display = st.selectbox(
-                "选择日期",
-                options=list(date_options.keys()),
-                index=0,
-                help="只能选择已上传到数据库的日期"
-            )
-            
-            # 获取实际日期值
-            selected_date = date_options[selected_date_display]
+            if date_objects:
+                # 默认选择最新日期
+                sorted_date_objects = sorted(date_objects, reverse=True)
+                default_date = sorted_date_objects[0]
+                min_date = min(date_objects)
+                max_date = max(date_objects)
+                
+                # 扩展日期范围，确保年份选择器包含所有可用年份
+                # 将最小日期设置为该年的1月1日，最大日期设置为该年的12月31日
+                from datetime import date as date_type
+                min_year = min_date.year
+                max_year = max_date.year
+                extended_min_date = date_type(min_year, 1, 1)
+                extended_max_date = date_type(max_year, 12, 31)
+                
+                # 使用 session_state 来存储上次选择的日期，避免无效选择
+                if 'selected_date_cache' not in st.session_state:
+                    st.session_state.selected_date_cache = default_date.strftime("%Y-%m-%d")
+                
+                # 从缓存中恢复上次选择的日期（如果存在）
+                try:
+                    cached_date_obj = datetime.strptime(st.session_state.selected_date_cache, "%Y-%m-%d").date()
+                    if cached_date_obj in date_objects:
+                        initial_date = cached_date_obj
+                    else:
+                        initial_date = default_date
+                except:
+                    initial_date = default_date
+                
+                selected_date_obj = st.date_input(
+                    "选择日期",
+                    value=initial_date,
+                    min_value=extended_min_date,
+                    max_value=extended_max_date,
+                    help="只能选择已上传到数据库的日期（灰色日期不可选）"
+                )
+                
+                # 转换为字符串格式
+                selected_date = selected_date_obj.strftime("%Y-%m-%d")
+                
+                # 验证：检查选择的日期是否在可用列表中
+                if selected_date not in available_dates:
+                    # 如果选择的日期不在可用列表中，自动选择最近的可用日期
+                    # 找到最接近的可用日期
+                    selected_date_obj_timestamp = selected_date_obj.timestamp()
+                    closest_date = min(
+                        date_objects,
+                        key=lambda x: abs(x.timestamp() - selected_date_obj_timestamp)
+                    )
+                    selected_date = closest_date.strftime("%Y-%m-%d")
+                    st.warning(f"⚠️ 该日期暂无数据，已自动选择最近的可用日期：{selected_date}")
+                    # 更新缓存并重新运行以应用新日期
+                    st.session_state.selected_date_cache = selected_date
+                    st.rerun()
+                else:
+                    # 更新缓存
+                    st.session_state.selected_date_cache = selected_date
+            else:
+                selected_date = None
         else:
             st.warning("⚠️ 暂无数据")
             selected_date = None
