@@ -157,18 +157,22 @@ div[data-baseweb="popover"] td,
 div[data-baseweb="popover"] th{
   color: var(--text) !important;
 }
-/* 禁用的日期（灰色，不可点击） */
+/* 禁用的日期（灰色，不可点击）- 通过 JavaScript 添加的样式 */
 div[data-baseweb="popover"] button[disabled],
-div[data-baseweb="popover"] button[aria-disabled="true"]{
+div[data-baseweb="popover"] button[aria-disabled="true"],
+div[data-baseweb="popover"] button.date-disabled{
   opacity: 0.4 !important;
   cursor: not-allowed !important;
   pointer-events: none !important;
+  color: var(--muted) !important;
+  background: rgba(148,163,184,.1) !important;
 }
 /* 可用的日期（正常显示，可点击） */
-div[data-baseweb="popover"] button:not([disabled]):not([aria-disabled="true"]){
+div[data-baseweb="popover"] button:not([disabled]):not([aria-disabled="true"]):not(.date-disabled){
   cursor: pointer !important;
+  opacity: 1 !important;
 }
-div[data-baseweb="popover"] button:not([disabled]):not([aria-disabled="true"]):hover{
+div[data-baseweb="popover"] button:not([disabled]):not([aria-disabled="true"]):not(.date-disabled):hover{
   background: rgba(99,102,241,.18) !important;
 }
 
@@ -614,6 +618,131 @@ def main():
                     max_value=extended_max_date,
                     help="只能选择已上传到数据库的日期（灰色日期不可选）"
                 )
+                
+                # 注入 JavaScript 来禁用不在 available_dates 中的日期
+                # 将可用日期列表转换为 JavaScript 数组
+                available_dates_js = json.dumps(available_dates)
+                disable_dates_js = f"""
+                <script>
+                (function() {{
+                    const availableDates = {available_dates_js};
+                    
+                    function disableUnavailableDates() {{
+                        // 查找日历弹窗
+                        const popover = document.querySelector('div[data-baseweb="popover"]');
+                        if (!popover) return;
+                        
+                        // 查找日历表格
+                        const table = popover.querySelector('table');
+                        if (!table) return;
+                        
+                        // 获取当前显示的月份和年份
+                        let currentYear = null;
+                        let currentMonth = null;
+                        
+                        // 尝试从日历标题获取年月
+                        const monthYearSelectors = [
+                            'div[role="combobox"]',
+                            '[data-baseweb="select"]',
+                            'button[aria-label*="month"]',
+                            'button[aria-label*="year"]'
+                        ];
+                        
+                        for (const selector of monthYearSelectors) {{
+                            const element = popover.querySelector(selector);
+                            if (element) {{
+                                const text = element.textContent || element.getAttribute('aria-label') || '';
+                                // 尝试提取年份
+                                const yearMatch = text.match(/(\\d{{4}})/);
+                                if (yearMatch) {{
+                                    currentYear = parseInt(yearMatch[1]);
+                                }}
+                                // 尝试提取月份
+                                const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 
+                                                   'July', 'August', 'September', 'October', 'November', 'December'];
+                                for (let i = 0; i < monthNames.length; i++) {{
+                                    if (text.toLowerCase().includes(monthNames[i].toLowerCase())) {{
+                                        currentMonth = i;
+                                        break;
+                                    }}
+                                }}
+                            }}
+                        }}
+                        
+                        // 如果无法获取年月，使用当前日期
+                        if (currentYear === null || currentMonth === null) {{
+                            const now = new Date();
+                            currentYear = currentYear || now.getFullYear();
+                            currentMonth = currentMonth !== null ? currentMonth : now.getMonth();
+                        }}
+                        
+                        // 查找所有日期按钮（在表格的 tbody 中）
+                        const tbody = table.querySelector('tbody');
+                        if (!tbody) return;
+                        
+                        const dateButtons = tbody.querySelectorAll('button');
+                        dateButtons.forEach(button => {{
+                            const dayText = button.textContent.trim();
+                            const day = parseInt(dayText);
+                            
+                            // 跳过非数字内容（可能是月份导航按钮等）
+                            if (isNaN(day) || day < 1 || day > 31) return;
+                            
+                            // 构建日期字符串 YYYY-MM-DD
+                            const dateStr = `${{currentYear}}-${{String(currentMonth + 1).padStart(2, '0')}}-${{String(day).padStart(2, '0')}}`;
+                            
+                            // 检查日期是否在可用列表中
+                            if (!availableDates.includes(dateStr)) {{
+                                // 禁用该日期按钮
+                                button.disabled = true;
+                                button.setAttribute('aria-disabled', 'true');
+                                button.style.opacity = '0.4';
+                                button.style.cursor = 'not-allowed';
+                                button.style.pointerEvents = 'none';
+                                button.classList.add('date-disabled');
+                            }} else {{
+                                // 确保可用日期是可点击的
+                                button.disabled = false;
+                                button.removeAttribute('aria-disabled');
+                                button.style.opacity = '1';
+                                button.style.cursor = 'pointer';
+                                button.style.pointerEvents = 'auto';
+                            }}
+                        }});
+                    }}
+                    
+                    // 使用 MutationObserver 监听日历弹窗的出现和变化
+                    const observer = new MutationObserver(function(mutations) {{
+                        disableUnavailableDates();
+                    }});
+                    
+                    // 开始观察整个文档
+                    observer.observe(document.body, {{
+                        childList: true,
+                        subtree: true,
+                        attributes: true,
+                        attributeFilter: ['aria-expanded', 'aria-hidden']
+                    }});
+                    
+                    // 监听点击事件，当日期选择器打开时执行
+                    document.addEventListener('click', function(e) {{
+                        if (e.target.closest('[data-baseweb="popover"]') || 
+                            e.target.closest('input[type="date"]') ||
+                            e.target.closest('button[aria-label*="date"]')) {{
+                            setTimeout(disableUnavailableDates, 50);
+                            setTimeout(disableUnavailableDates, 200);
+                            setTimeout(disableUnavailableDates, 500);
+                        }}
+                    }}, true);
+                    
+                    // 立即执行几次（延迟执行以确保日历已渲染）
+                    setTimeout(disableUnavailableDates, 100);
+                    setTimeout(disableUnavailableDates, 500);
+                    setTimeout(disableUnavailableDates, 1000);
+                }})();
+                </script>
+                """
+                st.markdown(disable_dates_js, unsafe_allow_html=True)
                 
                 # 转换为字符串格式
                 selected_date = selected_date_obj.strftime("%Y-%m-%d")
