@@ -127,7 +127,11 @@
     }
   ]
 }
-
-    ]
-
+    ],
+  "summary": {
+    "total_clusters": 5,
+    "total_players": 104,
+    "total_messages": 468,
+    "top_cluster": "账号注册与登录问题"
+  }
 }
