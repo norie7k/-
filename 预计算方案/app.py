@@ -543,46 +543,33 @@ def main():
         if available_dates:
             st.success(f"✅ 共有 {len(available_dates)} 天的数据")
             
-            # 日期选择（日历组件）
-            # 将字符串日期转换为 date 对象
-            date_objects = []
-            for date_str in available_dates:
-                try:
-                    date_objects.append(datetime.strptime(date_str, "%Y-%m-%d").date())
-                except:
-                    pass
+            # 日期选择（下拉选择框，只显示已上传到数据库的日期）
+            # 按日期倒序排列（最新的在前）
+            sorted_dates = sorted(available_dates, reverse=True)
             
-            if date_objects:
-                # 默认选择最新日期
-                default_date = date_objects[0]
-                min_date = min(date_objects)
-                max_date = max(date_objects)
-                
-                # 扩展日期范围，确保年份选择器包含所有可用年份
-                # 将最小日期设置为该年的1月1日，最大日期设置为该年的12月31日
-                from datetime import date as date_type
-                min_year = min_date.year
-                max_year = max_date.year
-                extended_min_date = date_type(min_year, 1, 1)
-                extended_max_date = date_type(max_year, 12, 31)
-                
-                selected_date_obj = st.date_input(
-                    "选择日期",
-                    value=default_date,
-                    min_value=extended_min_date,
-                    max_value=extended_max_date,
-                    help="选择要查看的分析日期（年份下拉菜单可直接选择）"
-                )
-                
-                # 转换为字符串格式
-                selected_date = selected_date_obj.strftime("%Y-%m-%d")
-                
-                # 检查选择的日期是否在可用列表中
-                if selected_date not in available_dates:
-                    st.warning(f"⚠️ {selected_date} 暂无数据，已自动选择最新日期")
-                    selected_date = available_dates[0]
-            else:
-                selected_date = None
+            # 格式化日期显示（例如：2026-01-01 -> 2026年1月1日）
+            def format_date_display(date_str: str) -> str:
+                try:
+                    dt = datetime.strptime(date_str, "%Y-%m-%d")
+                    return dt.strftime("%Y年%m月%d日")
+                except:
+                    return date_str
+            
+            # 创建日期选项字典（显示格式 -> 实际值）
+            date_options = {format_date_display(d): d for d in sorted_dates}
+            
+            # 默认选择最新日期（第一个）
+            default_date_display = format_date_display(sorted_dates[0])
+            
+            selected_date_display = st.selectbox(
+                "选择日期",
+                options=list(date_options.keys()),
+                index=0,
+                help="只能选择已上传到数据库的日期"
+            )
+            
+            # 获取实际日期值
+            selected_date = date_options[selected_date_display]
         else:
             st.warning("⚠️ 暂无数据")
             selected_date = None
