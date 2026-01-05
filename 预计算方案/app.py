@@ -589,8 +589,9 @@ def main():
                 min_date = min(date_objects)
                 max_date = max(date_objects)
                 
-                # 扩展日期范围，确保年份选择器包含所有可用年份
-                # 将最小日期设置为该年的1月1日，最大日期设置为该年的12月31日
+                # 设置日期范围为实际可用日期的范围（而不是整年）
+                # 这样 Streamlit 会自动禁用范围外的日期
+                # 但范围内的不可用日期需要通过 JavaScript 禁用
                 from datetime import date as date_type
                 min_year = min_date.year
                 max_year = max_date.year
@@ -626,61 +627,90 @@ def main():
                 <script>
                 (function() {{
                     const availableDates = {available_dates_js};
+                    console.log('可用日期列表:', availableDates);
                     
                     function disableUnavailableDates() {{
                         // 查找日历弹窗
                         const popover = document.querySelector('div[data-baseweb="popover"]');
-                        if (!popover) return;
+                        if (!popover) {{
+                            console.log('未找到日历弹窗');
+                            return;
+                        }}
                         
                         // 查找日历表格
                         const table = popover.querySelector('table');
-                        if (!table) return;
+                        if (!table) {{
+                            console.log('未找到日历表格');
+                            return;
+                        }}
                         
-                        // 获取当前显示的月份和年份
+                        // 获取当前显示的月份和年份 - 使用更可靠的方法
                         let currentYear = null;
                         let currentMonth = null;
                         
-                        // 尝试从日历标题获取年月
-                        const monthYearSelectors = [
-                            'div[role="combobox"]',
-                            '[data-baseweb="select"]',
-                            'button[aria-label*="month"]',
-                            'button[aria-label*="year"]'
-                        ];
+                        // 方法1: 从日历标题按钮获取
+                        const headerButtons = popover.querySelectorAll('button[role="combobox"]');
+                        headerButtons.forEach(btn => {{
+                            const text = (btn.textContent || btn.getAttribute('aria-label') || '').trim();
+                            console.log('日历标题按钮文本:', text);
+                            
+                            // 提取年份
+                            const yearMatch = text.match(/(\\d{{4}})/);
+                            if (yearMatch) {{
+                                currentYear = parseInt(yearMatch[1]);
+                                console.log('找到年份:', currentYear);
+                            }}
+                            
+                            // 提取月份
+                            const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 
+                                               'July', 'August', 'September', 'October', 'November', 'December'];
+                            const monthNamesCN = ['一月', '二月', '三月', '四月', '五月', '六月',
+                                                 '七月', '八月', '九月', '十月', '十一月', '十二月'];
+                            
+                            for (let i = 0; i < monthNames.length; i++) {{
+                                if (text.toLowerCase().includes(monthNames[i].toLowerCase()) ||
+                                    text.includes(monthNamesCN[i])) {{
+                                    currentMonth = i;
+                                    console.log('找到月份:', monthNames[i], i);
+                                    break;
+                                }}
+                            }}
+                        }});
                         
-                        for (const selector of monthYearSelectors) {{
-                            const element = popover.querySelector(selector);
-                            if (element) {{
-                                const text = element.textContent || element.getAttribute('aria-label') || '';
-                                // 尝试提取年份
-                                const yearMatch = text.match(/(\\d{{4}})/);
-                                if (yearMatch) {{
-                                    currentYear = parseInt(yearMatch[1]);
-                                }}
-                                // 尝试提取月份
-                                const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 
-                                                   'July', 'August', 'September', 'October', 'November', 'December'];
-                                for (let i = 0; i < monthNames.length; i++) {{
-                                    if (text.toLowerCase().includes(monthNames[i].toLowerCase())) {{
-                                        currentMonth = i;
-                                        break;
-                                    }}
-                                }}
+                        // 方法2: 如果还没找到，从输入框的值获取
+                        if (currentYear === null || currentMonth === null) {{
+                            const dateInput = document.querySelector('input[type="date"]');
+                            if (dateInput && dateInput.value) {{
+                                const inputDate = new Date(dateInput.value);
+                                currentYear = currentYear || inputDate.getFullYear();
+                                currentMonth = currentMonth !== null ? currentMonth : inputDate.getMonth();
+                                console.log('从输入框获取:', currentYear, currentMonth);
                             }}
                         }}
                         
-                        // 如果无法获取年月，使用当前日期
+                        // 方法3: 如果还是没找到，使用当前日期
                         if (currentYear === null || currentMonth === null) {{
                             const now = new Date();
                             currentYear = currentYear || now.getFullYear();
                             currentMonth = currentMonth !== null ? currentMonth : now.getMonth();
+                            console.log('使用当前日期:', currentYear, currentMonth);
                         }}
+                        
+                        console.log('最终年月:', currentYear, currentMonth);
                         
                         // 查找所有日期按钮（在表格的 tbody 中）
                         const tbody = table.querySelector('tbody');
-                        if (!tbody) return;
+                        if (!tbody) {{
+                            console.log('未找到 tbody');
+                            return;
+                        }}
                         
                         const dateButtons = tbody.querySelectorAll('button');
+                        console.log('找到日期按钮数量:', dateButtons.length);
+                        
+                        let disabledCount = 0;
+                        let enabledCount = 0;
+                        
                         dateButtons.forEach(button => {{
                             const dayText = button.textContent.trim();
                             const day = parseInt(dayText);
@@ -700,6 +730,7 @@ def main():
                                 button.style.cursor = 'not-allowed';
                                 button.style.pointerEvents = 'none';
                                 button.classList.add('date-disabled');
+                                disabledCount++;
                             }} else {{
                                 // 确保可用日期是可点击的
                                 button.disabled = false;
@@ -707,13 +738,20 @@ def main():
                                 button.style.opacity = '1';
                                 button.style.cursor = 'pointer';
                                 button.style.pointerEvents = 'auto';
+                                button.classList.remove('date-disabled');
+                                enabledCount++;
                             }}
                         }});
+                        
+                        console.log(`已禁用 ${{disabledCount}} 个日期，启用 ${{enabledCount}} 个日期`);
                     }}
                     
                     // 使用 MutationObserver 监听日历弹窗的出现和变化
                     const observer = new MutationObserver(function(mutations) {{
-                        disableUnavailableDates();
+                        const hasPopover = document.querySelector('div[data-baseweb="popover"]');
+                        if (hasPopover) {{
+                            disableUnavailableDates();
+                        }}
                     }});
                     
                     // 开始观察整个文档
@@ -721,17 +759,27 @@ def main():
                         childList: true,
                         subtree: true,
                         attributes: true,
-                        attributeFilter: ['aria-expanded', 'aria-hidden']
+                        attributeFilter: ['aria-expanded', 'aria-hidden', 'style']
                     }});
                     
                     // 监听点击事件，当日期选择器打开时执行
                     document.addEventListener('click', function(e) {{
-                        if (e.target.closest('[data-baseweb="popover"]') || 
-                            e.target.closest('input[type="date"]') ||
-                            e.target.closest('button[aria-label*="date"]')) {{
+                        const target = e.target;
+                        if (target.closest('[data-baseweb="popover"]') || 
+                            target.closest('input[type="date"]') ||
+                            target.closest('button[aria-label*="date"]') ||
+                            target.closest('button[role="combobox"]')) {{
                             setTimeout(disableUnavailableDates, 50);
                             setTimeout(disableUnavailableDates, 200);
                             setTimeout(disableUnavailableDates, 500);
+                        }}
+                    }}, true);
+                    
+                    // 监听输入框焦点事件
+                    document.addEventListener('focusin', function(e) {{
+                        if (e.target.tagName === 'INPUT' && e.target.type === 'date') {{
+                            setTimeout(disableUnavailableDates, 100);
+                            setTimeout(disableUnavailableDates, 300);
                         }}
                     }}, true);
                     
@@ -739,6 +787,7 @@ def main():
                     setTimeout(disableUnavailableDates, 100);
                     setTimeout(disableUnavailableDates, 500);
                     setTimeout(disableUnavailableDates, 1000);
+                    setTimeout(disableUnavailableDates, 2000);
                 }})();
                 </script>
                 """
@@ -750,11 +799,12 @@ def main():
                 # 验证：检查选择的日期是否在可用列表中
                 if selected_date not in available_dates:
                     # 如果选择的日期不在可用列表中，自动选择最近的可用日期
-                    # 找到最接近的可用日期
-                    selected_date_obj_timestamp = selected_date_obj.timestamp()
+                    # 找到最接近的可用日期（使用日期差值比较）
+                    from datetime import timedelta
+                    selected_date_obj_dt = datetime.combine(selected_date_obj, datetime.min.time())
                     closest_date = min(
                         date_objects,
-                        key=lambda x: abs(x.timestamp() - selected_date_obj_timestamp)
+                        key=lambda x: abs((datetime.combine(x, datetime.min.time()) - selected_date_obj_dt).days)
                     )
                     selected_date = closest_date.strftime("%Y-%m-%d")
                     st.warning(f"⚠️ 该日期暂无数据，已自动选择最近的可用日期：{selected_date}")
