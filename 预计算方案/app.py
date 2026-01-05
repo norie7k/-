@@ -123,6 +123,29 @@ div[data-baseweb="option"]:hover{
   background: rgba(99,102,241,.18) !important;
 }
 
+/* ===== 日期选择器年份下拉菜单优化 ===== */
+/* 确保年份选择器可以正常显示和选择 */
+section[data-testid="stSidebar"] div[data-baseweb="select"] select,
+section[data-testid="stSidebar"] div[role="combobox"] input{
+  color: var(--text) !important;
+}
+/* 日期选择器的年份下拉菜单 */
+div[data-baseweb="popover"]{
+  background: rgba(15,23,42,.98) !important;
+  border: 1px solid rgba(148,163,184,.20) !important;
+  border-radius: 12px !important;
+  z-index: 9999 !important;
+}
+/* 确保年份选择下拉菜单可见且可点击 */
+div[data-baseweb="popover"] div[role="listbox"],
+div[data-baseweb="popover"] div[role="option"]{
+  color: var(--text) !important;
+  background: rgba(15,23,42,.98) !important;
+}
+div[data-baseweb="popover"] div[role="option"]:hover{
+  background: rgba(99,102,241,.18) !important;
+}
+
 /* ===== 按钮 ===== */
 .stButton > button{
   background: linear-gradient(90deg, var(--primary), var(--secondary));
@@ -262,7 +285,7 @@ def fetch_json(url: str) -> dict | None:
 
 # ==================== 数据加载 ====================
 
-@st.cache_data(ttl=300)
+@st.cache_data(ttl=300, show_spinner=False)
 def load_index(group_id: str) -> dict:
     group = GROUPS.get(group_id)
     if not group:
@@ -284,7 +307,7 @@ def load_index(group_id: str) -> dict:
         return {}
 
 
-@st.cache_data(ttl=300)
+@st.cache_data(ttl=300, show_spinner=False)
 def load_result(group_id: str, date: str) -> dict:
     group = GROUPS.get(group_id)
     if not group:
@@ -535,12 +558,20 @@ def main():
                 min_date = min(date_objects)
                 max_date = max(date_objects)
                 
+                # 扩展日期范围，确保年份选择器包含所有可用年份
+                # 将最小日期设置为该年的1月1日，最大日期设置为该年的12月31日
+                from datetime import date as date_type
+                min_year = min_date.year
+                max_year = max_date.year
+                extended_min_date = date_type(min_year, 1, 1)
+                extended_max_date = date_type(max_year, 12, 31)
+                
                 selected_date_obj = st.date_input(
                     "选择日期",
                     value=default_date,
-                    min_value=min_date,
-                    max_value=max_date,
-                    help="选择要查看的分析日期"
+                    min_value=extended_min_date,
+                    max_value=extended_max_date,
+                    help="选择要查看的分析日期（年份下拉菜单可直接选择）"
                 )
                 
                 # 转换为字符串格式
@@ -561,7 +592,10 @@ def main():
         
         # 刷新按钮
         if st.button("🔄 刷新数据", use_container_width=True):
+            # 清除所有缓存
             st.cache_data.clear()
+            # 更新 nonce 强制刷新
+            _set_nonce()
             st.rerun()
     
     # 主内容区
