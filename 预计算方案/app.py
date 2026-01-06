@@ -673,7 +673,7 @@ def main():
                             f'<div style="padding: 1rem; background-color: rgba(255, 193, 7, 0.1); '
                             f'border-left: 4px solid #ffc107; border-radius: 4px; margin: 1rem 0;">'
                             f'<p style="margin: 0; font-size: 1.2rem; font-weight: 600; color: #ffc107;">'
-                            f'⚠️ {formatted_invalid_date}暂无数据，已自动选择最近的可用日期：{formatted_valid_date}</p></div>',
+                            f'⚠️ {formatted_invalid_date}暂无数据，推荐选择最近的可用日期：{formatted_valid_date}</p></div>',
                             unsafe_allow_html=True
                         )
                     st.session_state.need_date_correction = False
@@ -992,7 +992,7 @@ def main():
         if result:
             render_result(result)
         else:
-            st.error(f"❌ 无法加载 {selected_date} 的数据，请检查网络连接或稍后重试")
+            st.error(f"❌  {selected_date} 的数据待上传")
     else:
         st.info("👈 请在侧边栏选择社群和日期")
         
