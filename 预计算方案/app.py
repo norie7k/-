@@ -166,6 +166,15 @@ div[data-baseweb="popover"] button.date-disabled{
   pointer-events: none !important;
   color: var(--muted) !important;
   background: rgba(148,163,184,.1) !important;
+  user-select: none !important;
+}
+/* 禁用日期的禁止符号样式 */
+div[data-baseweb="popover"] button.date-disabled .date-disabled-icon {
+  display: inline-block !important;
+  font-size: 10px !important;
+  margin-left: 2px !important;
+  vertical-align: middle !important;
+  opacity: 0.8 !important;
 }
 /* 可用的日期（正常显示，可点击） */
 div[data-baseweb="popover"] button:not([disabled]):not([aria-disabled="true"]):not(.date-disabled){
@@ -612,12 +621,41 @@ def main():
                 except:
                     initial_date = default_date
                 
+                # 定义日期变化回调函数，快速验证并响应
+                def on_date_change():
+                    # 从 session_state 获取当前选择的日期对象
+                    selected_date_obj_check = st.session_state.get('selected_date_input', initial_date)
+                    if isinstance(selected_date_obj_check, str):
+                        try:
+                            selected_date_obj_check = datetime.strptime(selected_date_obj_check, "%Y-%m-%d").date()
+                        except:
+                            selected_date_obj_check = initial_date
+                    
+                    selected_date_str_check = selected_date_obj_check.strftime("%Y-%m-%d")
+                    
+                    if selected_date_str_check not in available_dates:
+                        # 快速找到最近的可用日期
+                        selected_date_obj_dt = datetime.combine(selected_date_obj_check, datetime.min.time())
+                        closest_date = min(
+                            date_objects,
+                            key=lambda x: abs((datetime.combine(x, datetime.min.time()) - selected_date_obj_dt).days)
+                        )
+                        closest_date_str = closest_date.strftime("%Y-%m-%d")
+                        st.session_state.selected_date_cache = closest_date_str
+                        st.session_state.selected_date_input = closest_date
+                        st.warning(f"⚠️ 该日期暂无数据，已自动选择最近的可用日期：{closest_date_str}")
+                        st.rerun()
+                    else:
+                        st.session_state.selected_date_cache = selected_date_str_check
+                
                 selected_date_obj = st.date_input(
                     "选择日期",
                     value=initial_date,
                     min_value=extended_min_date,
                     max_value=extended_max_date,
-                    help="只能选择已上传到数据库的日期（灰色日期不可选）"
+                    help="只能选择已上传到数据库的日期（带禁止符号的日期不可选）",
+                    key='selected_date_input',
+                    on_change=on_date_change
                 )
                 
                 # 注入 JavaScript 来禁用不在 available_dates 中的日期
@@ -730,6 +768,29 @@ def main():
                                 button.style.cursor = 'not-allowed';
                                 button.style.pointerEvents = 'none';
                                 button.classList.add('date-disabled');
+                                
+                                // 添加禁止符号（如果还没有）
+                                if (!button.querySelector('.date-disabled-icon')) {{
+                                    const icon = document.createElement('span');
+                                    icon.className = 'date-disabled-icon';
+                                    icon.textContent = '🚫';
+                                    icon.style.cssText = 'font-size: 10px; margin-left: 2px; vertical-align: middle;';
+                                    // 保存原始文本，以便恢复
+                                    if (!button.dataset.originalText) {{
+                                        button.dataset.originalText = dayText;
+                                    }}
+                                    // 在日期数字后添加禁止符号
+                                    button.innerHTML = button.dataset.originalText + ' ' + icon.outerHTML;
+                                }}
+                                
+                                // 阻止点击事件
+                                button.addEventListener('click', function(e) {{
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    e.stopImmediatePropagation();
+                                    return false;
+                                }}, true);
+                                
                                 disabledCount++;
                             }} else {{
                                 // 确保可用日期是可点击的
@@ -739,6 +800,18 @@ def main():
                                 button.style.cursor = 'pointer';
                                 button.style.pointerEvents = 'auto';
                                 button.classList.remove('date-disabled');
+                                
+                                // 移除禁止符号（如果存在）
+                                const icon = button.querySelector('.date-disabled-icon');
+                                if (icon) {{
+                                    icon.remove();
+                                    // 恢复原始文本
+                                    if (button.dataset.originalText) {{
+                                        button.textContent = button.dataset.originalText;
+                                        delete button.dataset.originalText;
+                                    }}
+                                }}
+                                
                                 enabledCount++;
                             }}
                         }});
@@ -773,6 +846,26 @@ def main():
                             setTimeout(disableUnavailableDates, 200);
                             setTimeout(disableUnavailableDates, 500);
                         }}
+                        
+                        // 拦截不可用日期的点击
+                        if (target.classList.contains('date-disabled') || 
+                            target.closest('.date-disabled')) {{
+                            e.preventDefault();
+                            e.stopPropagation();
+                            e.stopImmediatePropagation();
+                            return false;
+                        }}
+                    }}, true);
+                    
+                    // 额外的事件拦截器：在捕获阶段阻止不可用日期的点击
+                    document.addEventListener('mousedown', function(e) {{
+                        const target = e.target;
+                        if (target.classList.contains('date-disabled') || 
+                            target.closest('.date-disabled')) {{
+                            e.preventDefault();
+                            e.stopPropagation();
+                            return false;
+                        }}
                     }}, true);
                     
                     // 监听输入框焦点事件
@@ -794,25 +887,11 @@ def main():
                 st.markdown(disable_dates_js, unsafe_allow_html=True)
                 
                 # 转换为字符串格式
+                # 注意：日期验证已在 on_change 回调中处理，这里只需要确保缓存是最新的
                 selected_date = selected_date_obj.strftime("%Y-%m-%d")
                 
-                # 验证：检查选择的日期是否在可用列表中
-                if selected_date not in available_dates:
-                    # 如果选择的日期不在可用列表中，自动选择最近的可用日期
-                    # 找到最接近的可用日期（使用日期差值比较）
-                    from datetime import timedelta
-                    selected_date_obj_dt = datetime.combine(selected_date_obj, datetime.min.time())
-                    closest_date = min(
-                        date_objects,
-                        key=lambda x: abs((datetime.combine(x, datetime.min.time()) - selected_date_obj_dt).days)
-                    )
-                    selected_date = closest_date.strftime("%Y-%m-%d")
-                    st.warning(f"⚠️ 该日期暂无数据，已自动选择最近的可用日期：{selected_date}")
-                    # 更新缓存并重新运行以应用新日期
-                    st.session_state.selected_date_cache = selected_date
-                    st.rerun()
-                else:
-                    # 更新缓存
+                # 确保缓存是最新的（on_change 回调已经处理了验证和警告）
+                if selected_date in available_dates:
                     st.session_state.selected_date_cache = selected_date
             else:
                 selected_date = None
