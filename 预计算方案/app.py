@@ -643,7 +643,15 @@ def main():
                         closest_date_str = closest_date.strftime("%Y-%m-%d")
                         st.session_state.selected_date_cache = closest_date_str
                         st.session_state.selected_date_input = closest_date
-                        st.warning(f"⚠️ 该日期暂无数据，已自动选择最近的可用日期：{closest_date_str}")
+                        # 格式化日期显示（中文格式）
+                        formatted_date = selected_date_obj_check.strftime("%Y年%m月%d日")
+                        st.markdown(
+                            f'<div style="padding: 1rem; background-color: rgba(255, 193, 7, 0.1); '
+                            f'border-left: 4px solid #ffc107; border-radius: 4px; margin: 1rem 0;">'
+                            f'<p style="margin: 0; font-size: 1.2rem; font-weight: 600; color: #ffc107;">'
+                            f'⚠️ {formatted_date}暂无数据</p></div>',
+                            unsafe_allow_html=True
+                        )
                         st.rerun()
                     else:
                         st.session_state.selected_date_cache = selected_date_str_check
@@ -750,7 +758,16 @@ def main():
                         let enabledCount = 0;
                         
                         dateButtons.forEach(button => {{
-                            const dayText = button.textContent.trim();
+                            // 获取按钮的原始文本（去除可能已添加的禁止符号）
+                            let dayText = button.textContent.trim();
+                            // 移除可能存在的禁止符号和空格
+                            dayText = dayText.replace(/🚫/g, '').replace(/\s+/g, '').trim();
+                            
+                            // 如果按钮有保存的原始文本，使用它
+                            if (button.dataset.originalText) {{
+                                dayText = button.dataset.originalText;
+                            }}
+                            
                             const day = parseInt(dayText);
                             
                             // 跳过非数字内容（可能是月份导航按钮等）
@@ -761,30 +778,54 @@ def main():
                             
                             // 检查日期是否在可用列表中
                             if (!availableDates.includes(dateStr)) {{
+                                // 保存原始文本（如果还没有）
+                                if (!button.dataset.originalText) {{
+                                    button.dataset.originalText = dayText;
+                                }}
+                                
                                 // 禁用该日期按钮
                                 button.disabled = true;
                                 button.setAttribute('aria-disabled', 'true');
                                 button.style.opacity = '0.4';
                                 button.style.cursor = 'not-allowed';
                                 button.style.pointerEvents = 'none';
+                                button.style.userSelect = 'none';
                                 button.classList.add('date-disabled');
                                 
-                                // 添加禁止符号（如果还没有）
-                                if (!button.querySelector('.date-disabled-icon')) {{
-                                    const icon = document.createElement('span');
-                                    icon.className = 'date-disabled-icon';
-                                    icon.textContent = '🚫';
-                                    icon.style.cssText = 'font-size: 10px; margin-left: 2px; vertical-align: middle;';
-                                    // 保存原始文本，以便恢复
-                                    if (!button.dataset.originalText) {{
-                                        button.dataset.originalText = dayText;
-                                    }}
-                                    // 在日期数字后添加禁止符号
-                                    button.innerHTML = button.dataset.originalText + ' ' + icon.outerHTML;
+                                // 添加禁止符号（强制更新）
+                                const existingIcon = button.querySelector('.date-disabled-icon');
+                                if (existingIcon) {{
+                                    existingIcon.remove();
                                 }}
+                                const icon = document.createElement('span');
+                                icon.className = 'date-disabled-icon';
+                                icon.textContent = '🚫';
+                                icon.style.cssText = 'font-size: 12px; margin-left: 3px; vertical-align: middle; display: inline-block;';
+                                // 在日期数字后添加禁止符号
+                                button.innerHTML = button.dataset.originalText + ' ' + icon.outerHTML;
                                 
-                                // 阻止点击事件
-                                button.addEventListener('click', function(e) {{
+                                // 移除所有现有的事件监听器（通过克隆并替换）
+                                const oldButton = button;
+                                const newButton = oldButton.cloneNode(true);
+                                oldButton.parentNode.replaceChild(newButton, oldButton);
+                                
+                                // 添加阻止点击事件（使用捕获阶段，优先级最高）
+                                newButton.addEventListener('click', function(e) {{
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    e.stopImmediatePropagation();
+                                    console.log('阻止点击不可用日期:', dateStr);
+                                    return false;
+                                }}, true);
+                                
+                                newButton.addEventListener('mousedown', function(e) {{
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    e.stopImmediatePropagation();
+                                    return false;
+                                }}, true);
+                                
+                                newButton.addEventListener('mouseup', function(e) {{
                                     e.preventDefault();
                                     e.stopPropagation();
                                     e.stopImmediatePropagation();
@@ -799,17 +840,18 @@ def main():
                                 button.style.opacity = '1';
                                 button.style.cursor = 'pointer';
                                 button.style.pointerEvents = 'auto';
+                                button.style.userSelect = 'auto';
                                 button.classList.remove('date-disabled');
                                 
                                 // 移除禁止符号（如果存在）
                                 const icon = button.querySelector('.date-disabled-icon');
                                 if (icon) {{
                                     icon.remove();
-                                    // 恢复原始文本
-                                    if (button.dataset.originalText) {{
-                                        button.textContent = button.dataset.originalText;
-                                        delete button.dataset.originalText;
-                                    }}
+                                }}
+                                // 恢复原始文本
+                                if (button.dataset.originalText) {{
+                                    button.textContent = button.dataset.originalText;
+                                    delete button.dataset.originalText;
                                 }}
                                 
                                 enabledCount++;
@@ -877,10 +919,20 @@ def main():
                     }}, true);
                     
                     // 立即执行几次（延迟执行以确保日历已渲染）
+                    setTimeout(disableUnavailableDates, 50);
                     setTimeout(disableUnavailableDates, 100);
+                    setTimeout(disableUnavailableDates, 300);
                     setTimeout(disableUnavailableDates, 500);
                     setTimeout(disableUnavailableDates, 1000);
                     setTimeout(disableUnavailableDates, 2000);
+                    
+                    // 定期检查（防止日历更新后失效）
+                    setInterval(function() {{
+                        const popover = document.querySelector('div[data-baseweb="popover"]');
+                        if (popover && popover.style.display !== 'none') {{
+                            disableUnavailableDates();
+                        }}
+                    }}, 500);
                 }})();
                 </script>
                 """
