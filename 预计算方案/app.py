@@ -370,7 +370,7 @@ def load_result(group_id: str, date: str) -> dict:
 
 # ==================== 渲染 ====================
 
-def render_result(result: dict):
+def render_result(result: dict, group_key: str = None):
     if not result:
         st.warning("⚠️ 暂无数据")
         return
@@ -383,10 +383,34 @@ def render_result(result: dict):
     total_players = summary.get("total_players", 0)
     total_messages = summary.get("total_messages", 0)
 
+    # 格式化群组名称：从 "🌍 地球群1" 提取为 "《地球》1群"
+    group_display = ""
+    if group_key and group_key in GROUPS:
+        group_name = GROUPS[group_key]["name"]
+        import re
+        # 先移除 emoji 和多余空格
+        cleaned_name = re.sub(r'[^\w\s\u4e00-\u9fff]', '', group_name).strip()
+        # 匹配 "地球群1" 或类似格式（中文+群+数字）
+        match = re.search(r'([\u4e00-\u9fff]+)群(\d+)', cleaned_name)
+        if match:
+            group_type = match.group(1)  # "地球"
+            group_num = match.group(2)   # "1"
+            group_display = f"《{group_type}》{group_num}群 "
+        else:
+            # 如果格式不匹配，尝试其他格式
+            match2 = re.search(r'([\u4e00-\u9fff]+)(\d+)', cleaned_name)
+            if match2:
+                group_type = match2.group(1)
+                group_num = match2.group(2)
+                group_display = f"《{group_type}》{group_num}群 "
+            else:
+                # 最后备选：使用清理后的名称
+                group_display = cleaned_name + " "
+
     st.markdown(
         f"""
         <div class="stats-overview">
-            <h2>📊 {date} 分析报告</h2>
+            <h2>📊 {group_display}{date} 分析报告</h2>
             <div class="stat-grid">
                 <div class="stat-item">
                     <div class="stat-value">{total_messages}</div>
@@ -990,7 +1014,7 @@ def main():
             result = load_result(selected_group_key, selected_date)
         
         if result:
-            render_result(result)
+            render_result(result, selected_group_key)
         else:
             st.error(f"❌  {selected_date} 的数据待上传")
     else:
