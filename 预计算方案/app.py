@@ -641,30 +641,52 @@ def main():
                             key=lambda x: abs((datetime.combine(x, datetime.min.time()) - selected_date_obj_dt).days)
                         )
                         closest_date_str = closest_date.strftime("%Y-%m-%d")
+                        # 只设置缓存，不直接设置 selected_date_input（避免 Streamlit 警告）
                         st.session_state.selected_date_cache = closest_date_str
-                        st.session_state.selected_date_input = closest_date
-                        # 格式化日期显示（中文格式）
-                        formatted_date = selected_date_obj_check.strftime("%Y年%m月%d日")
+                        st.session_state.need_date_correction = True
+                        st.session_state.invalid_date_selected = selected_date_str_check
+                        st.session_state.valid_date_selected = closest_date_str
+                        st.rerun()
+                    else:
+                        st.session_state.selected_date_cache = selected_date_str_check
+                        st.session_state.need_date_correction = False
+                
+                # 如果需要纠正日期，使用最近的可用日期
+                if st.session_state.get('need_date_correction', False):
+                    corrected_date = datetime.strptime(st.session_state.valid_date_selected, "%Y-%m-%d").date()
+                    selected_date_obj = st.date_input(
+                        "选择日期",
+                        value=corrected_date,
+                        min_value=extended_min_date,
+                        max_value=extended_max_date,
+                        help="只能选择已上传到数据库的日期（带禁止符号的日期不可选）",
+                        key='selected_date_input',
+                        on_change=on_date_change
+                    )
+                    # 显示警告信息
+                    invalid_date = st.session_state.get('invalid_date_selected', '')
+                    valid_date = st.session_state.get('valid_date_selected', '')
+                    if invalid_date:
+                        formatted_invalid_date = datetime.strptime(invalid_date, "%Y-%m-%d").strftime("%Y年%m月%d日")
+                        formatted_valid_date = datetime.strptime(valid_date, "%Y-%m-%d").strftime("%Y年%m月%d日")
                         st.markdown(
                             f'<div style="padding: 1rem; background-color: rgba(255, 193, 7, 0.1); '
                             f'border-left: 4px solid #ffc107; border-radius: 4px; margin: 1rem 0;">'
                             f'<p style="margin: 0; font-size: 1.2rem; font-weight: 600; color: #ffc107;">'
-                            f'⚠️ {formatted_date}暂无数据</p></div>',
+                            f'⚠️ {formatted_invalid_date}暂无数据，已自动选择最近的可用日期：{formatted_valid_date}</p></div>',
                             unsafe_allow_html=True
                         )
-                        st.rerun()
-                    else:
-                        st.session_state.selected_date_cache = selected_date_str_check
-                
-                selected_date_obj = st.date_input(
-                    "选择日期",
-                    value=initial_date,
-                    min_value=extended_min_date,
-                    max_value=extended_max_date,
-                    help="只能选择已上传到数据库的日期（带禁止符号的日期不可选）",
-                    key='selected_date_input',
-                    on_change=on_date_change
-                )
+                    st.session_state.need_date_correction = False
+                else:
+                    selected_date_obj = st.date_input(
+                        "选择日期",
+                        value=initial_date,
+                        min_value=extended_min_date,
+                        max_value=extended_max_date,
+                        help="只能选择已上传到数据库的日期（带禁止符号的日期不可选）",
+                        key='selected_date_input',
+                        on_change=on_date_change
+                    )
                 
                 # 注入 JavaScript 来禁用不在 available_dates 中的日期
                 # 将可用日期列表转换为 JavaScript 数组
