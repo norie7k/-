@@ -225,16 +225,38 @@ div[data-baseweb="popover"] button.date-disabled .date-disabled-icon {
   justify-content:space-between;
   gap: 10px;
   margin-bottom: 8px;
+}
+
+/* Expander内部的sticky header（冻结首行） */
+.cluster-header-sticky{
   position: sticky;
   top: 0;
   z-index: 100;
+  margin: -12px -14px 12px -14px;
+  padding: 0;
+}
+.cluster-header-inner{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap: 10px;
+  padding: 12px 14px;
   background: linear-gradient(145deg, rgba(18,26,49,.98), rgba(15,23,42,.98));
-  padding: 12px 16px;
-  margin: -14px -16px 8px -16px;
-  border-radius: 18px 18px 0 0;
   backdrop-filter: blur(10px);
   border-bottom: 1px solid rgba(148,163,184,.2);
   box-shadow: 0 4px 12px rgba(0,0,0,.2);
+}
+.cluster-header-inner .cluster-title{
+  font-weight: 950;
+  font-size: 1.15rem;
+  color: #f1f5f9;
+  line-height: 1.25;
+}
+.cluster-header-inner .cluster-meta{
+  display:flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 8px;
 }
 .cluster-title{
   font-weight: 950;
@@ -307,6 +329,7 @@ section[data-testid="stMain"] div[data-testid="stExpander"] div[role="region"]{
   border: 1px solid rgba(148,163,184,.10) !important;
   border-radius: 14px !important;
   padding: 12px 14px !important;
+  position: relative;
 }
 
 /* ===== 讨论点 / 观点 / 引用 ===== */
@@ -524,30 +547,17 @@ def render_result(result: dict, group_key: str | None = None):
 
         # 展开详情（全量展示）
         with st.expander("展开详情（讨论点/观点/代表发言）", expanded=(idx <= 2)):
-            # 添加JavaScript确保header在expander滚动时也能sticky
+            # 在expander内部添加sticky header（冻结首行）
             st.markdown(
-                f"""<script>
-(function(){{
-  const clusterWrapper = document.querySelector('.cluster-wrapper:last-of-type');
-  if(clusterWrapper) {{
-    const header = clusterWrapper.querySelector('.cluster-header');
-    if(header) {{
-      const observer = new MutationObserver(function() {{
-        const expander = clusterWrapper.nextElementSibling;
-        if(expander && expander.querySelector('[data-testid="stExpander"]')) {{
-          const expanderContent = expander.querySelector('[role="region"]');
-          if(expanderContent) {{
-            expanderContent.style.position = 'relative';
-            header.style.position = 'sticky';
-            header.style.top = '0';
-          }}
-        }}
-      }});
-      observer.observe(document.body, {{ childList: true, subtree: true }});
-    }}
-  }}
-}})();
-</script>""",
+                f"""<div class="cluster-header-sticky">
+<div class="cluster-header-inner">
+  <div>
+    <div class="cluster-title">{idx}. {title}</div>
+    <div class="cluster-meta">{''.join(meta_chips)}</div>
+  </div>
+  <div class="badge-heat"><small>热度</small>{heat:.1f} 🔥</div>
+</div>
+</div>""",
                 unsafe_allow_html=True,
             )
             if time_axis:
