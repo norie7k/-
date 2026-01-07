@@ -272,12 +272,12 @@ div[data-baseweb="popover"] button.date-disabled .date-disabled-icon {
 .cluster-card{
   background: linear-gradient(145deg, rgba(18,26,49,.92), rgba(15,23,42,.92));
   border: 1px solid rgba(148,163,184,.16);
-  border-radius: 18px;
-  padding: 18px 18px 14px 18px;            /* ✅ 加大卡片 */
-  box-shadow: 0 14px 32px rgba(0,0,0,.30);
-  margin: 16px 0 12px 0;                   /* ✅ 让卡片“更像主角” */
+  border-radius: 16px;
+  padding: 14px 16px 10px 16px;      /* ✅ 上下都缩一点 */
+  box-shadow: 0 10px 24px rgba(0,0,0,.26);
+  margin: 10px auto 8px auto;        /* ✅ 垂直间距更小 + 居中 */
+  max-width: 980px;                  /* ✅ 和分析卡一样宽，整体更“瘦” */
 }
-
 .cluster-header{
   display:flex;
   align-items:flex-start;
@@ -286,8 +286,8 @@ div[data-baseweb="popover"] button.date-disabled .date-disabled-icon {
   margin-bottom: 8px;
 }
 .cluster-title{
-  font-weight: 980;
-  font-size: 1.38rem;                      /* ✅ 标题更大 */
+  font-weight: 900;
+  font-size: 1.18rem;                /* ✅ 小一点，卡片高度也会降一些 */
   color: #f8fafc;
   line-height: 1.25;
 }
@@ -299,10 +299,10 @@ div[data-baseweb="popover"] button.date-disabled .date-disabled-icon {
 }
 .meta-chip{
   background: rgba(99,102,241,.10);
-  border: 1px solid rgba(148,163,184,.14);
+  border: 1px solid rgba(99,102,241,.18);
   border-radius: 999px;
-  padding: 7px 12px;                       /* ✅ chip 更易读 */
-  font-size: .93rem;                       /* ✅ 字更大 */
+  padding: 5px 10px;                 /* ✅ 更紧凑 */
+  font-size: .85rem;
   color: var(--text);
 }
 .meta-chip span{
@@ -311,13 +311,13 @@ div[data-baseweb="popover"] button.date-disabled .date-disabled-icon {
   margin-right: 6px;
 }
 .badge-heat{
-  padding: 8px 12px;
+  padding: 6px 10px;                 /* ✅ 稍微缩小 */
   border-radius: 999px;
-  font-weight: 980;
-  font-size: 1.02rem;                      /* ✅ 徽章更醒目 */
+  font-weight: 900;
+  font-size: .92rem;
   color:#fff;
   background: linear-gradient(90deg, rgba(236,72,153,.95), rgba(139,92,246,.95));
-  box-shadow: 0 10px 24px rgba(236,72,153,.22);
+  box-shadow: 0 8px 18px rgba(236,72,153,.20);
   white-space: nowrap;
 }
 .badge-heat small{
@@ -326,6 +326,13 @@ div[data-baseweb="popover"] button.date-disabled .date-disabled-icon {
   margin-right: 4px;
 }
 
+.heatbar-wrap{
+  margin-top: 8px;
+  height: 6px;                         /* ✅ 固定高度，整体更精致 */
+  border-radius: 999px;
+  background: rgba(15,23,42,.9);
+  overflow: hidden;
+}
 .heatbar{
   height: 100%;
   border-radius: 999px;
@@ -509,7 +516,11 @@ def render_result(result: dict, group_key: str | None = None):
     # 如果你只想显示 Top5，把这行打开即可：
     # sorted_clusters = sorted_clusters[:5]
 
-    st.markdown(f"### 🔥 热门话题（摘要可扫读，详情可展开，共 {len(sorted_clusters)} 个）")
+    st.markdown(
+    f"""<h3 class="section-title">🔥 热门话题（摘要可扫读，详情可展开，共 {len(sorted_clusters)} 个）</h3>""",
+    unsafe_allow_html=True,
+)
+
 
     top1_heat = float(sorted_clusters[0].get("热度评分", 0) or 0) if sorted_clusters else 1.0
     if top1_heat <= 0:
