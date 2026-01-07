@@ -233,7 +233,7 @@ div[data-baseweb="popover"] button.date-disabled .date-disabled-icon {
   margin: 0 0 .55rem 0;
   padding-bottom: .45rem;
   border-bottom: 1px solid rgba(148,163,184,.16);
-  font-size: 1.38rem;   /* ✅ 改这里：接近 st.markdown("###") */
+  font-size: 1.45rem;   /* ✅ 改这里：接近 st.markdown("###") */
   font-weight: 900;
 }
 .stat-grid{
@@ -315,7 +315,6 @@ div[data-baseweb="popover"] button.date-disabled .date-disabled-icon {
   font-weight: 800;
   margin-right: 4px;
 }
-
 
 .heatbar{
   height: 100%;
@@ -479,25 +478,23 @@ def render_result(result: dict, group_key: str | None = None):
     heat_formula = result.get("heat_formula", "") or "热度评分 = 发言玩家数 × sqrt(发言总数)"
     st.markdown(
 f"""<div class="stats-overview">
-<h2>📊 {group_display}{date} 分析报告</h2>
+  <h2>📊 {group_display}{date} 分析报告</h2>
 
-<div class="report-note">
-  <div class="note-row">
-    <div class="note-text">本页为 {date} 基于 {group_display.strip() or "《地球》社群"} 的 {source} 内容生成的“热门讨论”汇总：</div>
-  </div>
-  <div class="note-row">
-    <span style="width:54px;flex:0 0 54px;"></span>
-    <div class="note-text">以热度值对讨论点排序，默认展示当日热度最高的 Top 5 话题（可展开查看讨论点 / 玩家观点 / 代表性发言）。</div>
-  </div>
-  <div class="note-row note-formula">
-    <span style="width:54px;flex:0 0 54px;"></span>
-    <div class="note-text"><code>{heat_formula}</code></div>
-  </div>
-</div>
+  <div class="report-note">
+    <div class="note-row">
+      <div class="note-text">
+        本页为 {date} 基于 {group_display.strip() or "《地球》社群"} 的 {source} 内容生成的“热门讨论”汇总：以热度值对讨论点排序，默认展示当日热度最高的 Top 5 话题（可展开查看讨论点 / 玩家观点 / 代表性发言）。
+      </div>
+    </div>
 
+    <div class="note-row note-formula">
+      <div class="note-text"><code>{heat_formula}</code></div>
+    </div>
+  </div>
 </div>""",
 unsafe_allow_html=True
 )
+
     # ========= 热门话题列表（摘要卡 + 展开详情）=========
     sorted_clusters = sorted(clusters, key=lambda x: float(x.get("热度评分", 0) or 0), reverse=True)
 
