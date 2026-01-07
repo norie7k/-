@@ -166,6 +166,30 @@ div[data-baseweb="popover"] button.date-disabled .date-disabled-icon {
   box-shadow: 0 12px 28px rgba(99,102,241,.38);
 }
 
+/* ===== 报告说明条（替代三张数据卡）===== */
+.report-note{
+  margin-top: .55rem;
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: rgba(99,102,241,.08);
+  border: 1px solid rgba(148,163,184,.14);
+  color: rgba(226,232,240,.95);
+  line-height: 1.55;
+  font-size: .98rem;
+}
+.report-note b{ color: #e9d5ff; }
+.report-note .tag{
+  display:inline-block;
+  padding: 2px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(148,163,184,.16);
+  background: rgba(236,72,153,.10);
+  margin: 0 6px 0 0;
+  font-weight: 800;
+  font-size: .9rem;
+  color: #fce7f3;
+}
+
 /* ===== 统计概览卡 ===== */
 /* ===== 统计概览卡：更紧凑 ===== */
 .stats-overview{
@@ -438,27 +462,27 @@ def render_result(result: dict, group_key: str | None = None):
             else:
                 group_display = cleaned_name + " "
 
-    # 统计概览
+        # ====== 报告说明（替代三张数据卡）======
+    # 你可以在 result.json 里加 "source" 字段，比如 "QQ" / "微信" / "QQ+微信"
+    # 如果没有，就默认写“社群聊天记录”
+    source = result.get("source", "") or result.get("来源", "") or "社群聊天记录"
+
+    # 可选：如果你希望文案里也提到“热度评分口径”，可以写死或从 result 里读
+    heat_formula = result.get("heat_formula", "") or "热度用于衡量讨论强度（综合参与人数与发言量）"
+
     st.markdown(
         f"""<div class="stats-overview">
 <h2>📊 {group_display}{date} 分析报告</h2>
-<div class="stat-grid">
-  <div class="stat-item">
-    <div class="stat-value">{total_messages}</div>
-    <div class="stat-label">总发言数</div>
-  </div>
-  <div class="stat-item">
-    <div class="stat-value">{total_players}</div>
-    <div class="stat-label">参与玩家数</div>
-  </div>
-  <div class="stat-item">
-    <div class="stat-value">{total_clusters}</div>
-    <div class="stat-label">热门话题簇</div>
-  </div>
+<div class="report-note">
+  <span class="tag">说明</span>
+  本页为 <b>{date}</b> 基于 <b>{group_display.strip() or "指定社群"}</b> 的 <b>{source}</b> 内容生成的“热门讨论”汇总：<br/>
+  以 <b>热度值</b> 对话题簇排序，默认展示当日热度最高的 Top 5话题（可展开查看讨论点 / 玩家观点 / 代表性发言）。<br/>
+  <span style="color:rgba(148,163,184,.95);">{heat_formula}</span>
 </div>
 </div>""",
         unsafe_allow_html=True,
     )
+
 
     # ========= 热门话题列表（摘要卡 + 展开详情）=========
     sorted_clusters = sorted(clusters, key=lambda x: float(x.get("热度评分", 0) or 0), reverse=True)
