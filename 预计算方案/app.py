@@ -444,7 +444,7 @@ def render_result(result: dict, group_key: str | None = None):
         formatted_date = date
     
     # 获取热度公式（如果有）
-    heat_formula = result.get("heat_formula", "热度评分 = 发言玩家数 × sqrt(发言总数)")
+    heat_formula = result.get("heat_formula", "热度值 = 发言玩家数 × sqrt(发言总数)")
     
     # 报告说明
     st.markdown(
@@ -471,7 +471,7 @@ def render_result(result: dict, group_key: str | None = None):
     # 如果你只想显示 Top5，把这行打开即可：
     # sorted_clusters = sorted_clusters[:5]
 
-    st.markdown(f"### 🔥 热门话题（摘要可扫读，详情可展开，共 {len(sorted_clusters)} 个）")
+    st.markdown(f"#### 🔥 热门话题Top5")
 
     top1_heat = float(sorted_clusters[0].get("热度评分", 0) or 0) if sorted_clusters else 1.0
     if top1_heat <= 0:
@@ -497,7 +497,7 @@ def render_result(result: dict, group_key: str | None = None):
             f"""<div class="cluster-card">
 <div class="cluster-header">
   <div>
-    <div class="cluster-title">#{idx} {title}</div>
+    <div class="cluster-title">{idx}. {title}</div>
     <div class="cluster-meta">{''.join(meta_chips)}</div>
   </div>
   <div class="badge-heat"><small>热度</small>{heat:.1f} 🔥</div>
