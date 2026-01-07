@@ -32,158 +32,69 @@ STYLE_CSS = """
   --primary:#6366f1;
   --secondary:#8b5cf6;
   --accent:#ec4899;
-  --bg0:#0f172a;
-  --bg1:#1e1b4b;
-  --bg2:#312e81;
-  --text:#e2e8f0;
+
+  --bg0:#0b1020;
+  --bg1:#111b34;
+  --bg2:#1e1b4b;
+
+  --card:#121a31;
+  --card2:#0f172a;
+  --line:rgba(148,163,184,.18);
+
+  --text:#e5e7eb;
   --muted:#94a3b8;
-  --line:rgba(99,102,241,.28);
+  --muted2:#64748b;
+  --good:#22c55e;
+  --warn:#f59e0b;
+  --bad:#ef4444;
 }
 
-/* ===== App 背景 + 基础字体色（不要用 * 全局覆盖）===== */
+/* ===== App 背景 ===== */
 .stApp{
-  background: linear-gradient(135deg, var(--bg0) 0%, var(--bg1) 50%, var(--bg2) 100%);
+  background: radial-gradient(1200px 800px at 20% 0%, rgba(99,102,241,.20), transparent 60%),
+              radial-gradient(1000px 700px at 85% 30%, rgba(236,72,153,.14), transparent 55%),
+              linear-gradient(135deg, var(--bg0) 0%, var(--bg1) 45%, var(--bg2) 100%);
   color: var(--text);
 }
 
-/* 主内容区基础文字 */
-section[data-testid="stMain"]{
-  color: var(--text);
-}
+/* 主内容区文字 */
+section[data-testid="stMain"]{ color: var(--text); }
 section[data-testid="stMain"] p,
-section[data-testid="stMain"] li{
-  color: var(--text);
-}
+section[data-testid="stMain"] li{ color: var(--text); }
 
 /* ===== 标题 ===== */
 .main-title{
   font-family: 'Orbitron','Noto Sans SC',sans-serif;
-  font-size: 2.5rem;
-  font-weight: 800;
-  background: linear-gradient(90deg, #818cf8, #c084fc, #f472b6);
+  font-size: 2.4rem;
+  font-weight: 900;
+  background: linear-gradient(90deg, #a5b4fc, #c4b5fd, #f0abfc);
   -webkit-background-clip:text;
   -webkit-text-fill-color:transparent;
   text-align:center;
-  margin-bottom: .4rem;
-  text-shadow: 0 0 28px rgba(129, 140, 248, 0.35);
+  margin-bottom: .35rem;
+  text-shadow: 0 0 26px rgba(129, 140, 248, 0.28);
 }
 .sub-title{
   font-family: 'Noto Sans SC',sans-serif;
-  font-size: 1.05rem;
+  font-size: 1.02rem;
   color: var(--muted);
   text-align:center;
-  margin-bottom: 1.6rem;
+  margin-bottom: 1.35rem;
 }
 
-/* ===== 侧边栏：用稳定选择器，不用 .css-xxxx ===== */
+/* ===== 侧边栏（保留你的稳定选择器策略）===== */
 section[data-testid="stSidebar"]{
-  background: linear-gradient(180deg, #111b34, #0b1020) !important;
-  border-right: 1px solid rgba(148,163,184,.15);
+  background: linear-gradient(180deg, #10182f, #0b1020) !important;
+  border-right: 1px solid rgba(148,163,184,.14);
 }
 section[data-testid="stSidebar"] h1,
 section[data-testid="stSidebar"] h2,
-section[data-testid="stSidebar"] h3{
-  color: #c7d2fe !important;
-}
+section[data-testid="stSidebar"] h3{ color: #c7d2fe !important; }
 section[data-testid="stSidebar"] p,
 section[data-testid="stSidebar"] label,
 section[data-testid="stSidebar"] div,
-section[data-testid="stSidebar"] span{
-  color: var(--text);
-}
-section[data-testid="stSidebar"] .stCaption{
-  color: var(--muted) !important;
-}
-
-/* sidebar 输入框/下拉框：背景变深，边框清晰 */
-section[data-testid="stSidebar"] [data-baseweb="select"] > div{
-  background: rgba(30,41,59,.92) !important;
-  border: 1px solid rgba(148,163,184,.22) !important;
-  border-radius: 12px !important;
-}
-section[data-testid="stSidebar"] [data-baseweb="input"]{
-  background: rgba(30,41,59,.92) !important;
-  border: 1px solid rgba(148,163,184,.22) !important;
-  border-radius: 12px !important;
-}
-section[data-testid="stSidebar"] input{
-  color: var(--text) !important;
-}
-
-/* 下拉菜单弹层（options） */
-div[data-baseweb="menu"]{
-  background: rgba(15,23,42,.98) !important;
-  border: 1px solid rgba(148,163,184,.20) !important;
-  border-radius: 12px !important;
-}
-div[data-baseweb="option"]{
-  color: var(--text) !important;
-}
-div[data-baseweb="option"]:hover{
-  background: rgba(99,102,241,.18) !important;
-}
-
-/* ===== 日期选择器年份下拉菜单优化 ===== */
-/* 确保年份选择器可以正常显示和选择 */
-section[data-testid="stSidebar"] div[data-baseweb="select"] select,
-section[data-testid="stSidebar"] div[role="combobox"] input{
-  color: var(--text) !important;
-}
-/* 日期选择器的年份下拉菜单 */
-div[data-baseweb="popover"]{
-  background: rgba(15,23,42,.98) !important;
-  border: 1px solid rgba(148,163,184,.20) !important;
-  border-radius: 12px !important;
-  z-index: 9999 !important;
-}
-/* 确保年份选择下拉菜单可见且可点击 */
-div[data-baseweb="popover"] div[role="listbox"],
-div[data-baseweb="popover"] div[role="option"]{
-  color: var(--text) !important;
-  background: rgba(15,23,42,.98) !important;
-}
-div[data-baseweb="popover"] div[role="option"]:hover{
-  background: rgba(99,102,241,.18) !important;
-}
-
-/* ===== 日期选择器：禁用不可用日期 ===== */
-/* 日历中不在可用日期范围内的日期会被 Streamlit 自动禁用（灰色显示） */
-section[data-testid="stSidebar"] input[type="date"]{
-  color: var(--text) !important;
-}
-/* 日历弹窗样式 */
-div[data-baseweb="popover"] table,
-div[data-baseweb="popover"] td,
-div[data-baseweb="popover"] th{
-  color: var(--text) !important;
-}
-/* 禁用的日期（灰色，不可点击）- 通过 JavaScript 添加的样式 */
-div[data-baseweb="popover"] button[disabled],
-div[data-baseweb="popover"] button[aria-disabled="true"],
-div[data-baseweb="popover"] button.date-disabled{
-  opacity: 0.4 !important;
-  cursor: not-allowed !important;
-  pointer-events: none !important;
-  color: var(--muted) !important;
-  background: rgba(148,163,184,.1) !important;
-  user-select: none !important;
-}
-/* 禁用日期的禁止符号样式 */
-div[data-baseweb="popover"] button.date-disabled .date-disabled-icon {
-  display: inline-block !important;
-  font-size: 10px !important;
-  margin-left: 2px !important;
-  vertical-align: middle !important;
-  opacity: 0.8 !important;
-}
-/* 可用的日期（正常显示，可点击） */
-div[data-baseweb="popover"] button:not([disabled]):not([aria-disabled="true"]):not(.date-disabled){
-  cursor: pointer !important;
-  opacity: 1 !important;
-}
-div[data-baseweb="popover"] button:not([disabled]):not([aria-disabled="true"]):not(.date-disabled):hover{
-  background: rgba(99,102,241,.18) !important;
-}
+section[data-testid="stSidebar"] span{ color: var(--text); }
+section[data-testid="stSidebar"] .stCaption{ color: var(--muted) !important; }
 
 /* ===== 按钮 ===== */
 .stButton > button{
@@ -191,110 +102,237 @@ div[data-baseweb="popover"] button:not([disabled]):not([aria-disabled="true"]):n
   color: #fff !important;
   border: none;
   border-radius: 12px;
-  padding: 0.75rem 1.2rem;
-  font-weight: 700;
-  transition: all .25s ease;
-  box-shadow: 0 6px 18px rgba(99,102,241,.35);
+  padding: 0.72rem 1.2rem;
+  font-weight: 800;
+  transition: all .22s ease;
+  box-shadow: 0 8px 22px rgba(99,102,241,.30);
 }
 .stButton > button:hover{
   transform: translateY(-1px);
-  box-shadow: 0 10px 26px rgba(99,102,241,.45);
+  box-shadow: 0 12px 28px rgba(99,102,241,.38);
 }
 
 /* ===== 统计概览卡 ===== */
 .stats-overview{
-  background: linear-gradient(145deg, rgba(30,41,59,.95), rgba(51,65,85,.92));
+  background: linear-gradient(145deg, rgba(18,26,49,.92), rgba(15,23,42,.92));
   border-radius: 18px;
-  padding: 1.6rem;
-  margin: 1.2rem 0 1.4rem 0;
+  padding: 1.35rem 1.35rem 1.15rem 1.35rem;
+  margin: 1.1rem 0 1.1rem 0;
   border: 1px solid var(--line);
-  box-shadow: 0 10px 26px rgba(0,0,0,.25);
+  box-shadow: 0 12px 30px rgba(0,0,0,.30);
 }
 .stats-overview h2{
-  color: #c7d2fe;
-  margin: 0 0 1rem 0;
-  padding-bottom: .6rem;
-  border-bottom: 1px solid rgba(199,210,254,.25);
+  color: #e9d5ff;
+  margin: 0 0 .9rem 0;
+  padding-bottom: .65rem;
+  border-bottom: 1px solid rgba(148,163,184,.18);
 }
 .stat-grid{
   display:grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 1rem;
+  gap: .9rem;
 }
 .stat-item{
-  background: rgba(99,102,241,.10);
-  border: 1px solid rgba(99,102,241,.18);
+  background: rgba(99,102,241,.09);
+  border: 1px solid rgba(148,163,184,.12);
   border-radius: 14px;
-  padding: 1rem;
+  padding: .95rem .9rem;
   text-align:center;
 }
 .stat-value{
-  font-size: 1.9rem;
-  font-weight: 800;
+  font-size: 1.85rem;
+  font-weight: 900;
   color: #c7d2fe;
+  letter-spacing: .5px;
 }
 .stat-label{
-  font-size: .9rem;
+  font-size: .88rem;
   color: var(--muted);
 }
 
-/* ===== 关键修复：Expander 标题条/内容 ===== */
-section[data-testid="stMain"] div[data-testid="stExpander"] details > summary{
-  background: rgba(15,23,42,.88) !important;
-  border: 1px solid rgba(148,163,184,.18) !important;
-  border-radius: 14px !important;
-  padding: 12px 16px !important;
+/* ===== Top5 导航 ===== */
+.top5-nav{
+  position: sticky;
+  top: 12px;
+  background: rgba(18,26,49,.70);
+  border: 1px solid rgba(148,163,184,.16);
+  border-radius: 16px;
+  padding: 12px 12px 10px 12px;
+  box-shadow: 0 10px 24px rgba(0,0,0,.24);
 }
-section[data-testid="stMain"] div[data-testid="stExpander"] details > summary *{
-  color: var(--text) !important;
-  font-weight: 700 !important;
+.top5-nav-title{
+  font-weight: 900;
+  color: #ddd6fe;
+  margin-bottom: 8px;
+  letter-spacing: .2px;
 }
-section[data-testid="stMain"] div[data-testid="stExpander"] div[role="region"]{
-  background: rgba(30,41,59,.35) !important;
-  border: 1px solid rgba(148,163,184,.12) !important;
-  border-radius: 14px !important;
-  padding: 10px 12px !important;
+.nav-item{
+  display:flex;
+  gap:10px;
+  align-items:center;
+  padding: 10px 10px;
+  border-radius: 12px;
+  border: 1px solid rgba(148,163,184,.10);
+  background: rgba(15,23,42,.55);
+  text-decoration: none !important;
+  margin-bottom: 8px;
 }
-
-/* Metric */
-[data-testid="stMetricValue"]{ color: #c7d2fe !important; font-weight: 800 !important; }
-[data-testid="stMetricLabel"]{ color: var(--muted) !important; }
-
-/* ===== 讨论点 / 观点 / 引用块 ===== */
-.discussion-point{
-  background: rgba(236,72,153,.14);
-  border-left: 4px solid var(--accent);
-  padding: .9rem 1rem;
-  margin: .8rem 0;
-  border-radius: 0 10px 10px 0;
+.nav-item:hover{
+  background: rgba(99,102,241,.14);
+  border-color: rgba(99,102,241,.25);
 }
-.discussion-point strong{
+.nav-rank{
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-weight: 900;
   color:#fff;
-  font-size: 1.05rem;
+  background: linear-gradient(90deg, var(--primary), var(--secondary));
+  box-shadow: 0 6px 14px rgba(99,102,241,.30);
+  flex: 0 0 auto;
 }
+.nav-text{
+  flex: 1 1 auto;
+  min-width:0;
+}
+.nav-title{
+  font-weight: 850;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.nav-sub{
+  font-size: .86rem;
+  color: var(--muted);
+}
+
+/* ===== Top 摘要卡 ===== */
+.cluster-card{
+  background: linear-gradient(145deg, rgba(18,26,49,.92), rgba(15,23,42,.92));
+  border: 1px solid rgba(148,163,184,.16);
+  border-radius: 18px;
+  padding: 14px 16px 12px 16px;
+  box-shadow: 0 12px 28px rgba(0,0,0,.28);
+  margin: 10px 0 8px 0;
+}
+.cluster-header{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+.cluster-title{
+  font-weight: 950;
+  font-size: 1.15rem;
+  color: #f1f5f9;
+  line-height: 1.25;
+}
+.cluster-meta{
+  display:flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 8px;
+}
+.meta-chip{
+  background: rgba(99,102,241,.10);
+  border: 1px solid rgba(148,163,184,.14);
+  border-radius: 999px;
+  padding: 6px 10px;
+  font-size: .86rem;
+  color: var(--text);
+}
+.meta-chip span{
+  color: var(--muted);
+  font-weight: 700;
+  margin-right: 6px;
+}
+
+.badge-heat{
+  flex: 0 0 auto;
+  padding: 7px 10px;
+  border-radius: 999px;
+  font-weight: 950;
+  color:#fff;
+  background: linear-gradient(90deg, rgba(236,72,153,.95), rgba(139,92,246,.95));
+  box-shadow: 0 8px 20px rgba(236,72,153,.22);
+  white-space: nowrap;
+}
+.badge-heat small{
+  opacity:.88;
+  font-weight: 800;
+  margin-right: 4px;
+}
+
+.heatbar-wrap{
+  margin-top: 10px;
+  background: rgba(148,163,184,.10);
+  border-radius: 999px;
+  height: 10px;
+  overflow: hidden;
+  border: 1px solid rgba(148,163,184,.10);
+}
+.heatbar{
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, rgba(99,102,241,.95), rgba(236,72,153,.92));
+}
+
+/* ===== 讨论点 / 观点 / 引用 ===== */
+.discussion-point{
+  background: rgba(236,72,153,.12);
+  border: 1px solid rgba(236,72,153,.18);
+  padding: .78rem .95rem;
+  margin: .7rem 0 .55rem 0;
+  border-radius: 12px;
+}
+.discussion-point strong{ color:#fff; font-size: 1.02rem; }
+
 .opinion-item{
-  background: rgba(34,211,238,.12);
-  border: 1px solid rgba(34,211,238,.18);
-  padding: .8rem 1rem;
-  margin: .55rem 0;
-  border-radius: 10px;
+  background: rgba(34,211,238,.10);
+  border: 1px solid rgba(34,211,238,.16);
+  padding: .72rem .92rem;
+  margin: .45rem 0;
+  border-radius: 12px;
   color: var(--text);
 }
 .example-quote{
   background: rgba(99,102,241,.10);
-  border-left: 3px solid rgba(99,102,241,.9);
-  padding: .7rem .9rem;
-  margin: .45rem 0;
-  border-radius: 10px;
-  color: #d7e0ef;
+  border: 1px solid rgba(99,102,241,.16);
+  padding: .68rem .9rem;
+  margin: .42rem 0;
+  border-radius: 12px;
+  color: #dbeafe;
   font-style: italic;
 }
 
-/* 链接颜色 */
-a{ color:#a5b4fc !important; }
+/* ===== Expander（让“展开详情”更像按钮/卡片）===== */
+section[data-testid="stMain"] div[data-testid="stExpander"] details > summary{
+  background: rgba(15,23,42,.80) !important;
+  border: 1px solid rgba(148,163,184,.16) !important;
+  border-radius: 14px !important;
+  padding: 10px 14px !important;
+}
+section[data-testid="stMain"] div[data-testid="stExpander"] details > summary *{
+  color: var(--text) !important;
+  font-weight: 850 !important;
+}
+section[data-testid="stMain"] div[data-testid="stExpander"] div[role="region"]{
+  background: rgba(15,23,42,.32) !important;
+  border: 1px solid rgba(148,163,184,.10) !important;
+  border-radius: 14px !important;
+  padding: 10px 12px !important;
+}
+
+/* 链接 */
+a{ color:#a5b4fc !important; text-decoration: none !important; }
+a:hover{ text-decoration: underline !important; }
 </style>
 """
-
 
 # ==================== 网络读取（带刷新 nonce 防缓存）===================
 
@@ -369,8 +407,276 @@ def load_result(group_id: str, date: str) -> dict:
 
 
 # ==================== 渲染 ====================
-
 def render_result(result: dict, group_key: str = None):
+    if not result:
+        st.warning("⚠️ 暂无数据")
+        return
+
+    date = result.get("date", "")
+    clusters = result.get("clusters", [])
+    summary = result.get("summary", {})
+
+    total_clusters = summary.get("total_clusters", len(clusters))
+    total_players = summary.get("total_players", 0)
+    total_messages = summary.get("total_messages", 0)
+
+    # 格式化群组名称
+    group_display = ""
+    if group_key and group_key in GROUPS:
+        group_name = GROUPS[group_key]["name"]
+        import re
+        cleaned_name = re.sub(r'[^\w\s\u4e00-\u9fff]', '', group_name).strip()
+        match = re.search(r'([\u4e00-\u9fff]+)群(\d+)', cleaned_name)
+        if match:
+            group_type = match.group(1)
+            group_num = match.group(2)
+            group_display = f"《{group_type}》{group_num}群 "
+        else:
+            match2 = re.search(r'([\u4e00-\u9fff]+)(\d+)', cleaned_name)
+            if match2:
+                group_type = match2.group(1)
+                group_num = match2.group(2)
+                group_display = f"《{group_type}》{group_num}群 "
+            else:
+                group_display = cleaned_name + " "
+
+    # 顶部统计概览
+    st.markdown(
+        f"""
+        <div class="stats-overview">
+            <h2>📊 {group_display}{date} 分析报告</h2>
+            <div class="stat-grid">
+                <div class="stat-item">
+                    <div class="stat-value">{total_messages}</div>
+                    <div class="stat-label">总发言数</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">{total_players}</div>
+                    <div class="stat-label">参与玩家数</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">{total_clusters}</div>
+                    <div class="stat-label">热门话题簇</div>
+                </div>
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    st.markdown("### 🔥 热门话题 Top 5（摘要可扫读，详情可展开）")
+
+    # 排序
+    sorted_clusters = sorted(clusters, key=lambda x: float(x.get("热度评分", 0) or 0), reverse=True)
+    top5 = sorted_clusters[:5]
+
+    # 归一化热度条（相对 Top1）
+    top1_heat = float(top5[0].get("热度评分", 0) or 0) if top5 else 0.0
+    if top1_heat <= 0:
+        top1_heat = 1.0
+
+    # ====== 主区两栏：左导航 / 右内容 ======
+    nav_col, content_col = st.columns([1, 3], gap="large")
+
+    with nav_col:
+        # Top5 快速导航（锚点）
+        nav_items_html = []
+        nav_items_html.append('<div class="top5-nav">')
+        nav_items_html.append('<div class="top5-nav-title">📌 今日 Top5 目录</div>')
+        for i, c in enumerate(top5, 1):
+            title = c.get("聚合话题簇", "(未命名话题)")
+            heat = float(c.get("热度评分", 0) or 0)
+            players = c.get("发言玩家总数", 0)
+            msgs = c.get("发言总数", 0)
+            nav_items_html.append(
+                f'''
+                <a class="nav-item" href="#t{i}">
+                    <div class="nav-rank">{i}</div>
+                    <div class="nav-text">
+                        <div class="nav-title">{title}</div>
+                        <div class="nav-sub">🔥 {heat:.1f} · 👥 {players} · 💬 {msgs}</div>
+                    </div>
+                </a>
+                '''
+            )
+        nav_items_html.append('</div>')
+        st.markdown("".join(nav_items_html), unsafe_allow_html=True)
+
+    with content_col:
+        for idx, cluster in enumerate(top5, 1):
+            title = cluster.get("聚合话题簇", "(未命名话题)")
+            heat = float(cluster.get("热度评分", 0) or 0)
+            players = cluster.get("发言玩家总数", 0)
+            msgs = cluster.get("发言总数", 0)
+            time_axis = cluster.get("时间轴", "")
+
+            # 热度条百分比（0-100）
+            pct = max(0.0, min(100.0, (heat / top1_heat) * 100.0))
+
+            # 锚点（给左侧目录跳转）
+            st.markdown(f'<div id="t{idx}"></div>', unsafe_allow_html=True)
+
+            # 摘要卡：标题 + 热度徽章 + 热度条 + 关键 meta
+            meta_chips = []
+            meta_chips.append(f'<div class="meta-chip"><span>👥 玩家</span>{players}</div>')
+            meta_chips.append(f'<div class="meta-chip"><span>💬 发言</span>{msgs}</div>')
+            if time_axis:
+                # 时间轴很长时也用 chip 承载（运营扫读只要知道“有时间轴”，细看再展开）
+                short_time = time_axis if len(time_axis) <= 60 else (time_axis[:60] + "…")
+                meta_chips.append(f'<div class="meta-chip"><span>⏰ 时间</span>{short_time}</div>')
+
+            st.markdown(
+                f"""
+                <div class="cluster-card">
+                    <div class="cluster-header">
+                        <div>
+                            <div class="cluster-title">#{idx} {title}</div>
+                            <div class="cluster-meta">
+                                {''.join(meta_chips)}
+                            </div>
+                        </div>
+                        <div class="badge-heat"><small>热度</small>{heat:.1f} 🔥</div>
+                    </div>
+                    <div class="heatbar-wrap">
+                        <div class="heatbar" style="width:{pct:.1f}%"></div>
+                    </div>
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
+
+            # 详情折叠：默认只展开 Top1（你也可改成 idx<=2）
+            with st.expander("展开详情（讨论点/观点/代表发言）", expanded=(idx == 1)):
+
+                discussion_list = cluster.get("讨论点列表", []) or []
+                if not discussion_list:
+                    st.info("暂无讨论点列表")
+                    continue
+
+                st.markdown("#### 💬 讨论点与玩家观点（默认展示前 2 条）")
+
+                # 默认展示前2条，剩余折叠
+                head = discussion_list[:2]
+                tail = discussion_list[2:]
+
+                def _render_discussion_block(dp: dict):
+                    # 取 “讨论点X”
+                    dp_title = ""
+                    for k in dp.keys():
+                        if str(k).startswith("讨论点"):
+                            dp_title = dp.get(k, "")
+                            break
+
+                    if dp_title:
+                        st.markdown(
+                            f"""
+                            <div class="discussion-point">
+                                <strong>📌 {dp_title}</strong>
+                            </div>
+                            """,
+                            unsafe_allow_html=True,
+                        )
+
+                    opinions = dp.get("玩家观点", []) or []
+                    if opinions:
+                        st.markdown("**玩家观点：**")
+                        for opinion in opinions:
+                            st.markdown(
+                                f"""
+                                <div class="opinion-item">{opinion}</div>
+                                """,
+                                unsafe_allow_html=True,
+                            )
+
+                    examples = dp.get("代表性玩家发言示例", []) or []
+                    if examples:
+                        with st.expander(f"代表性发言（{len(examples)}）", expanded=False):
+                            for example in examples:
+                                st.markdown(
+                                    f"""
+                                    <div class="example-quote">"{example}"</div>
+                                    """,
+                                    unsafe_allow_html=True,
+                                )
+
+                for dp in head:
+                    _render_discussion_block(dp)
+                    st.markdown("---")
+
+                if tail:
+                    with st.expander(f"展开全部讨论点（剩余 {len(tail)} 条）", expanded=False):
+                        for dp in tail:
+                            _render_discussion_block(dp)
+                            st.markdown("---")
+
+            st.markdown("")  # 留白
+
+
+    # ===== 导出区保持你原样 =====
+    st.markdown("### 📥 导出结果")
+    col1, col2 = st.columns(2)
+
+    with col1:
+        json_str = json.dumps(result, ensure_ascii=False, indent=2)
+        st.download_button(
+            label="📄 下载 JSON 格式",
+            data=json_str,
+            file_name=f"analysis_{result.get('group', 'unknown')}_{date}.json",
+            mime="application/json",
+            use_container_width=True,
+        )
+
+    with col2:
+        # 保留你原来的 Markdown 报告导出逻辑（略微不改）
+        report_lines = [f"# 玩家社群发言分析报告 - {date}\n\n"]
+        report_lines.append("## 统计概览\n")
+        report_lines.append(f"- 总发言数: {total_messages}\n")
+        report_lines.append(f"- 参与玩家数: {total_players}\n")
+        report_lines.append(f"- 热门话题簇: {total_clusters}\n\n")
+
+        for idx, cluster in enumerate(sorted_clusters[:5], 1):
+            report_lines.append(f"## {idx}. {cluster.get('聚合话题簇','(未命名话题)')}\n\n")
+            report_lines.append(f"- **热度评分**: {cluster.get('热度评分', 0)}\n")
+            report_lines.append(f"- **发言玩家数**: {cluster.get('发言玩家总数', 0)}\n")
+            report_lines.append(f"- **发言总数**: {cluster.get('发言总数', 0)}\n")
+            report_lines.append(f"- **时间轴**: {cluster.get('时间轴','')}\n\n")
+
+            discussion_list = cluster.get("讨论点列表", []) or []
+            if discussion_list:
+                report_lines.append("### 讨论点与玩家观点\n\n")
+                for dp in discussion_list:
+                    dp_title = ""
+                    for k in dp.keys():
+                        if str(k).startswith("讨论点"):
+                            dp_title = dp.get(k, "")
+                            break
+                    if dp_title:
+                        report_lines.append(f"#### 📌 {dp_title}\n\n")
+
+                    opinions = dp.get("玩家观点", []) or []
+                    if opinions:
+                        report_lines.append("**玩家观点:**\n")
+                        for opinion in opinions:
+                            report_lines.append(f"- {opinion}\n")
+                        report_lines.append("\n")
+
+                    examples = dp.get("代表性玩家发言示例", []) or []
+                    if examples:
+                        report_lines.append("**代表性发言:**\n")
+                        for example in examples:
+                            report_lines.append(f'> "{example}"\n')
+                        report_lines.append("\n")
+                report_lines.append("---\n\n")
+
+        report_text = "".join(report_lines)
+        st.download_button(
+            label="📝 下载文本报告",
+            data=report_text,
+            file_name=f"report_{result.get('group', 'unknown')}_{date}.md",
+            mime="text/markdown",
+            use_container_width=True,
+        )
+
     if not result:
         st.warning("⚠️ 暂无数据")
         return

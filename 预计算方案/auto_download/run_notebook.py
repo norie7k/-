@@ -16,6 +16,7 @@ import re
 import time
 from pathlib import Path
 from datetime import datetime, timedelta
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 try:
     import requests
@@ -223,7 +224,7 @@ def inject_date_into_notebook(notebook_path: Path, date_str: str, output_path: P
         notebook_path: 原始 notebook 路径
         date_str: 分析日期
         output_path: 输出的临时 notebook 路径
-        txt_file: 聊天记录 txt 文件名（可选）
+        txt_file: 聊天记录 txt 文件名（可选，支持模式匹配，如 "《欢迎来到地球》测试1群.txt"）
         mapping_file: 映射文件名（可选）
     """
     # 读取 notebook
@@ -235,6 +236,25 @@ def inject_date_into_notebook(notebook_path: Path, date_str: str, output_path: P
     next_day = (datetime.strptime(date_str, "%Y-%m-%d") + timedelta(days=1)).strftime("%Y-%m-%d")
     end_time = f"{next_day} 00:00:00"
     
+    # 查找实际的 txt 文件（支持日期前缀）
+    actual_txt_file = None
+    if txt_file:
+        # 先尝试精确匹配
+        txt_path = SOURCE_DIR / txt_file
+        if txt_path.exists():
+            actual_txt_file = txt_file
+        else:
+            # 尝试模式匹配（支持日期前缀，如 "1219《欢迎来到地球》测试1群.txt"）
+            pattern = f"*{txt_file}"
+            matches = list(SOURCE_DIR.glob(pattern))
+            if matches:
+                # 选择最接近日期的文件（文件名中包含日期）
+                actual_txt_file = matches[0].name
+                print(f"  📄 找到匹配文件: {actual_txt_file} (模式: {txt_file})")
+            else:
+                print(f"  ⚠️  未找到匹配的 txt 文件: {txt_file}")
+                actual_txt_file = txt_file  # 使用原始文件名
+    
     # 构建注入代码
     inject_lines = [
         "# ========== 自动注入的配置 (请勿手动修改) ==========\n",
@@ -244,8 +264,8 @@ def inject_date_into_notebook(notebook_path: Path, date_str: str, output_path: P
     ]
     
     # 如果提供了 txt 文件名，也注入
-    if txt_file:
-        inject_lines.append(f'pathtxt = "{txt_file}"\n')
+    if actual_txt_file:
+        inject_lines.append(f'pathtxt = "{actual_txt_file}"\n')
     
     # 如果提供了 mapping 文件名，也注入
     if mapping_file:
@@ -256,7 +276,7 @@ def inject_date_into_notebook(notebook_path: Path, date_str: str, output_path: P
         'print(f"⏰ 时间范围: {start_time} ~ {end_time}")\n',
     ])
     
-    if txt_file:
+    if actual_txt_file:
         inject_lines.append('print(f"📄 聊天记录: {pathtxt}")\n')
     
     inject_lines.append("# ========================================================\n")
@@ -299,8 +319,8 @@ def inject_date_into_notebook(notebook_path: Path, date_str: str, output_path: P
                     new_lines.append(f'# start_time = ...  # 已被自动设置为 {start_time}\n')
                 elif re.match(r'^end_time\s*=\s*["\']', line):
                     new_lines.append(f'# end_time = ...  # 已被自动设置为 {end_time}\n')
-                elif txt_file and re.match(r'^pathtxt\s*=\s*["\']', line):
-                    new_lines.append(f'# pathtxt = ...  # 已被自动设置为 {txt_file}\n')
+                elif actual_txt_file and re.match(r'^pathtxt\s*=\s*["\']', line):
+                    new_lines.append(f'# pathtxt = ...  # 已被自动设置为 {actual_txt_file}\n')
                 elif mapping_file and re.match(r'^MAPPING_FILE\s*=\s*["\']', line):
                     new_lines.append(f'# MAPPING_FILE = ...  # 已被自动设置为 {mapping_file}\n')
                 else:
@@ -313,8 +333,8 @@ def inject_date_into_notebook(notebook_path: Path, date_str: str, output_path: P
         json.dump(nb, f, ensure_ascii=False, indent=1)
     
     print(f"  ✅ 已注入配置: 日期={date_str}")
-    if txt_file:
-        print(f"               txt={txt_file}")
+    if actual_txt_file:
+        print(f"               txt={actual_txt_file}")
     if mapping_file:
         print(f"               mapping={mapping_file}")
     return True
@@ -378,11 +398,25 @@ def run_single_notebook_via_nbclient(notebook_config: dict, date_str: str):
         with open(temp_notebook, 'r', encoding='utf-8') as f:
             nb = nbformat.read(f, as_version=4)
         
+        # 检测 notebook 中指定的内核名称，如果没有则使用 'python3'
+        kernel_name = 'python3'
+        if 'kernelspec' in nb.metadata and 'name' in nb.metadata.kernelspec:
+            kernel_name = nb.metadata.kernelspec.name
+            print(f"📌 使用 Notebook 指定的内核: {kernel_name}")
+        else:
+            print(f"📌 使用默认内核: {kernel_name}")
+            print(f"   提示：如果遇到 ModuleNotFoundError，请确保当前 Python 环境已安装所需依赖")
+        
         # 创建客户端并执行
+        # 注意：这里的 timeout 是 NotebookClient 的执行超时（整个 notebook 的总时间）
+        # notebook 内部的 TIMEOUT_SEC=600 是每个 API 调用的超时，两者不同
+        # 根据你的配置：BATCH_SIZE=300, SLEEP_BETWEEN=1, TIMEOUT_SEC=600
+        # 用户反馈：数据量大时可能需要 5 小时，设置为 24 小时以确保充足时间
+        # 设置 24 小时超时以确保覆盖所有批次 + 模型#3聚合 + 模型#4观点分析
         client = NotebookClient(
             nb,
-            timeout=3600,  # 1小时超时
-            kernel_name='python3',
+            timeout=86400,  # 24小时超时（86400秒 = 24 * 60 * 60）
+            kernel_name=kernel_name,  # 使用检测到的内核名称
             resources={'metadata': {'path': str(SOURCE_DIR)}}
         )
         
@@ -443,19 +477,40 @@ def run_notebook_via_nbclient(date_str: str = None, run_all: bool = True):
     print()
     
     if run_all and NOTEBOOKS:
-        # 运行所有配置的 notebooks
-        results = []
-        for nb_config in NOTEBOOKS:
-            success = run_single_notebook_via_nbclient(nb_config, date_str)
-            results.append((nb_config["name"], success))
-            print()
+        # 并行运行所有配置的 notebooks
+        print("🚀 并行执行所有 Notebook...")
+        print(f"   共 {len(NOTEBOOKS)} 个 Notebook 将同时运行")
+        print()
+        
+        results = {}
+        
+        # 使用线程池并行执行
+        with ThreadPoolExecutor(max_workers=len(NOTEBOOKS)) as executor:
+            # 提交所有任务
+            future_to_config = {
+                executor.submit(run_single_notebook_via_nbclient, nb_config, date_str): nb_config
+                for nb_config in NOTEBOOKS
+            }
+            
+            # 收集结果
+            for future in as_completed(future_to_config):
+                nb_config = future_to_config[future]
+                name = nb_config["name"]
+                try:
+                    success = future.result()
+                    results[name] = success
+                    status = "✅ 成功" if success else "❌ 失败"
+                    print(f"\n📊 {name}: {status}")
+                except Exception as e:
+                    results[name] = False
+                    print(f"\n❌ {name}: 执行出错 - {e}")
         
         # 汇总结果
-        print("=" * 60)
+        print("\n" + "=" * 60)
         print("📊 执行结果汇总")
         print("=" * 60)
         all_success = True
-        for name, success in results:
+        for name, success in results.items():
             status = "✅ 成功" if success else "❌ 失败"
             print(f"  {name}: {status}")
             if not success:
@@ -518,14 +573,14 @@ def run_notebook_via_nbconvert(date_str: str = None):
                 sys.executable, "-m", "jupyter", "nbconvert",
                 "--to", "notebook",
                 "--execute",
-                "--ExecutePreprocessor.timeout=3600",  # 1小时超时
+                "--ExecutePreprocessor.timeout=86400",  # 24小时超时（86400秒 = 24 * 60 * 60）
                 "--output", output_notebook.name,
                 str(temp_notebook)
             ],
             cwd=str(SOURCE_DIR),
             capture_output=True,
             text=True,
-            timeout=3700,  # 略大于内部超时
+            timeout=86500,  # 略大于内部超时（24小时 + 100秒缓冲）
         )
         
         # 删除临时文件

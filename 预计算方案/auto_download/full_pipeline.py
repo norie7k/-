@@ -74,7 +74,7 @@ def step2_run_jupyter_analysis(date_str: str):
     try:
         result = subprocess.run(
             [sys.executable, str(run_script), "--date", date_str],
-            timeout=3700,  # 略大于 notebook 内部超时
+            timeout=21700,  # 6小时 + 100秒缓冲（覆盖大数据量的情况）
             cwd=str(run_script.parent),
         )
         

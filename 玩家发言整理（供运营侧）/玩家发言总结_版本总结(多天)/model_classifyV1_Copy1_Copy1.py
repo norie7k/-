@@ -55,6 +55,15 @@ def build_user_prompt_cluster_agg(jsonl_block: str) -> str:
         "禁止使用 ```json 或 ``` 等 Markdown 代码块，禁止输出解释文字。\n\n"
         "【输入】：\n" + jsonl_block
     )
+def build_user_prompt_version_agg(jsonl_block: str) -> str:
+    return (
+        "以下是输入数据（JSONL 格式，每行一个发言对象）：\n\n"
+        "请先完整阅读全部输入，然后按系统提示中的话题簇规则进行划分。\n"
+        "【输出要求】只输出若干 JSON 对象，每个话题簇一个 JSON；"
+        "禁止使用 ```json 或 ``` 等 Markdown 代码块，禁止输出解释文字。\n\n"
+        "【输入】：\n" + jsonl_block
+    )
+
 from typing import List, Dict, Any
 import json
 
@@ -453,35 +462,135 @@ def fix_model3_line_extreme_axis(s: str) -> str:
     2) "时间轴": "极轴": "22:30:57-22:33:57"  =>  "时间轴": "22:30:57-22:33:57"
     3) "时间轴": "22:34:24-极轴": "22:38:33" => "时间轴": "22:34:24-22:38:33"
     """
-
-    # 1) 修复日期字段被“极轴”污染：
-    #    "日期": "极轴": "2025-12-06"
-    s = re.sub(
-        r'"日期"\s*:\s*"极轴"\s*:\s*"([^"]+)"',
-        r'"日期": "\1"',
-        s
-    )
-
-    # 2) 修复时间轴字段完全是 "极轴": "xxx" 的情况：
-    #    "时间轴": "极轴": "22:30:57-22:33:57"
-    s = re.sub(
-        r'"时间轴"\s*:\s*"极轴"\s*:\s*"([^"]+)"',
-        r'"时间轴": "\1"',
-        s
-    )
-
-    # 3) 修复时间轴值中间带 "-极轴": " 的情况：
-    #    "时间轴": "22:34:24-极轴": "22:38:33"
-    #    -> "时间轴": "22:34:24-22:38:33"
-    s = re.sub(
-        r'"时间轴"\s*:\s*"([^"]*?)-极轴"\s*:\s*"([^"]+)"',
-        r'"时间轴": "\1-\2"',
-        s
-    )
-
+    s = re.sub(r'"日期"\s*:\s*"极轴"\s*:\s*"([^"]+)"', r'"日期": "\1"', s)
+    s = re.sub(r'"时间轴"\s*:\s*"极轴"\s*:\s*"([^"]+)"', r'"时间轴": "\1"', s)
+    s = re.sub(r'"时间轴"\s*:\s*"([^"]*?)-极轴"\s*:\s*"([^"]+)"', r'"时间轴": "\1-\2"', s)
     return s
 
+def _strip_fences(s: str) -> str:
+    s = (s or "").strip()
+    s = re.sub(r"^```[a-zA-Z0-9]*\s*", "", s)
+    s = re.sub(r"\s*```$", "", s)
+    return s.strip()
 
+def _as_list(v):
+    if v is None:
+        return []
+    if isinstance(v, list):
+        return v
+    return [v]
+
+def _merge_time_axes(time_axes: list[str]) -> str:
+    seen, out = set(), []
+    for t in time_axes:
+        t = (t or "").strip()
+        if not t or t in seen:
+            continue
+        seen.add(t)
+        out.append(t)
+    return "、".join(out)
+
+def normalize_model3_clusters(output_text: str, parsed_subclusters: list[dict]) -> list[dict]:
+    # 0) 先让子簇具备 日期/时间轴
+    parsed_subclusters = enrich_subclusters_with_datetime(parsed_subclusters)
+
+    # 1) 建索引：_cluster_id -> 子簇(含日期/时间轴)
+    sub_by_id = {}
+    for sc in parsed_subclusters:
+        cid = (sc.get("_cluster_id") or "").strip()
+        if cid:
+            sub_by_id[cid] = sc
+
+    # 2) 逐行修复“极轴”污染再 parse
+    raw = _strip_fences(output_text)
+    lines = [ln.strip() for ln in raw.splitlines() if ln.strip()]
+    lines = [fix_model3_line_extreme_axis(ln) for ln in lines]
+
+    objs = []
+    for ln in lines:
+        try:
+            objs.append(json.loads(ln))
+        except Exception:
+            continue
+
+    normalized = []
+    for obj in objs:
+        topic = (obj.get("话题簇") or obj.get("聚合话题簇") or obj.get("话题簇3") or "").strip()
+
+        sub_list = (
+            obj.get("子话题簇列表")
+            or obj.get("子话题簇")
+            or obj.get("子话题簇id列表")
+            or obj.get("子话题簇ID列表")
+            or []
+        )
+        sub_list = [str(x).strip() for x in _as_list(sub_list) if str(x).strip()]
+
+        date = (obj.get("日期") or "").strip()
+        time_axis = (obj.get("时间轴") or "").strip()
+
+        # 3) 缺失回填：从子簇取日期/时间轴
+        if (not date) or (not time_axis):
+            sub_dates, sub_axes = [], []
+            for cid in sub_list:
+                sc = sub_by_id.get(cid)
+                if not sc:
+                    continue
+                d = (sc.get("日期") or "").strip()
+                ta = (sc.get("时间轴") or "").strip()
+                if d:
+                    sub_dates.append(d)
+                if ta:
+                    sub_axes.append(ta)
+            if not date and sub_dates:
+                date = sub_dates[0]
+            if not time_axis and sub_axes:
+                time_axis = _merge_time_axes(sub_axes)
+
+        # 4) 强制 schema：缺关键字段就丢弃，避免后续 split(None) 崩
+        if not topic or not sub_list or not date or not time_axis:
+            continue
+
+        normalized.append({
+            "话题簇": topic,
+            "子话题簇列表": sub_list,
+            "日期": date,
+            "时间轴": time_axis
+        })
+
+    return normalized
+
+######匹配all_CLUSTER时间
+
+# 匹配：……（2025-12-07 22:40:36-22:41:27） 或 ……(2025-12-07 22:40:36-22:41:27)
+SUB_TIME_RE = re.compile(
+    r"[（(]\s*(\d{4}-\d{2}-\d{2})\s+(\d{2}:\d{2}:\d{2}-\d{2}:\d{2}:\d{2})\s*[）)]"
+)
+
+def enrich_subclusters_with_datetime(parsed_subclusters: list[dict]) -> list[dict]:
+    """
+    给每条子簇补字段：
+    - 日期: YYYY-MM-DD
+    - 时间轴: HH:MM:SS-HH:MM:SS
+    从 子簇["话题簇"] 尾部括号里提取。
+    """
+    out = []
+    for sc in parsed_subclusters:
+        sc2 = dict(sc)
+        title = sc2.get("话题簇") or ""
+        m = SUB_TIME_RE.search(title)
+        if m:
+            sc2["日期"] = m.group(1)
+            sc2["时间轴"] = m.group(2)
+        else:
+            # 兜底：日期可从 _cluster_id 里取到（时间轴取不到）
+            cid = (sc2.get("_cluster_id") or "").strip()
+            if cid and re.match(r"^\d{4}-\d{2}-\d{2}_", cid) is None:
+                # 你的 _cluster_id 是 2025-12-07_B4_06，前10位就是日期
+                sc2["日期"] = cid[:10]
+            sc2.setdefault("时间轴", "")
+        out.append(sc2)
+    return out
 ################top5筛选#################################
 
 
@@ -840,14 +949,139 @@ def build_daily_top5_opinion_records(
 
     return final_records
 #------------------------版本聚合话提簇引入-------------------------
-def build_user_prompt_version_agg(version_jsonl_text: str) -> str:
+def read_jsonl_file(path: str | Path) -> list[dict]:
+    path = Path(path)
+    rows = []
+    if not path.exists():
+        return rows
+    for i, line in enumerate(path.read_text(encoding="utf-8").splitlines(), start=1):
+        line = line.strip()
+        if not line:
+            continue
+        try:
+            rows.append(json.loads(line))
+        except Exception as e:
+            print(f"[read_jsonl_file] line {i} JSON解析失败：{e}\n原文：{line[:200]}...")
+    return rows
+
+
+#####多日输出提纯只要id、日期话提簇、讨论点################################
+import json
+
+def build_version_agg_input_jsonl_text(
+    daily_top5_rows: list[dict],
+    max_points_per_row: int = 3,
+) -> str:
     """
-    给模型4：版本话题簇聚合 用的 user_prompt 构造。
-    version_jsonl_text 是 append_daily_top5_to_version_jsonl 写入的那个 jsonl 全文。
+    从 daily_TOP5（多日混在一个文件）抽取最小字段，生成给模型#4的 jsonl 文本。
+    每行结构：
+    {"id": "...", "日期": "...", "话题簇": "...", "讨论点": [...]}
     """
-    return (
-        "下面是一整个版本周期内，每天的 top5 话题簇（jsonl，每行一个 JSON 对象）。\n"
-        "请根据系统提示中的规则，对这些 daily top5 进行版本级话题簇聚合，"
-        "只输出聚合后的版本级话题簇 JSON 行，不要输出解释说明。\n\n"
-        f"{version_jsonl_text}"
-    )
+    out_lines = []
+    seen = set()
+
+    for r in daily_top5_rows:
+        _id = (r.get("_daily_top_id") or r.get("id") or "").strip()
+        date = (r.get("日期") or "").strip()
+        topic = (r.get("聚合话题簇") or r.get("话题簇") or r.get("话题簇3") or "").strip()
+
+        points = r.get("讨论点") or []
+        if isinstance(points, str):
+            points = [points]
+        points = [p.strip() for p in points if isinstance(p, str) and p.strip()]
+
+        if max_points_per_row and len(points) > max_points_per_row:
+            points = points[:max_points_per_row]
+
+        # 没 id 的行跳过（建议保证每行都有 _daily_top_id）
+        if not _id:
+            continue
+
+        # 去重
+        if _id in seen:
+            continue
+        seen.add(_id)
+
+        obj = {
+            "话题簇": topic,
+            "日期": date,
+            "讨论点": points,
+            "id": _id,
+            
+        }
+        out_lines.append(json.dumps(obj, ensure_ascii=False))
+
+    return "\n".join(out_lines)
+
+####################版本热度top5计算#################
+def compute_version_heat_topk(
+    version_clusters: List[Dict[str, Any]],
+    daily_top5_rows: List[Dict[str, Any]],
+    top_k: int = 5,
+) -> List[Dict[str, Any]]:
+    """
+    version_clusters: 模型#4 的版本聚合输出（每行有 话题簇 / 讨论点 / 日期时间轴列表）
+    daily_top5_rows:  daily_top5.jsonl 解析结果（有 发言总数 / 发言玩家总数 / _daily_top_id）
+
+    版本级发言热度公式：
+      版本_发言热度 = 版本_发言玩家总数 × sqrt(版本_发言总数)
+    其中：
+      版本_发言总数     = 该版本级簇下所有 daily 子簇 发言总数 之和
+      版本_发言玩家总数 = 该版本级簇下所有 daily 子簇 发言玩家总数 之和（近似）
+    """
+
+    # 1) 建 daily_top5 的索引：id -> {发言总数, 发言玩家总数}
+    id2metrics: Dict[str, Dict[str, int]] = {}
+    for r in daily_top5_rows:
+        _id = (r.get("_daily_top_id") or r.get("id") or "").strip()
+        if not _id:
+            continue
+        total_msgs = int(r.get("发言总数") or 0)
+        total_players = int(r.get("发言玩家总数") or 0)
+        id2metrics[_id] = {
+            "发言总数": total_msgs,
+            "发言玩家总数": total_players,
+        }
+
+    enriched: List[Dict[str, Any]] = []
+
+    # 2) 对每个版本级聚合话题簇，累加旗下所有 id 的 U / M
+    for vc in version_clusters:
+        dt_list = vc.get("日期时间轴列表") or []
+        version_total_msgs = 0
+        version_total_players = 0
+        used_ids = set()
+
+        for item in dt_list:
+            did = (item.get("id") or "").strip()
+            if not did or did in used_ids:
+                continue
+            used_ids.add(did)
+
+            metrics = id2metrics.get(did)
+            if not metrics:
+                # daily_top5.jsonl 里找不到这个 id，可以打印出来排查
+                # print(f"[WARN] 找不到 daily 记录：{did}")
+                continue
+
+            version_total_msgs += metrics["发言总数"]
+            version_total_players += metrics["发言玩家总数"]
+
+        # 没有任何有效数据，跳过
+        if version_total_msgs <= 0 or version_total_players <= 0:
+            continue
+
+        # 🔁 这里直接复用你已有的 compute_heat_score
+        version_heat = compute_heat_score(version_total_players, version_total_msgs)
+
+        vc_enriched = dict(vc)
+        vc_enriched["版本_发言总数"] = version_total_msgs
+        vc_enriched["版本_发言玩家总数"] = version_total_players
+        vc_enriched["版本_发言热度"] = version_heat
+
+        enriched.append(vc_enriched)
+
+    # 3) 按版本_发言热度排序，取 TopK
+    enriched.sort(key=lambda x: x.get("版本_发言热度", 0.0), reverse=True)
+    return enriched[:top_k]
+

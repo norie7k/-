@@ -9,6 +9,7 @@ from typing import List, Dict, Any,Optional,Union,Tuple
 import re, json, unicodedata
 from datetime import datetime
 import json
+from collections import defaultdict
 from json import JSONDecodeError
 # --- openpyxl 样式/工具 ---
 from openpyxl import Workbook, load_workbook
@@ -397,6 +398,149 @@ def fix_model3_line_extreme_axis(s: str) -> str:
 
     return s
 
+
+def _strip_fences(s: str) -> str:
+    s = (s or "").strip()
+    s = re.sub(r"^```[a-zA-Z0-9]*\s*", "", s)
+    s = re.sub(r"\s*```$", "", s)
+    return s.strip()
+
+def _as_list(v):
+    if v is None:
+        return []
+    if isinstance(v, list):
+        return v
+    return [v]
+
+def _merge_time_axes(time_axes: list[str]) -> str:
+    seen, out = set(), []
+    for t in time_axes:
+        t = (t or "").strip()
+        if not t or t in seen:
+            continue
+        seen.add(t)
+        out.append(t)
+    return "、".join(out)
+
+
+def clean_time_axis(raw: str) -> str:
+    """
+    保留：数字、冒号、横杠、顿号、空白；其他全部删掉
+    """
+    if not raw:
+        return ""
+    return re.sub(r"[^\d:、\-\s]", "", str(raw))
+
+
+def normalize_model3_clusters(output_text: str, parsed_subclusters: list[dict]):
+     # 0) 先让子簇具备 日期/时间轴
+    parsed_subclusters = enrich_subclusters_with_datetime(parsed_subclusters)
+   
+    
+
+    # 1) 建索引：_cluster_id -> 子簇(含日期/时间轴)
+    sub_by_id = {}
+    for sc in parsed_subclusters:
+        cid = (sc.get("_cluster_id") or "").strip()
+        if cid:
+            sub_by_id[cid] = sc
+
+    # 2) 逐行修复“极轴”污染再 parse
+    raw = _strip_fences(output_text)
+    lines = [ln.strip() for ln in raw.splitlines() if ln.strip()]
+    lines = [fix_model3_line_extreme_axis(ln) for ln in lines]
+
+    objs = []
+    for ln in lines:
+        try:
+            objs.append(json.loads(ln))
+        except Exception:
+            continue
+
+    normalized = []
+    for obj in objs:
+        topic = (obj.get("话题簇") or obj.get("聚合话题簇") or obj.get("话题簇3") or "").strip()
+
+        sub_list = (
+            obj.get("子话题簇列表")
+            or obj.get("子话题簇")
+            or obj.get("子话题簇id列表")
+            or obj.get("子话题簇ID列表")
+            or []
+        )
+        sub_list = [str(x).strip() for x in _as_list(sub_list) if str(x).strip()]
+
+        date = (obj.get("日期") or "").strip()
+        time_axis = (obj.get("时间轴") or "").strip()
+
+        # 3) 缺失回填：从子簇取日期/时间轴
+        if (not date) or (not time_axis):
+            sub_dates, sub_axes = [], []
+            for cid in sub_list:
+                sc = sub_by_id.get(cid)
+                if not sc:
+                    continue
+                d = (sc.get("日期") or "").strip()
+                ta = (sc.get("时间轴") or "").strip()
+                if d:
+                    sub_dates.append(d)
+                if ta:
+                    sub_axes.append(ta)
+            if not date and sub_dates:
+                date = sub_dates[0]
+            if not time_axis and sub_axes:
+                time_axis = _merge_time_axes(sub_axes)
+
+        # 4) 强制 schema：缺关键字段就丢弃，避免后续 split(None) 崩
+        if not topic or not sub_list or not date or not time_axis:
+            continue
+
+        normalized.append({
+            "话题簇": topic,
+            "子话题簇列表": sub_list,
+            "日期": date,
+            "时间轴": clean_time_axis(time_axis)
+        })
+
+    return normalized, parsed_subclusters
+
+######匹配all_CLUSTER时间
+
+# 匹配：……（2025-12-07 22:40:36-22:41:27） 或 ……(2025-12-07 22:40:36-22:41:27)
+
+SUB_TIME_RE = re.compile(
+    r"[（(]?\s*(\d{4}-\d{2}-\d{2})\s+(\d{2}:\d{2}:\d{2}-\d{2}:\d{2}:\d{2})\s*[）)]?"
+)
+
+
+
+def enrich_subclusters_with_datetime(parsed_subclusters: list[dict]) -> list[dict]:
+    out = []
+    for sc in parsed_subclusters:
+        sc2 = dict(sc)
+        title = sc2.get("话题簇") or ""
+        m = SUB_TIME_RE.search(title)
+
+        if m:
+            sc2["日期"] = m.group(1)
+            sc2["时间轴"] = m.group(2)
+        else:
+            # ✅ 新增：从“发言时间”里补齐
+            ft = (sc2.get("发言时间") or "").strip()
+            m2 = SUB_TIME_RE.search(ft)
+            if m2:
+                sc2["日期"] = m2.group(1)
+                sc2["时间轴"] = m2.group(2)
+            else:
+                # 兜底：日期从 _cluster_id 取
+                cid = (sc2.get("_cluster_id") or "").strip()
+                if cid and re.match(r"^\d{4}-\d{2}-\d{2}_", cid):
+                    sc2["日期"] = cid[:10]
+                sc2.setdefault("时间轴", "")
+
+        out.append(sc2)
+    return out
+
 #################################话提簇唯一id#################################
 
 ###1. clusterid的日期扒取##
@@ -489,116 +633,129 @@ from typing import List, Tuple
 from datetime import datetime
 from typing import List, Tuple
 
-def _parse_time_ranges(time_axis_str: str) -> List[Tuple[datetime.time, datetime.time]]:
+import re
+from datetime import datetime
+
+def parse_time_range(date_str: str, range_str: str):
     """
-    支持时间轴格式：
-    - "16:31:26-16:32:57"
-    - "16:31:26 至 16:32:57"
-    - "16:31:26到16:32:57"
-    - "16:31:26~16:32:57" / "16:31:26～16:32:57"
-    - 多段用 "、" 分隔
+    从 range_str 中鲁棒地解析出一个时间段：
+    - 支持出现“极轴”“极”等脏字符
+    - 只认里面的 HH:MM:SS 模式
+    - 解析失败时返回 (None, None)，避免直接抛异常
     """
-    if not time_axis_str or not isinstance(time_axis_str, str):
-        return []
+    if not range_str:
+        return None, None
 
-    # 统一去掉两边空白
-    s = time_axis_str.strip()
+    # 提取所有形如 16:10:56 的时间片段
+    times = re.findall(r"\d{1,2}:\d{2}:\d{2}", str(range_str))
+    if len(times) < 2:
+        print(f"[parse_time_range] 无法从 {range_str!r} 提取到 2 个时间，跳过")
+        return None, None
 
-    # 统一各种连接符为 "-"
-    for sep in ["至", "到", "~", "～", "—", "–"]:
-        s = s.replace(sep, "-")
+    start_str, end_str = times[0], times[1]
 
-    # 去掉中间多余空格（防止 "16:31:26 - 16:32:57"）
-    s = s.replace(" ", "")
-
-    parts = [p.strip() for p in s.split("、") if p.strip()]
-    ranges: List[Tuple[datetime.time, datetime.time]] = []
-
-    for p in parts:
-        if "-" not in p:
-            continue
-        a, b = [x.strip() for x in p.split("-", 1)]
-        try:
-            start_t = datetime.strptime(a, "%H:%M:%S").time()
-            end_t   = datetime.strptime(b, "%H:%M:%S").time()
-        except Exception:
-            continue
-        ranges.append((start_t, end_t))
-
-    return ranges
-
+    try:
+        start_dt = datetime.strptime(f"{date_str} {start_str}", "%Y-%m-%d %H:%M:%S")
+        end_dt   = datetime.strptime(f"{date_str} {end_str}", "%Y-%m-%d %H:%M:%S")
+        return start_dt, end_dt
+    except ValueError as e:
+        print(f"[parse_time_range] 解析失败：date_str={date_str!r}, range_str={range_str!r}, err={e}")
+        return None, None
 
 
 from datetime import datetime
 from typing import Any, Dict, List, Optional, Tuple
 
+
 def match_dialogs_by_time(
     messages: List[Dict[str, Any]],
     date_str: str,
     time_axis_str: Optional[str],
-    dedup: bool = True,
 ) -> List[Dict[str, Any]]:
     """
-    严格模式（无兜底）：
-    - date_str / time_axis_str 为空或解析失败 -> 返回 []
-    - 仅匹配 row['发言日期'] == date_str 且 row['发言时间'] 落在时间轴范围内
-    - 支持多段： "a-b、c-d"
-    - 支持跨天段（end < start）：认为跨到次日；在同一天数据里按 t>=start 或 t<=end 命中
-    - dedup=True：避免多段重叠导致同一条消息重复计数
+    根据 日期 + 时间轴，从 messages 中筛选出对应的原始发言：
+    - messages 里的时间字段为：发言日期(YYYY-MM-DD) + 发言时间(HH:MM:SS)
+    - time_axis_str 支持多段："16:10:56-16:23:00、21:00:00-21:10:00"
+    - 内部用 parse_time_range 做“极轴”鲁棒解析
     """
     if not messages or not date_str:
         return []
     if not time_axis_str or not isinstance(time_axis_str, str) or not time_axis_str.strip():
         return []
 
-    ranges = _parse_time_ranges(time_axis_str)  # ✅ 这里一次性解析整个时间轴字符串
+    # 解析所有时间段 -> List[(start_dt, end_dt)]
+    ranges: List[Tuple[datetime, datetime]] = []
+    for part in str(time_axis_str).split("、"):
+        part = part.strip()
+        if not part:
+            continue
+        start_dt, end_dt = parse_time_range(date_str, part)
+        if start_dt and end_dt:
+            ranges.append((start_dt, end_dt))
+
     if not ranges:
         return []
 
     matched: List[Dict[str, Any]] = []
     seen = set()
 
-    for row in messages:
-        if (row.get("发言日期") or "") != date_str:
+    for msg in messages:
+        if (msg.get("发言日期") or "") != date_str:
             continue
 
-        ts = row.get("发言时间") or ""
+        ts = msg.get("发言时间") or ""
         try:
-            t = datetime.strptime(ts, "%H:%M:%S").time()
+            msg_dt = datetime.strptime(f"{date_str} {ts}", "%Y-%m-%d %H:%M:%S")
         except Exception:
             continue
 
-        hit = False
-        for start_t, end_t in ranges:
-            if start_t <= end_t:
-                # 普通区间
-                if start_t <= t <= end_t:
-                    hit = True
-                    break
-            else:
-                # 跨天区间（如 23:59:50-00:02:10）
-                if t >= start_t or t <= end_t:
-                    hit = True
-                    break
-
+        hit = any(start <= msg_dt <= end for (start, end) in ranges)
         if not hit:
             continue
 
-        if dedup:
-            key = (
-                row.get("_idx"),
-                row.get("发言日期"),
-                row.get("发言时间"),
-                row.get("玩家ID"),
-                row.get("玩家消息"),
-            )
-            if key in seen:
-                continue
-            seen.add(key)
-
-        matched.append(row)
+        key = (
+            msg.get("_idx"),
+            msg.get("发言日期"),
+            msg.get("发言时间"),
+            msg.get("玩家ID"),
+            msg.get("玩家消息"),
+        )
+        if key in seen:
+            continue
+        seen.add(key)
+        matched.append(msg)
 
     return matched
+
+from datetime import datetime
+from typing import List, Tuple
+
+def _parse_time_ranges(fayan_time: str) -> List[Tuple[datetime.time, datetime.time]]:
+    """
+    把 '14:00:01-14:09:52、21:00:00-21:10:00' 解析成 List[(start_time, end_time)]
+    只返回 time，不返回 datetime，避免和下游比较类型不一致。
+    """
+    if not fayan_time:
+        return []
+
+    parts = [p.strip() for p in str(fayan_time).split("、") if p.strip()]
+    ranges: List[Tuple[datetime.time, datetime.time]] = []
+
+    for part in parts:
+        # 提取所有形如 16:10:56 的时间片段（兼容“极轴”等脏字符）
+        times = re.findall(r"\d{1,2}:\d{2}:\d{2}", part)
+        if len(times) < 2:
+            continue
+        start_str, end_str = times[0], times[1]
+        try:
+            start_t = datetime.strptime(start_str, "%H:%M:%S").time()
+            end_t   = datetime.strptime(end_str,   "%H:%M:%S").time()
+            ranges.append((start_t, end_t))
+        except Exception:
+            continue
+
+    return ranges
+
 
 
 def get_dialogs_lines_by_fayan_time_debug(
@@ -772,7 +929,7 @@ def extract_top5_heat_clusters(聚合话题簇列表: List[Dict], 原始发言: 
 # -------------------------------
 # 🔹 3. 添加讨论点字段
 # -------------------------------
-def attach_discussion_points(top_clusters: List[Dict], subclusters: List[Dict]) -> List[Dict]:
+def attach_discussion_points_day(top_clusters: List[Dict], subclusters: List[Dict]) -> List[Dict]:
     """
     将 top_clusters 中每个聚合簇的子话题簇列表，与 subclusters 中的 _cluster_id 匹配，
     拼出核心机制描述，并格式化为列点 + 空行。移除子话题簇列表字段。
@@ -810,6 +967,76 @@ def attach_discussion_points(top_clusters: List[Dict], subclusters: List[Dict]) 
     return result
 
 
+def attach_discussion_points_all(
+    top_clusters: List[Dict[str, Any]],
+    subclusters: List[Dict[str, Any]],
+) -> List[Dict[str, Any]]:
+    """
+    对每个聚合簇：
+    - 根据 子话题簇列表(_cluster_id) 找回子话题簇
+    - 用 子话题簇["核心对象/机制"]（或["讨论点"]） 作为讨论点文本
+    - 只输出：讨论点 + 日期时间轴列表 + 子话题簇列表
+    不做 TopK，不做热度，不排序
+    """
+
+    # _cluster_id -> 子话题簇row
+    sub_by_id: Dict[str, Dict[str, Any]] = {}
+    for row in subclusters:
+        cid = row.get("_cluster_id")
+        if cid:
+            sub_by_id[str(cid)] = row
+
+    result: List[Dict[str, Any]] = []
+
+    for cluster in top_clusters:
+        ids = cluster.get("子话题簇列表", []) or []
+
+        # 用 point_text 聚合：同一个讨论点可能对应多个子簇
+        point_bucket: Dict[str, Dict[str, Any]] = {}
+
+        for cid in ids:
+            sc = sub_by_id.get(str(cid))
+            if not sc:
+                continue
+
+            point_text = (sc.get("核心对象/机制") or sc.get("讨论点") or "").strip()
+            if not point_text:
+                continue
+
+            d = sc.get("日期") or cluster.get("日期")
+            t_axis = sc.get("时间轴") or sc.get("时间范围") or sc.get("日期时间轴") or ""
+
+            if point_text not in point_bucket:
+                point_bucket[point_text] = {
+                    "讨论点": point_text,
+                    "日期时间轴列表": [],
+                    "子话题簇列表": [],
+                }
+
+            point_bucket[point_text]["子话题簇列表"].append(str(cid))
+            point_bucket[point_text]["日期时间轴列表"].append({
+                "日期": d,
+                "时间轴": t_axis
+            })
+
+        # 不排序、不截断：全部返回
+        points = list(point_bucket.values())
+
+        cluster_name = cluster.get("话题簇") or cluster.get("聚合话题簇") or "未知"
+
+        enriched_cluster = {
+            "聚合话题簇": cluster_name,
+            "日期": cluster.get("日期"),
+            "时间轴": cluster.get("时间轴"),
+            "发言玩家总数": cluster.get("发言玩家总数"),
+            "发言总数": cluster.get("发言总数"),
+            "热度评分": cluster.get("热度评分"),
+            "讨论点": points,
+        }
+
+        result.append(enriched_cluster)
+
+    return result
 
 ####################### 存入每日发言 top5 ########################
 
@@ -1038,15 +1265,23 @@ def get_dialogs_lines_by_fayan_time(jsonl_lines01: list[str], fayan_time: str) -
 def parse_opinion_output_to_list(opinion_output: str) -> List[Dict[str, Any]]:
     """
     把模型4返回的字符串解析成 List[dict]：
-    - 可能是一个 JSON 对象
-    - 也可能是一个 JSON 数组
-    - 也可能是 jsonl（多行，每行一个 JSON）
+    - 支持：
+      * 单个 JSON 对象
+      * JSON 数组
+      * jsonl（多行，每行一个 JSON）
+      * ```json 代码块 + 多行漂亮 JSON
     """
     if not opinion_output:
         return []
 
     s = opinion_output.strip()
-    # 1) 尝试整体解析
+
+    # 0) 去掉 ```json / ``` 外壳
+    s = re.sub(r"^```[a-zA-Z0-9]*\s*", "", s)
+    s = re.sub(r"\s*```$", "", s)
+    s = s.strip()
+
+    # 1) 先尝试整体解析（能吃掉单对象 / 数组）
     try:
         obj = json.loads(s)
         if isinstance(obj, dict):
@@ -1056,20 +1291,60 @@ def parse_opinion_output_to_list(opinion_output: str) -> List[Dict[str, Any]]:
     except json.JSONDecodeError:
         pass
 
-    # 2) 尝试按行解析 jsonl
-    results = []
+    # 2) 用“括号深度”方式，从多行里拼出一个或多个 JSON 对象
+    objs: List[Dict[str, Any]] = []
+    buf: List[str] = []
+    depth = 0
+
     for raw in s.splitlines():
-        line = raw.strip()
-        if not line or not line.startswith("{"):
-            continue
-        try:
-            d = json.loads(line)
-            if isinstance(d, dict):
-                results.append(d)
-        except json.JSONDecodeError:
+        line = (raw or "").strip()
+        if not line:
             continue
 
-    return results
+        # 去掉 markdown 列表前缀，如 "- { ... }"
+        if line.startswith("- "):
+            line = line[2:].lstrip()
+
+        # 如果这一行完全不含 { 或 }，且当前深度为 0，基本是解释文字，跳过
+        if depth == 0 and "{" not in line:
+            continue
+
+        # 进入/继续一个对象
+        open_cnt = line.count("{")
+        close_cnt = line.count("}")
+
+        if depth == 0 and "{" in line:
+            # 新对象的开始
+            buf = [line]
+            depth = open_cnt - close_cnt
+            if depth <= 0:
+                # 单行对象：{...}
+                text = "\n".join(buf)
+                try:
+                    obj = json.loads(text)
+                    if isinstance(obj, dict):
+                        objs.append(obj)
+                except json.JSONDecodeError:
+                    pass
+                buf = []
+                depth = 0
+        else:
+            # 已经在对象内部
+            buf.append(line)
+            depth += open_cnt - close_cnt
+            if depth <= 0:
+                # 对象结束
+                text = "\n".join(buf)
+                try:
+                    obj = json.loads(text)
+                    if isinstance(obj, dict):
+                        objs.append(obj)
+                except json.JSONDecodeError:
+                    pass
+                buf = []
+                depth = 0
+
+    return objs
 
 ######################观点回溯至top5做最后输出##############
 def _norm_text(s: str) -> str:
@@ -1086,34 +1361,20 @@ def merge_top5_with_opinions_numbered(
     top5_results: List[Dict[str, Any]],
     opinions: List[Dict[str, Any]],
 ) -> List[Dict[str, Any]]:
-    """
-    用“讨论点”把模型4的观点结果合并回 top5。
 
-    - 以 讨论点 文本做 key，把 opinions 中对应的观点对象挂回 top5。
-    - 输出：
-        * 保留原 top5 字段，但移除顶层 "讨论点" / "代表性玩家发言示例"
-        * 新增 "讨论点列表"：
-            [
-              {
-                "讨论点1": "xxx",
-                "玩家观点": [...],
-                "代表性玩家发言示例": [...]
-              },
-              ...
-            ]
-    """
-
-    # 1) opinions -> map：归一化讨论点 => opinion 对象
-    op_map: Dict[str, Dict[str, Any]] = {}
+    # 1) opinions -> multimap：归一化讨论点 => [op1, op2, ...]
+    op_map: Dict[str, List[Dict[str, Any]]] = defaultdict(list)
     for op in opinions:
         dp = (op.get("讨论点") or "").strip()
         if not dp:
             continue
-        op_map[_norm_text(dp)] = op
+        op_map[_norm_text(dp)].append(op)
 
     merged: List[Dict[str, Any]] = []
+    missing = 0
+    hit = 0
 
-    # 2) 合并回 top5
+    # 2) 合并回 top5（逐个消费 list，避免覆盖丢失）
     for row in top5_results:
         dps = row.get("讨论点") or []
         if isinstance(dps, str):
@@ -1126,18 +1387,22 @@ def merge_top5_with_opinions_numbered(
             if not raw_dp:
                 continue
 
-            op = op_map.get(_norm_text(raw_dp))
+            k = _norm_text(raw_dp)
             numbered_key = f"讨论点{idx}"
 
-            if not op:
-                # 没找到对应观点结果，留个标记方便排查
+            if not op_map.get(k):
                 discussion_list.append({
                     numbered_key: raw_dp,
                     "玩家观点": [],
                     "代表性玩家发言示例": [],
                     "_missing_opinion": True,   # 调试用
                 })
+                missing += 1
                 continue
+
+            # ✅ 关键：按顺序取出并消费，防止同名覆盖
+            op = op_map[k].pop(0)
+            hit += 1
 
             examples = op.get("代表性玩家发言示例") or []
             if not isinstance(examples, list):
@@ -1153,15 +1418,18 @@ def merge_top5_with_opinions_numbered(
                 "代表性玩家发言示例": examples,
             })
 
-        # 3) 组装输出：移除顶层“讨论点/代表性玩家发言示例”，只保留讨论点列表
         new_row = dict(row)
         new_row.pop("讨论点", None)
         new_row.pop("代表性玩家发言示例", None)
         new_row["讨论点列表"] = discussion_list
-
         merged.append(new_row)
 
+    # 3) 可选：看有没有 opinion 没被用掉（一般也能帮助确认是否 key 冲突）
+    leftover = sum(len(v) for v in op_map.values())
+    print(f"✅ merge 命中={hit}, missing={missing}, leftover_unused_opinions={leftover}")
+
     return merged
+
 
 #####时间轴校正###
 import re
@@ -1265,3 +1533,69 @@ def ensure_subcluster_list_key(c: Dict[str, Any]) -> bool:
             c["_sub_list_from"] = k
             return True
     return False
+#######按 _idx 回原文算真实时间轴 / 取原文行#######
+from datetime import datetime
+import json
+import re
+
+def extract_idx_list_from_cluster_obj(c: dict) -> list[int]:
+    v = c.get("发言行号列表")
+    if v is None:
+        return []
+    if isinstance(v, list):
+        out = []
+        for x in v:
+            try:
+                out.append(int(x))
+            except:
+                pass
+        return out
+    if isinstance(v, str):
+        nums = re.findall(r"\d+", v)
+        return [int(n) for n in nums]
+    return []
+
+def calc_fayan_time_by_idx(jsonl_lines01_idx: list[str], idx_list: list[int]) -> str:
+    """
+    用 idx_list 回原文算真实 min/max -> 'YYYY-MM-DD HH:MM:SS-HH:MM:SS'
+    """
+    if not idx_list:
+        return ""
+    idx_set = set(idx_list)
+
+    dts = []
+    for line in jsonl_lines01_idx:
+        try:
+            obj = json.loads(line)
+        except:
+            continue
+        if obj.get("_idx") not in idx_set:
+            continue
+
+        d = (obj.get("发言日期") or "").strip()
+        t = (obj.get("发言时间") or "").strip()
+        if not d or not t:
+            continue
+        try:
+            dt = datetime.strptime(f"{d} {t}", "%Y-%m-%d %H:%M:%S")
+        except:
+            continue
+        dts.append(dt)
+
+    if not dts:
+        return ""
+
+    dts.sort()
+    date_str = dts[0].strftime("%Y-%m-%d")
+    return f"{date_str} {dts[0].strftime('%H:%M:%S')}-{dts[-1].strftime('%H:%M:%S')}"
+
+
+def refill_cluster_fayan_time(cluster_json_list: list[dict], jsonl_lines01_idx: list[str]) -> int:
+    ok = 0
+    for c in cluster_json_list:
+        idxs = extract_idx_list_from_cluster_obj(c)
+        axis = calc_fayan_time_by_idx(jsonl_lines01_idx, idxs)
+        c["发言时间"] = axis  # ✅ 写回：后面链路仍然按“发言时间”跑
+        c["_发言时间来源"] = "idx_minmax" if axis else "idx_empty"
+        ok += 1 if axis else 0
+    return ok

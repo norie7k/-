@@ -1,0 +1,6 @@
+@echo off
+chcp 65001 >nul
+cd /d "%~dp0\..\.."
+python "预计算方案\auto_download\run_yesterday.py"
+pause
+

@@ -171,7 +171,7 @@ def fill_empty_cells(excel_path, txt_path, output_path):
 # =============== 执行入口 ==================================
 # ===========================================================
 if __name__ == "__main__":
-    excel_path = r"E:\项目\玩家社群分析智能体\玩家发言分类（供研发侧）\12232群_空值补齐V2修正.xlsx"
-    txt_path   = r"E:\项目\玩家社群分析智能体\玩家发言分类（供研发侧）\1224《欢迎来到地球》测试2群.txt"
+    excel_path = r"E:\项目\玩家社群分析智能体\玩家发言分类（供研发侧）\01052群.xlsx"
+    txt_path   = r"E:\项目\玩家社群分析智能体\玩家发言分类（供研发侧）\0106《欢迎来到地球》测试2群.txt"
     output_path= excel_path.replace(".xlsx", "_空值补齐V2.xlsx")
     fill_empty_cells(excel_path, txt_path, output_path)

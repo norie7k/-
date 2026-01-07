@@ -1,0 +1,18 @@
+[theme]
+# 主题配置
+primaryColor = "#6366f1"
+backgroundColor = "#0f172a"
+secondaryBackgroundColor = "#1e293b"
+textColor = "#f1f5f9"
+font = "sans serif"
+
+[server]
+# 服务器配置
+headless = true
+enableCORS = false
+enableXsrfProtection = true
+
+[browser]
+# 浏览器配置
+gatherUsageStats = false
+
