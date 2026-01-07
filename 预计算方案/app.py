@@ -424,23 +424,40 @@ def render_result(result: dict, group_key: str | None = None):
             else:
                 group_display = cleaned_name + " "
 
-    # 统计概览
+    # 获取平台信息
+    platform = result.get("source", "QQ")  # 默认为QQ
+    platform_display = {
+        "QQ": "QQ",
+        "微信": "微信",
+        "WeChat": "微信",
+        "Discord": "Discord",
+        "discord": "Discord"
+    }.get(platform, platform)
+    
+    # 格式化日期显示（YYYY年MM月DD日）
+    try:
+        date_obj = datetime.strptime(date, "%Y-%m-%d")
+        formatted_date = date_obj.strftime("%Y年%m月%d日")
+    except:
+        formatted_date = date
+    
+    # 获取热度公式（如果有）
+    heat_formula = result.get("heat_formula", "热度评分 = 发言玩家数 × sqrt(发言总数)")
+    
+    # 报告说明
     st.markdown(
         f"""<div class="stats-overview">
 <h2>📊 {group_display}{date} 分析报告</h2>
-<div class="stat-grid">
-  <div class="stat-item">
-    <div class="stat-value">{total_messages}</div>
-    <div class="stat-label">总发言数</div>
-  </div>
-  <div class="stat-item">
-    <div class="stat-value">{total_players}</div>
-    <div class="stat-label">参与玩家数</div>
-  </div>
-  <div class="stat-item">
-    <div class="stat-value">{total_clusters}</div>
-    <div class="stat-label">热门话题簇</div>
-  </div>
+<div style="padding: 1rem 0; line-height: 1.8; color: var(--text);">
+  <p style="margin: 0.5rem 0; font-size: 1.05rem;">
+    <strong>{formatted_date}</strong> <strong>{platform_display}</strong> <strong>{group_display.strip()}</strong> 每日输出结果
+  </p>
+  <p style="margin: 0.5rem 0; font-size: 1.05rem; color: var(--muted);">
+    默认展示当日热度最高的Top5话题（可展开查看讨论点/玩家观点/代表性发言）
+  </p>
+  <p style="margin: 0.5rem 0; font-size: 0.95rem; color: var(--muted2); font-style: italic;">
+    {heat_formula}
+  </p>
 </div>
 </div>""",
         unsafe_allow_html=True,
