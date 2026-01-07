@@ -2,6 +2,8 @@
   "group": "地球群2",
   "group_id": "2",
   "date": "2026-01-04",
+  "source": "QQ",
+  "heat_formula": "热度评分 = 发言玩家数 × sqrt(发言总数)",
   "generated_at": "2026-01-05T20:04:17.411938",
   "clusters": [
     {
