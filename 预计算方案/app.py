@@ -229,11 +229,11 @@ div[data-baseweb="popover"] button.date-disabled .date-disabled-icon {
   box-shadow: 0 10px 26px rgba(0,0,0,.25);
 }
 .stats-overview h2{
-  color: #e9d5ff;
+  color:var(--text) ;
   margin: 0 0 .55rem 0;
   padding-bottom: .45rem;
   border-bottom: 1px solid rgba(148,163,184,.16);
-  font-size: 1.35rem;   /* ✅ 改这里：接近 st.markdown("###") */
+  font-size: 1.38rem;   /* ✅ 改这里：接近 st.markdown("###") */
   font-weight: 900;
 }
 .stat-grid{
@@ -316,14 +316,7 @@ div[data-baseweb="popover"] button.date-disabled .date-disabled-icon {
   margin-right: 4px;
 }
 
-.heatbar-wrap{
-  margin-top: 12px;
-  background: rgba(148,163,184,.10);
-  border-radius: 999px;
-  height: 12px;                            /* ✅ 热度条更粗更明显 */
-  overflow: hidden;
-  border: 1px solid rgba(148,163,184,.10);
-}
+
 .heatbar{
   height: 100%;
   border-radius: 999px;
