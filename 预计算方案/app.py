@@ -167,28 +167,56 @@ div[data-baseweb="popover"] button.date-disabled .date-disabled-icon {
 }
 
 /* ===== 报告说明条（替代三张数据卡）===== */
+/* ===== 报告说明区：更干净的三行排版（不改文字）===== */
 .report-note{
   margin-top: .55rem;
   padding: 12px 14px;
   border-radius: 14px;
-  background: rgba(99,102,241,.08);
-  border: 1px solid rgba(148,163,184,.14);
-  color: rgba(226,232,240,.95);
+  background: rgba(148,163,184,.08);
+  border: 1px solid rgba(148,163,184,.12);
+}
+
+.note-row{
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
   line-height: 1.55;
+  color: rgba(226,232,240,.92);
   font-size: .98rem;
 }
-.report-note b{ color: #e9d5ff; }
-.report-note .tag{
-  display:inline-block;
-  padding: 2px 10px;
+
+.note-badge{
+  flex: 0 0 auto;
+  padding: 3px 10px;
   border-radius: 999px;
-  border: 1px solid rgba(148,163,184,.16);
-  background: rgba(236,72,153,.10);
-  margin: 0 6px 0 0;
-  font-weight: 800;
-  font-size: .9rem;
-  color: #fce7f3;
+  border: 1px solid rgba(148,163,184,.14);
+  background: rgba(99,102,241,.12);
+  color: #e0e7ff;
+  font-weight: 900;
+  font-size: .88rem;
+  margin-top: 2px;
 }
+
+.note-text{
+  flex: 1 1 auto;
+}
+
+.note-formula{
+  margin-top: 6px;
+}
+
+.note-formula code{
+  display: inline-block;
+  padding: 6px 10px;
+  border-radius: 12px;
+  border: 1px solid rgba(148,163,184,.14);
+  background: rgba(99,102,241,.10);
+  color: #dbeafe;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-size: .93rem;
+  white-space: normal;
+}
+
 
 /* ===== 统计概览卡 ===== */
 /* ===== 统计概览卡：更紧凑 ===== */
@@ -452,25 +480,30 @@ def render_result(result: dict, group_key: str | None = None):
         # ====== 报告说明（替代三张数据卡）======
     # 你可以在 result.json 里加 "source" 字段，比如 "QQ" / "微信" / "QQ+微信"
     # 如果没有，就默认写“社群聊天记录”
-    source = result.get("source", "") or result.get("来源", "") or "社群聊天记录"
-
-    # 可选：如果你希望文案里也提到“热度评分口径”，可以写死或从 result 里读
-    heat_formula = result.get("heat_formula", "") or "热度用于衡量讨论强度（综合参与人数与发言量）"
-
+    source = result.get("source", "") or result.get("来源", "") or "QQ/微信等社群"
+    heat_formula = result.get("heat_formula", "") or "热度评分 = 发言玩家数 × sqrt(发言总数)"
     st.markdown(
-        f"""<div class="stats-overview">
+f"""<div class="stats-overview">
 <h2>📊 {group_display}{date} 分析报告</h2>
+
 <div class="report-note">
-  <span class="tag">说明</span>
-  本页为 <b>{date}</b> 基于 <b>{group_display.strip() or "指定社群"}</b> 的 <b>{source}</b> 内容生成的“热门讨论”汇总：<br/>
-  以 <b>热度值</b> 对话题簇排序，默认展示当日热度最高的 Top 5话题（可展开查看讨论点 / 玩家观点 / 代表性发言）。<br/>
-  <span style="color:rgba(148,163,184,.95);">{heat_formula}</span>
+  <div class="note-row">
+    <span class="note-badge">说明</span>
+    <div class="note-text">本页为 {date} 基于 {group_display.strip() or "《地球》社群"} 的 {source} 内容生成的“热门讨论”汇总：</div>
+  </div>
+  <div class="note-row">
+    <span style="width:54px;flex:0 0 54px;"></span>
+    <div class="note-text">以热度值对讨论点排序，默认展示当日热度最高的 Top 5 话题（可展开查看讨论点 / 玩家观点 / 代表性发言）。</div>
+  </div>
+  <div class="note-row note-formula">
+    <span style="width:54px;flex:0 0 54px;"></span>
+    <div class="note-text"><code>{heat_formula}</code></div>
+  </div>
 </div>
+
 </div>""",
-        unsafe_allow_html=True,
-    )
-
-
+unsafe_allow_html=True
+)
     # ========= 热门话题列表（摘要卡 + 展开详情）=========
     sorted_clusters = sorted(clusters, key=lambda x: float(x.get("热度评分", 0) or 0), reverse=True)
 
