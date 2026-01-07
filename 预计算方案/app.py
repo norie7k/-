@@ -229,10 +229,12 @@ div[data-baseweb="popover"] button.date-disabled .date-disabled-icon {
   box-shadow: 0 10px 26px rgba(0,0,0,.25);
 }
 .stats-overview h2{
-  color: #c7d2fe;
-  margin: 0 0 1rem 0;
-  padding-bottom: .6rem;
-  border-bottom: 1px solid rgba(199,210,254,.25);
+  color: #e9d5ff;
+  margin: 0 0 .55rem 0;
+  padding-bottom: .45rem;
+  border-bottom: 1px solid rgba(148,163,184,.16);
+  font-size: 1.35rem;   /* ✅ 改这里：接近 st.markdown("###") */
+  font-weight: 900;
 }
 .stat-grid{
   display:grid;
@@ -488,7 +490,6 @@ f"""<div class="stats-overview">
 
 <div class="report-note">
   <div class="note-row">
-    <span class="note-badge">说明</span>
     <div class="note-text">本页为 {date} 基于 {group_display.strip() or "《地球》社群"} 的 {source} 内容生成的“热门讨论”汇总：</div>
   </div>
   <div class="note-row">
