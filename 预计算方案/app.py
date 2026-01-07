@@ -12,6 +12,7 @@ import requests
 from datetime import datetime
 from pathlib import Path
 import time
+import textwrap   # ✅ 加这一行
 
 # ==================== 配置 ====================
 
@@ -484,26 +485,27 @@ def render_result(result: dict, group_key: str | None = None):
     # 如果没有，就默认写“社群聊天记录”
     source = result.get("source", "") or result.get("来源", "") or "QQ/微信等社群"
     heat_formula = result.get("heat_formula", "") or "热度评分 = 发言玩家数 × sqrt(发言总数)"
-    st.markdown(
-    f"""
-    <div class="stats-overview">
-      <h2>📊 {group_display}{date} 分析报告</h2>
 
-      <div class="report-note">
+    html = textwrap.dedent(f"""
+    <div class="stats-overview">
+    <h2>📊 {group_display}{date} 分析报告</h2>
+
+    <div class="report-note">
         <div class="note-row">
-          <div class="note-text">
+        <div class="note-text">
             本页为 {date} 基于 {group_display.strip() or "《地球》社群"} 的 {source} 内容生成的“热门讨论”汇总：以热度值对讨论点排序，默认展示当日热度最高的 Top 5 话题（可展开查看讨论点 / 玩家观点 / 代表性发言）。
-          </div>
+        </div>
         </div>
 
         <div class="note-row note-formula">
-          <div class="note-text"><code>{heat_formula}</code></div>
+        <div class="note-text"><code>{heat_formula}</code></div>
         </div>
-      </div>
     </div>
-    """,
-    unsafe_allow_html=True
-)
+    </div>
+    """).strip()
+
+    st.markdown(html, unsafe_allow_html=True)
+
 
     # ========= 热门话题列表（摘要卡 + 展开详情）=========
     sorted_clusters = sorted(clusters, key=lambda x: float(x.get("热度评分", 0) or 0), reverse=True)
