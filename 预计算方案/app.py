@@ -170,16 +170,18 @@ div[data-baseweb="popover"] button.date-disabled .date-disabled-icon {
 .stats-overview{
   background: linear-gradient(145deg, rgba(18,26,49,.92), rgba(15,23,42,.92));
   border-radius: 18px;
-  padding: 1.35rem 1.35rem 1.15rem 1.35rem;
+  padding: 0.8rem 1rem 0.8rem 1rem;
   margin: 1.1rem 0 1.1rem 0;
   border: 1px solid rgba(148,163,184,.16);
   box-shadow: 0 12px 30px rgba(0,0,0,.30);
 }
 .stats-overview h2{
   color: #e9d5ff;
-  margin: 0 0 .9rem 0;
-  padding-bottom: .65rem;
+  margin: 0 0 .6rem 0;
+  padding-bottom: .5rem;
   border-bottom: 1px solid rgba(148,163,184,.18);
+  font-size: 1.5rem;
+  font-weight: 600;
 }
 .stat-grid{
   display:grid;
@@ -448,14 +450,14 @@ def render_result(result: dict, group_key: str | None = None):
     st.markdown(
         f"""<div class="stats-overview">
 <h2>📊 {group_display}{date} 分析报告</h2>
-<div style="padding: 1rem 0; line-height: 1.8; color: var(--text);">
-  <p style="margin: 0.5rem 0; font-size: 1.05rem;">
+<div style="padding: 0.3rem 0; line-height: 1.6; color: var(--text);">
+  <p style="margin: 0.3rem 0; font-size: 1.05rem;">
     <strong>{formatted_date}</strong> <strong>{platform_display}</strong> <strong>{group_display.strip()}</strong> 每日输出结果
   </p>
-  <p style="margin: 0.5rem 0; font-size: 1.05rem; color: var(--muted);">
+  <p style="margin: 0.3rem 0; font-size: 1.05rem; color: var(--muted);">
     默认展示当日热度最高的Top5话题（可展开查看讨论点/玩家观点/代表性发言）
   </p>
-  <p style="margin: 0.5rem 0; font-size: 0.95rem; color: var(--muted2); font-style: italic;">
+  <p style="margin: 0.3rem 0; font-size: 0.95rem; color: var(--muted2); font-style: italic;">
     {heat_formula}
   </p>
 </div>
