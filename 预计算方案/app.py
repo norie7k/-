@@ -171,8 +171,7 @@ div[data-baseweb="popover"] button.date-disabled .date-disabled-icon {
 /* ===== 报告说明区：更干净的三行排版（不改文字）===== */
 .report-note{
   width: 100%;
-  max-width: 980px;          /* 你想更窄就 900/860，想更宽就 1100 */
-  margin: .55rem auto 0 auto;/* 居中 */
+  margin: .55rem 0 0 0;             /* ✅ 不再居中，而是占满 stats-overview 内部 */
   padding: 12px 14px;
   border-radius: 14px;
   background: rgba(148,163,184,.08);
@@ -233,10 +232,12 @@ div[data-baseweb="popover"] button.date-disabled .date-disabled-icon {
   background: linear-gradient(145deg, rgba(30,41,59,.95), rgba(51,65,85,.92));
   border-radius: 18px;
   padding: 1.6rem;
-  margin: 1.2rem 0 1.4rem 0;
+  margin: 1.2rem auto 1.4rem auto;   /* ✅ 居中 */
   border: 1px solid var(--line);
   box-shadow: 0 10px 26px rgba(0,0,0,.25);
+  max-width: 980px;                  /* ✅ 和说明一样宽 */
 }
+
 .stats-overview h2{
   color:var(--text) ;
   margin: 0 0 .55rem 0;
@@ -486,26 +487,21 @@ def render_result(result: dict, group_key: str | None = None):
     source = result.get("source", "") or result.get("来源", "") or "QQ/微信等社群"
     heat_formula = result.get("heat_formula", "") or "热度评分 = 发言玩家数 × sqrt(发言总数)"
 
-    html = textwrap.dedent(f"""
-    <div class="stats-overview">
+    html = f"""<div class="stats-overview">
     <h2>📊 {group_display}{date} 分析报告</h2>
-
     <div class="report-note">
-        <div class="note-row">
+    <div class="note-row">
         <div class="note-text">
-            本页为 {date} 基于 {group_display.strip() or "《地球》社群"} 的 {source} 内容生成的“热门讨论”汇总：以热度值对讨论点排序，默认展示当日热度最高的 Top 5 话题（可展开查看讨论点 / 玩家观点 / 代表性发言）。
+        本页为 {date} 基于 {group_display.strip() or "《地球》社群"} 的 {source} 内容生成的“热门讨论”汇总：以热度值对讨论点排序，默认展示当日热度最高的 Top 5 话题（可展开查看讨论点 / 玩家观点 / 代表性发言）。
         </div>
-        </div>
-
-        <div class="note-row note-formula">
+    </div>
+    <div class="note-row note-formula">
         <div class="note-text"><code>{heat_formula}</code></div>
-        </div>
     </div>
     </div>
-    """).strip()
+    </div>"""
 
     st.markdown(html, unsafe_allow_html=True)
-
 
     # ========= 热门话题列表（摘要卡 + 展开详情）=========
     sorted_clusters = sorted(clusters, key=lambda x: float(x.get("热度评分", 0) or 0), reverse=True)
