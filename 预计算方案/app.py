@@ -207,13 +207,17 @@ div[data-baseweb="popover"] button.date-disabled .date-disabled-icon {
 }
 
 /* ===== 摘要卡 ===== */
+.cluster-wrapper{
+  margin: 14px 0 10px 0;
+  position: relative;
+}
 .cluster-card{
   background: linear-gradient(145deg, rgba(18,26,49,.92), rgba(15,23,42,.92));
   border: 1px solid rgba(148,163,184,.16);
   border-radius: 18px;
   padding: 14px 16px 12px 16px;
   box-shadow: 0 12px 28px rgba(0,0,0,.28);
-  margin: 14px 0 10px 0;
+  margin-bottom: 8px;
 }
 .cluster-header{
   display:flex;
@@ -221,6 +225,16 @@ div[data-baseweb="popover"] button.date-disabled .date-disabled-icon {
   justify-content:space-between;
   gap: 10px;
   margin-bottom: 8px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: linear-gradient(145deg, rgba(18,26,49,.98), rgba(15,23,42,.98));
+  padding: 12px 16px;
+  margin: -14px -16px 8px -16px;
+  border-radius: 18px 18px 0 0;
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(148,163,184,.2);
+  box-shadow: 0 4px 12px rgba(0,0,0,.2);
 }
 .cluster-title{
   font-weight: 950;
@@ -493,8 +507,10 @@ def render_result(result: dict, group_key: str | None = None):
             short_time = time_axis if len(time_axis) <= 70 else (time_axis[:70] + "…")
             meta_chips.append(f'<div class="meta-chip"><span>⏰ 时间</span>{short_time}</div>')
 
+        # 包装容器，用于实现sticky效果
         st.markdown(
-            f"""<div class="cluster-card">
+            f"""<div class="cluster-wrapper">
+<div class="cluster-card">
 <div class="cluster-header">
   <div>
     <div class="cluster-title">{idx}. {title}</div>
@@ -502,13 +518,38 @@ def render_result(result: dict, group_key: str | None = None):
   </div>
   <div class="badge-heat"><small>热度</small>{heat:.1f} 🔥</div>
 </div>
-<div class="heatbar-wrap"><div class="heatbar" style="width:{pct:.1f}%"></div></div>
 </div>""",
             unsafe_allow_html=True,
         )
 
         # 展开详情（全量展示）
         with st.expander("展开详情（讨论点/观点/代表发言）", expanded=(idx <= 2)):
+            # 添加JavaScript确保header在expander滚动时也能sticky
+            st.markdown(
+                f"""<script>
+(function(){{
+  const clusterWrapper = document.querySelector('.cluster-wrapper:last-of-type');
+  if(clusterWrapper) {{
+    const header = clusterWrapper.querySelector('.cluster-header');
+    if(header) {{
+      const observer = new MutationObserver(function() {{
+        const expander = clusterWrapper.nextElementSibling;
+        if(expander && expander.querySelector('[data-testid="stExpander"]')) {{
+          const expanderContent = expander.querySelector('[role="region"]');
+          if(expanderContent) {{
+            expanderContent.style.position = 'relative';
+            header.style.position = 'sticky';
+            header.style.top = '0';
+          }}
+        }}
+      }});
+      observer.observe(document.body, {{ childList: true, subtree: true }});
+    }}
+  }}
+}})();
+</script>""",
+                unsafe_allow_html=True,
+            )
             if time_axis:
                 st.markdown(f"**⏰ 完整时间轴：** {time_axis}")
             else:
