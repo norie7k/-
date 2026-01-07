@@ -232,8 +232,9 @@ div[data-baseweb="popover"] button.date-disabled .date-disabled-icon {
   position: sticky;
   top: 0;
   z-index: 100;
-  margin: -12px -14px 12px -14px;
+  margin: 0;
   padding: 0;
+  margin-bottom: 12px;
 }
 .cluster-header-inner{
   display:flex;
@@ -328,8 +329,22 @@ section[data-testid="stMain"] div[data-testid="stExpander"] div[role="region"]{
   background: rgba(15,23,42,.30) !important;
   border: 1px solid rgba(148,163,184,.10) !important;
   border-radius: 14px !important;
-  padding: 12px 14px !important;
+  padding: 0 !important;
   position: relative;
+  max-height: 600px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(148,163,184,.3) transparent;
+}
+section[data-testid="stMain"] div[data-testid="stExpander"] div[role="region"] > *:not(.cluster-header-sticky){
+  padding-left: 14px;
+  padding-right: 14px;
+  padding-top: 12px;
+  padding-bottom: 12px;
+}
+section[data-testid="stMain"] div[data-testid="stExpander"] div[role="region"] > .cluster-header-sticky + *{
+  padding-top: 0;
 }
 
 /* ===== 讨论点 / 观点 / 引用 ===== */
