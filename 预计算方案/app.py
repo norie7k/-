@@ -193,52 +193,39 @@ div[data-baseweb="popover"] button.date-disabled .date-disabled-icon {
 /* ===== 统计概览卡 ===== */
 /* ===== 统计概览卡：更紧凑 ===== */
 .stats-overview{
-  background: linear-gradient(145deg, rgba(18,26,49,.86), rgba(15,23,42,.86));
-  border-radius: 16px;
-  padding: .9rem 1.05rem .85rem 1.05rem;   /* ✅ 减小 */
-  margin: .6rem 0 .7rem 0;                 /* ✅ 减小 */
-  border: 1px solid rgba(148,163,184,.14);
-  box-shadow: 0 10px 22px rgba(0,0,0,.26);
-  max-width: 1100px;                       /* ✅ 避免横向太“铺满显大” */
-  margin-left: auto;
-  margin-right: auto;
+  background: linear-gradient(145deg, rgba(30,41,59,.95), rgba(51,65,85,.92));
+  border-radius: 18px;
+  padding: 1.6rem;
+  margin: 1.2rem 0 1.4rem 0;
+  border: 1px solid var(--line);
+  box-shadow: 0 10px 26px rgba(0,0,0,.25);
 }
-
 .stats-overview h2{
-  color: #e9d5ff;
-  margin: 0 0 .55rem 0;                    /* ✅ 减小 */
-  padding-bottom: .45rem;                  /* ✅ 减小 */
-  border-bottom: 1px solid rgba(148,163,184,.16);
-  font-size: 1.15rem;                      /* ✅ 减小标题 */
-  font-weight: 900;
+  color: #c7d2fe;
+  margin: 0 0 1rem 0;
+  padding-bottom: .6rem;
+  border-bottom: 1px solid rgba(199,210,254,.25);
 }
-
 .stat-grid{
   display:grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: .7rem;                              /* ✅ 减小间距 */
+  gap: 1rem;
 }
-
 .stat-item{
-  background: rgba(99,102,241,.08);
-  border: 1px solid rgba(148,163,184,.12);
+  background: rgba(99,102,241,.10);
+  border: 1px solid rgba(99,102,241,.18);
   border-radius: 14px;
-  padding: .65rem .7rem;                   /* ✅ 减小内边距 */
+  padding: 1rem;
   text-align:center;
 }
-
 .stat-value{
-  font-size: 1.45rem;                      /* ✅ 数字变小但仍醒目 */
-  font-weight: 950;
+  font-size: 1.9rem;
+  font-weight: 800;
   color: #c7d2fe;
-  letter-spacing: .3px;
-  line-height: 1.1;
 }
-
 .stat-label{
-  font-size: .82rem;                       /* ✅ 更紧凑 */
+  font-size: .9rem;
   color: var(--muted);
-  margin-top: .15rem;
 }
 
 /* ===== 摘要卡 ===== */
