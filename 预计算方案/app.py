@@ -167,41 +167,54 @@ div[data-baseweb="popover"] button.date-disabled .date-disabled-icon {
 }
 
 /* ===== 统计概览卡 ===== */
+/* ===== 统计概览卡：更紧凑 ===== */
 .stats-overview{
-  background: linear-gradient(145deg, rgba(18,26,49,.92), rgba(15,23,42,.92));
-  border-radius: 18px;
-  padding: 1.35rem 1.35rem 1.15rem 1.35rem;
-  margin: 1.1rem 0 1.1rem 0;
-  border: 1px solid rgba(148,163,184,.16);
-  box-shadow: 0 12px 30px rgba(0,0,0,.30);
+  background: linear-gradient(145deg, rgba(18,26,49,.86), rgba(15,23,42,.86));
+  border-radius: 16px;
+  padding: .9rem 1.05rem .85rem 1.05rem;   /* ✅ 减小 */
+  margin: .6rem 0 .7rem 0;                 /* ✅ 减小 */
+  border: 1px solid rgba(148,163,184,.14);
+  box-shadow: 0 10px 22px rgba(0,0,0,.26);
+  max-width: 1100px;                       /* ✅ 避免横向太“铺满显大” */
+  margin-left: auto;
+  margin-right: auto;
 }
+
 .stats-overview h2{
   color: #e9d5ff;
-  margin: 0 0 .9rem 0;
-  padding-bottom: .65rem;
-  border-bottom: 1px solid rgba(148,163,184,.18);
+  margin: 0 0 .55rem 0;                    /* ✅ 减小 */
+  padding-bottom: .45rem;                  /* ✅ 减小 */
+  border-bottom: 1px solid rgba(148,163,184,.16);
+  font-size: 1.15rem;                      /* ✅ 减小标题 */
+  font-weight: 900;
 }
+
 .stat-grid{
   display:grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: .9rem;
+  gap: .7rem;                              /* ✅ 减小间距 */
 }
+
 .stat-item{
-  background: rgba(99,102,241,.09);
+  background: rgba(99,102,241,.08);
   border: 1px solid rgba(148,163,184,.12);
   border-radius: 14px;
-  padding: .95rem .9rem;
+  padding: .65rem .7rem;                   /* ✅ 减小内边距 */
   text-align:center;
 }
+
 .stat-value{
-  font-size: 1.85rem;
-  font-weight: 900;
+  font-size: 1.45rem;                      /* ✅ 数字变小但仍醒目 */
+  font-weight: 950;
   color: #c7d2fe;
-  letter-spacing: .5px;
+  letter-spacing: .3px;
+  line-height: 1.1;
 }
+
 .stat-label{
-  font-size: .88rem;
+  font-size: .82rem;                       /* ✅ 更紧凑 */
   color: var(--muted);
+  margin-top: .15rem;
 }
 
 /* ===== 摘要卡 ===== */
@@ -209,10 +222,11 @@ div[data-baseweb="popover"] button.date-disabled .date-disabled-icon {
   background: linear-gradient(145deg, rgba(18,26,49,.92), rgba(15,23,42,.92));
   border: 1px solid rgba(148,163,184,.16);
   border-radius: 18px;
-  padding: 14px 16px 12px 16px;
-  box-shadow: 0 12px 28px rgba(0,0,0,.28);
-  margin: 14px 0 10px 0;
+  padding: 18px 18px 14px 18px;            /* ✅ 加大卡片 */
+  box-shadow: 0 14px 32px rgba(0,0,0,.30);
+  margin: 16px 0 12px 0;                   /* ✅ 让卡片“更像主角” */
 }
+
 .cluster-header{
   display:flex;
   align-items:flex-start;
@@ -221,23 +235,23 @@ div[data-baseweb="popover"] button.date-disabled .date-disabled-icon {
   margin-bottom: 8px;
 }
 .cluster-title{
-  font-weight: 950;
-  font-size: 1.15rem;
-  color: #f1f5f9;
+  font-weight: 980;
+  font-size: 1.38rem;                      /* ✅ 标题更大 */
+  color: #f8fafc;
   line-height: 1.25;
 }
 .cluster-meta{
   display:flex;
-  gap: 8px;
+  gap: 10px;
   flex-wrap: wrap;
-  margin-top: 8px;
+  margin-top: 10px;
 }
 .meta-chip{
   background: rgba(99,102,241,.10);
   border: 1px solid rgba(148,163,184,.14);
   border-radius: 999px;
-  padding: 6px 10px;
-  font-size: .86rem;
+  padding: 7px 12px;                       /* ✅ chip 更易读 */
+  font-size: .93rem;                       /* ✅ 字更大 */
   color: var(--text);
 }
 .meta-chip span{
@@ -246,13 +260,13 @@ div[data-baseweb="popover"] button.date-disabled .date-disabled-icon {
   margin-right: 6px;
 }
 .badge-heat{
-  flex: 0 0 auto;
-  padding: 7px 10px;
+  padding: 8px 12px;
   border-radius: 999px;
-  font-weight: 950;
+  font-weight: 980;
+  font-size: 1.02rem;                      /* ✅ 徽章更醒目 */
   color:#fff;
   background: linear-gradient(90deg, rgba(236,72,153,.95), rgba(139,92,246,.95));
-  box-shadow: 0 8px 20px rgba(236,72,153,.22);
+  box-shadow: 0 10px 24px rgba(236,72,153,.22);
   white-space: nowrap;
 }
 .badge-heat small{
@@ -262,10 +276,10 @@ div[data-baseweb="popover"] button.date-disabled .date-disabled-icon {
 }
 
 .heatbar-wrap{
-  margin-top: 10px;
+  margin-top: 12px;
   background: rgba(148,163,184,.10);
   border-radius: 999px;
-  height: 10px;
+  height: 12px;                            /* ✅ 热度条更粗更明显 */
   overflow: hidden;
   border: 1px solid rgba(148,163,184,.10);
 }
