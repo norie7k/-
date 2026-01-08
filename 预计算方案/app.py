@@ -321,12 +321,33 @@ div[data-baseweb="popover"] button.date-disabled .date-disabled-icon {
   margin: 14px 0;
   position: relative;
 }
+.custom-expander{
+  border-radius: 18px;
+}
+/* Summary中的卡片：未展开时显示，展开后隐藏 */
+.custom-expander:not([open]) .custom-expander-summary .cluster-card{
+  display: block;
+  background: linear-gradient(145deg, rgba(18,26,49,.92), rgba(15,23,42,.92));
+  border: 1px solid rgba(148,163,184,.16);
+  border-radius: 18px;
+  padding: 14px 16px 12px 16px;
+  box-shadow: 0 12px 28px rgba(0,0,0,.28);
+  margin-bottom: 8px;
+}
+.custom-expander[open] .custom-expander-summary .cluster-card{
+  display: none;
+}
+/* 内容区域中的Sticky卡片：滚动时固定在内容区域顶部 */
 .cluster-card-sticky{
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  background: transparent;
-  padding-bottom: 8px;
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 100 !important;
+  background: linear-gradient(180deg, rgba(15,23,42,1) 0%, rgba(15,23,42,0.98) 85%, rgba(15,23,42,0.7) 100%) !important;
+  padding-bottom: 10px;
+  margin: -12px -14px 0 -14px;
+  padding-left: 14px;
+  padding-right: 14px;
+  padding-top: 12px;
 }
 .cluster-card-sticky .cluster-card{
   background: linear-gradient(145deg, rgba(18,26,49,.92), rgba(15,23,42,.92));
@@ -346,6 +367,7 @@ div[data-baseweb="popover"] button.date-disabled .date-disabled-icon {
   cursor: pointer !important;
   list-style: none !important;
   user-select: none !important;
+  display: block !important;
 }
 .custom-expander-summary::-webkit-details-marker{
   display: none;
@@ -355,7 +377,7 @@ div[data-baseweb="popover"] button.date-disabled .date-disabled-icon {
   border: 1px solid rgba(148,163,184,.16);
   border-radius: 18px;
   padding: 10px 16px;
-  text-align: center;
+  text-align: left;
   color: var(--text);
   font-weight: 900;
   transition: all 0.2s ease;
@@ -374,12 +396,6 @@ div[data-baseweb="popover"] button.date-disabled .date-disabled-icon {
 }
 .toggle-text{
   font-size: 0.95rem;
-}
-.custom-expander:not([open]) .toggle-text::after{
-  content: '详情（讨论点/观点/代表发言）';
-}
-.custom-expander[open] .toggle-text::after{
-  content: '详情（讨论点/观点/代表发言）';
 }
 .custom-expander-content{
   background: rgba(15,23,42,.30) !important;
@@ -617,19 +633,13 @@ def render_result(result: dict, group_key: str | None = None):
     # 获取热度公式（如果有）
     heat_formula = result.get("heat_formula", "热度值 = 发言玩家数 × sqrt(发言总数)")
     
-    # 报告说明
+    # 报告说明（紧凑版）
     st.markdown(
         f"""<div class="stats-overview">
-<h2>📊 {group_display}{date} 分析报告</h2>
-<div style="padding: 0.3rem 0; line-height: 1.6; color: var(--text);">
-  <p style="margin: 0.3rem 0; font-size: 1.05rem;">
-    <strong>{formatted_date}</strong> <strong>{platform_display}</strong> <strong>{group_display.strip()}</strong> 每日输出结果
-  </p>
-  <p style="margin: 0.3rem 0; font-size: 1.05rem; color: var(--muted);">
-    默认展示当日热度最高的Top5话题（可展开查看讨论点/玩家观点/代表性发言）
-  </p>
-  <p style="margin: 0.3rem 0; font-size: 0.95rem; color: var(--muted2); font-style: italic;">
-    {heat_formula}
+<h2>📊 {platform_display} {group_display} {formatted_date} 分析报告</h2>
+<div style="padding: 0.3rem 0; line-height: 1.8; color: var(--text);">
+  <p style="margin: 0.2rem 0; font-size: 1.0rem;">
+    默认展示当日热度最高的Top5话题（可展开查看讨论点/玩家观点/代表性发言） • <span style="color: var(--muted2); font-style: italic;">{heat_formula}</span>
   </p>
 </div>
 </div>""",
@@ -711,6 +721,24 @@ def render_result(result: dict, group_key: str | None = None):
         
         st.markdown(
             f"""<div class="cluster-custom-wrapper">
+<details class="custom-expander" {expanded_str}>
+<summary class="custom-expander-summary">
+<div class="cluster-card">
+<div class="cluster-header">
+<div>
+<div class="cluster-title">{idx}. {title_escaped}</div>
+<div class="cluster-meta">{''.join(meta_chips)}</div>
+</div>
+<div class="badge-heat"><small>热度</small>{heat:.1f} 🔥</div>
+</div>
+</div>
+<div class="expander-toggle">
+<span class="toggle-icon">▼</span>
+<span class="toggle-text">详情（讨论点/观点/代表发言）</span>
+</div>
+</summary>
+<div class="custom-expander-content">
+<!-- 内部Sticky卡片：滚动详细内容时固定 -->
 <div class="cluster-card-sticky">
 <div class="cluster-card">
 <div class="cluster-header">
@@ -722,15 +750,6 @@ def render_result(result: dict, group_key: str | None = None):
 </div>
 </div>
 </div>
-
-<details class="custom-expander" {expanded_str}>
-<summary class="custom-expander-summary">
-<div class="expander-toggle">
-<span class="toggle-icon">▼</span>
-<span class="toggle-text"></span>
-</div>
-</summary>
-<div class="custom-expander-content">
 <div class="custom-expander-inner">
 {time_axis_html}
 {discussion_content_html}
