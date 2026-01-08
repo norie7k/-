@@ -741,7 +741,7 @@ def render_result(result: dict, group_key: str | None = None):
 </div>
 <!-- 可滚动内容区域（包含收起按钮 + 详细内容）-->
 <div class="scrollable-content">
-<div class="expander-toggle-inside" onclick="this.closest('details').removeAttribute('open')">
+<div class="expander-toggle-inside">
 <span class="toggle-icon">▲</span>
 <span class="toggle-text">收起详情</span>
 </div>
@@ -809,6 +809,56 @@ def render_result(result: dict, group_key: str | None = None):
 
                 st.markdown("---")
 
+    # ========= JavaScript：处理收起详情按钮 =========
+    st.markdown(
+        """<script>
+(function() {
+    // 等待DOM加载完成
+    function setupCollapseButtons() {
+        // 找到所有收起按钮
+        const collapseButtons = document.querySelectorAll('.expander-toggle-inside');
+        
+        collapseButtons.forEach(button => {
+            // 移除旧的事件监听器（如果有）
+            const newButton = button.cloneNode(true);
+            button.parentNode.replaceChild(newButton, button);
+            
+            // 添加点击事件
+            newButton.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                // 向上查找最近的 details 元素
+                const details = this.closest('details');
+                if (details) {
+                    details.removeAttribute('open');
+                }
+            });
+        });
+    }
+    
+    // 页面加载完成后设置
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', setupCollapseButtons);
+    } else {
+        setupCollapseButtons();
+    }
+    
+    // 延迟执行以确保Streamlit渲染完成
+    setTimeout(setupCollapseButtons, 100);
+    setTimeout(setupCollapseButtons, 500);
+    setTimeout(setupCollapseButtons, 1000);
+    
+    // 监听DOM变化
+    const observer = new MutationObserver(function() {
+        setupCollapseButtons();
+    });
+    observer.observe(document.body, { childList: true, subtree: true });
+})();
+</script>""",
+        unsafe_allow_html=True,
+    )
+    
     # ========= 导出 =========
     st.markdown("### 📥 导出结果")
     col1, col2 = st.columns(2)
