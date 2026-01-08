@@ -1322,33 +1322,6 @@ def show_homepage():
                 # TODO: 实现版本查询逻辑
         
         st.info("💡 版本查询将展示特定版本期间的社群反馈汇总")
-    
-    # 数据概览
-    st.markdown("<br><br>", unsafe_allow_html=True)
-    st.markdown("### 📊 数据概览")
-    
-    cols = st.columns(len(GROUPS))
-    for idx, (gid, group) in enumerate(GROUPS.items()):
-        with cols[idx]:
-            with st.spinner(f"加载 {group['name']}..."):
-                idx_data = load_index(gid)
-                dates = idx_data.get("available_dates", [])
-            
-            latest_date = datetime.strptime(dates[0], "%Y-%m-%d").strftime("%m月%d日") if dates else "暂无"
-            
-            st.markdown(f"""
-<div style='background: rgba(255,255,255,0.02); border: 1px solid rgba(148,163,184,0.16); 
-     border-radius: 16px; padding: 24px; text-align: center;'>
-    <h4 style='margin: 0 0 12px 0; color: var(--text); font-size: 1rem; font-weight: 600;'>{group['name']}</h4>
-    <div style='font-size: 2.5rem; font-weight: 900; margin: 12px 0; 
-         background: linear-gradient(135deg, #667eea, #764ba2); 
-         -webkit-background-clip: text; -webkit-text-fill-color: transparent;'>{len(dates)}</div>
-    <p style='color: var(--muted); font-size: 0.85rem; margin: 0;'>天数据</p>
-    <p style='color: var(--muted2); font-size: 0.8rem; margin-top: 8px;'>最新: {latest_date}</p>
-</div>
-""", unsafe_allow_html=True)
-    
-    st.markdown("</div>", unsafe_allow_html=True)
 
 # ==================== 主应用 ====================
 
@@ -1686,16 +1659,6 @@ def main():
             st.error(f"❌  {selected_date} 的数据待上传")
     else:
         st.info("👈 请在侧边栏选择社群和日期")
-
-        st.markdown("### 📊 数据概览")
-        for gid, group in GROUPS.items():
-            with st.spinner(f"加载 {group['name']} 数据..."):
-                idx = load_index(gid)
-                dates = idx.get("available_dates", [])
-            if dates:
-                st.markdown(f"**{group['name']}**: {len(dates)} 天 (最新: {dates[0]})")
-            else:
-                st.markdown(f"**{group['name']}**: 暂无数据")
 
 if __name__ == "__main__":
     main()
