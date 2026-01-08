@@ -319,6 +319,21 @@ div[data-baseweb="popover"] button.date-disabled .date-disabled-icon {
 /* ===== 自定义 Expander（完全控制，支持 sticky）===== */
 .cluster-custom-wrapper{
   margin: 14px 0;
+  position: relative;
+}
+.cluster-card-sticky{
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: transparent;
+  padding-bottom: 8px;
+}
+.cluster-card-sticky .cluster-card{
+  background: linear-gradient(145deg, rgba(18,26,49,.92), rgba(15,23,42,.92));
+  border: 1px solid rgba(148,163,184,.16);
+  border-radius: 18px;
+  padding: 14px 16px 12px 16px;
+  box-shadow: 0 12px 28px rgba(0,0,0,.28);
 }
 .custom-expander{
   border-radius: 18px;
@@ -335,19 +350,10 @@ div[data-baseweb="popover"] button.date-disabled .date-disabled-icon {
 .custom-expander-summary::-webkit-details-marker{
   display: none;
 }
-.custom-expander-summary .cluster-card{
-  background: linear-gradient(145deg, rgba(18,26,49,.92), rgba(15,23,42,.92));
-  border: 1px solid rgba(148,163,184,.16);
-  border-radius: 18px 18px 0 0;
-  padding: 14px 16px 12px 16px;
-  box-shadow: 0 12px 28px rgba(0,0,0,.28);
-  margin-bottom: 0;
-}
 .expander-toggle{
   background: rgba(15,23,42,.75);
   border: 1px solid rgba(148,163,184,.16);
-  border-top: none;
-  border-radius: 0 0 18px 18px;
+  border-radius: 18px;
   padding: 10px 16px;
   text-align: center;
   color: var(--text);
@@ -361,21 +367,48 @@ div[data-baseweb="popover"] button.date-disabled .date-disabled-icon {
   display: inline-block;
   margin-right: 8px;
   transition: transform 0.2s;
+  font-size: 0.8rem;
 }
 .custom-expander[open] .toggle-icon{
   transform: rotate(180deg);
 }
-.custom-expander[open] .toggle-text::before{
-  content: '收起';
-}
-.custom-expander:not([open]) .toggle-text::before{
-  content: '展开';
-}
 .toggle-text{
   font-size: 0.95rem;
 }
-.custom-expander[open] .custom-expander-summary{
-  display: none;
+.custom-expander:not([open]) .toggle-text::after{
+  content: '详情（讨论点/观点/代表发言）';
+}
+.custom-expander[open] .toggle-text::after{
+  content: '详情（讨论点/观点/代表发言）';
+}
+.custom-expander-content{
+  background: rgba(15,23,42,.30) !important;
+  border: 1px solid rgba(148,163,184,.10) !important;
+  border-radius: 14px !important;
+  margin-top: 8px;
+  position: relative !important;
+  max-height: 600px !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  scrollbar-width: thin !important;
+  scrollbar-color: rgba(148,163,184,.3) transparent !important;
+}
+.custom-expander-content::-webkit-scrollbar{
+  width: 8px;
+}
+.custom-expander-content::-webkit-scrollbar-track{
+  background: transparent;
+}
+.custom-expander-content::-webkit-scrollbar-thumb{
+  background: rgba(148,163,184,.3);
+  border-radius: 4px;
+}
+.custom-expander-inner{
+  padding: 12px 14px;
+}
+.custom-expander-inner p,
+.custom-expander-inner h4{
+  color: var(--text);
 }
 .custom-expander-content{
   background: rgba(15,23,42,.30) !important;
@@ -678,8 +711,7 @@ def render_result(result: dict, group_key: str | None = None):
         
         st.markdown(
             f"""<div class="cluster-custom-wrapper">
-<details class="custom-expander" {expanded_str}>
-<summary class="custom-expander-summary">
+<div class="cluster-card-sticky">
 <div class="cluster-card">
 <div class="cluster-header">
 <div>
@@ -689,22 +721,16 @@ def render_result(result: dict, group_key: str | None = None):
 <div class="badge-heat"><small>热度</small>{heat:.1f} 🔥</div>
 </div>
 </div>
+</div>
+
+<details class="custom-expander" {expanded_str}>
+<summary class="custom-expander-summary">
 <div class="expander-toggle">
 <span class="toggle-icon">▼</span>
-<span class="toggle-text">展开详情（讨论点/观点/代表发言）</span>
+<span class="toggle-text"></span>
 </div>
 </summary>
 <div class="custom-expander-content">
-<div class="cluster-header-sticky-custom">
-<div class="cluster-header-inner">
-<div>
-<div class="cluster-title">{idx}. {title_escaped}</div>
-<div class="cluster-meta">{''.join(meta_chips)}</div>
-</div>
-<div class="badge-heat"><small>热度</small>{heat:.1f} 🔥</div>
-</div>
-</div>
-
 <div class="custom-expander-inner">
 {time_axis_html}
 {discussion_content_html}
