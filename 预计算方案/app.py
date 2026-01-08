@@ -810,53 +810,67 @@ def render_result(result: dict, group_key: str | None = None):
                 st.markdown("---")
 
     # ========= JavaScript：处理收起详情按钮 =========
-    st.markdown(
-        """<script>
+    components.html(
+        """
+<script>
 (function() {
-    // 等待DOM加载完成
+    // 等待父页面加载完成
     function setupCollapseButtons() {
-        // 找到所有收起按钮
-        const collapseButtons = document.querySelectorAll('.expander-toggle-inside');
+        // 获取父页面的document
+        const parentDoc = window.parent.document;
         
-        collapseButtons.forEach(button => {
-            // 移除旧的事件监听器（如果有）
-            const newButton = button.cloneNode(true);
-            button.parentNode.replaceChild(newButton, button);
+        // 找到所有收起按钮
+        const collapseButtons = parentDoc.querySelectorAll('.expander-toggle-inside');
+        
+        console.log('找到收起按钮数量:', collapseButtons.length);
+        
+        collapseButtons.forEach((button, index) => {
+            // 检查是否已经绑定过
+            if (button.dataset.bound === 'true') {
+                return;
+            }
+            button.dataset.bound = 'true';
+            
+            console.log('绑定第', index + 1, '个按钮');
             
             // 添加点击事件
-            newButton.addEventListener('click', function(e) {
+            button.addEventListener('click', function(e) {
                 e.preventDefault();
                 e.stopPropagation();
+                
+                console.log('收起按钮被点击');
                 
                 // 向上查找最近的 details 元素
                 const details = this.closest('details');
                 if (details) {
+                    console.log('找到details元素，开始收起');
+                    details.open = false;
                     details.removeAttribute('open');
+                } else {
+                    console.log('未找到details元素');
                 }
             });
         });
     }
     
-    // 页面加载完成后设置
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', setupCollapseButtons);
-    } else {
-        setupCollapseButtons();
-    }
-    
-    // 延迟执行以确保Streamlit渲染完成
+    // 多次尝试绑定，确保成功
     setTimeout(setupCollapseButtons, 100);
+    setTimeout(setupCollapseButtons, 300);
     setTimeout(setupCollapseButtons, 500);
-    setTimeout(setupCollapseButtons, 1000);
+    setTimeout(setupCollapseButtons, 800);
+    setTimeout(setupCollapseButtons, 1200);
+    setTimeout(setupCollapseButtons, 2000);
     
-    // 监听DOM变化
+    // 监听父页面DOM变化
+    const parentDoc = window.parent.document;
     const observer = new MutationObserver(function() {
         setupCollapseButtons();
     });
-    observer.observe(document.body, { childList: true, subtree: true });
+    observer.observe(parentDoc.body, { childList: true, subtree: true });
 })();
-</script>""",
-        unsafe_allow_html=True,
+</script>
+""",
+        height=0,
     )
     
     # ========= 导出 =========
