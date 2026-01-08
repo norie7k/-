@@ -229,35 +229,36 @@ div[data-baseweb="popover"] button.date-disabled .date-disabled-icon {
 
 /* Expander内部的sticky header（冻结首行） */
 .cluster-header-sticky{
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  margin: 0;
-  padding: 0;
-  margin-bottom: 12px;
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 100 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  margin-bottom: 12px !important;
+  background: transparent !important;
 }
 .cluster-header-inner{
-  display:flex;
-  align-items:flex-start;
-  justify-content:space-between;
-  gap: 10px;
-  padding: 12px 14px;
-  background: linear-gradient(145deg, rgba(18,26,49,.98), rgba(15,23,42,.98));
-  backdrop-filter: blur(10px);
-  border-bottom: 1px solid rgba(148,163,184,.2);
-  box-shadow: 0 4px 12px rgba(0,0,0,.2);
+  display:flex !important;
+  align-items:flex-start !important;
+  justify-content:space-between !important;
+  gap: 10px !important;
+  padding: 12px 14px !important;
+  background: linear-gradient(145deg, rgba(18,26,49,.98), rgba(15,23,42,.98)) !important;
+  backdrop-filter: blur(10px) !important;
+  border-bottom: 1px solid rgba(148,163,184,.2) !important;
+  box-shadow: 0 4px 12px rgba(0,0,0,.2) !important;
 }
 .cluster-header-inner .cluster-title{
-  font-weight: 950;
-  font-size: 1.15rem;
-  color: #f1f5f9;
-  line-height: 1.25;
+  font-weight: 950 !important;
+  font-size: 1.15rem !important;
+  color: #f1f5f9 !important;
+  line-height: 1.25 !important;
 }
 .cluster-header-inner .cluster-meta{
-  display:flex;
-  gap: 8px;
-  flex-wrap: wrap;
-  margin-top: 8px;
+  display:flex !important;
+  gap: 8px !important;
+  flex-wrap: wrap !important;
+  margin-top: 8px !important;
 }
 .cluster-title{
   font-weight: 950;
@@ -330,12 +331,12 @@ section[data-testid="stMain"] div[data-testid="stExpander"] div[role="region"]{
   border: 1px solid rgba(148,163,184,.10) !important;
   border-radius: 14px !important;
   padding: 0 !important;
-  position: relative;
-  max-height: 600px;
-  overflow-y: auto;
-  overflow-x: hidden;
-  scrollbar-width: thin;
-  scrollbar-color: rgba(148,163,184,.3) transparent;
+  position: relative !important;
+  max-height: 600px !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  scrollbar-width: thin !important;
+  scrollbar-color: rgba(148,163,184,.3) transparent !important;
 }
 section[data-testid="stMain"] div[data-testid="stExpander"] div[role="region"] > *:not(.cluster-header-sticky){
   padding-left: 14px;
@@ -564,7 +565,7 @@ def render_result(result: dict, group_key: str | None = None):
         with st.expander("展开详情（讨论点/观点/代表发言）", expanded=(idx <= 2)):
             # 在expander内部添加sticky header（冻结首行）
             st.markdown(
-                f"""<div class="cluster-header-sticky">
+                f"""<div class="cluster-header-sticky" id="sticky-header-{idx}">
 <div class="cluster-header-inner">
   <div>
     <div class="cluster-title">{idx}. {title}</div>
@@ -572,7 +573,25 @@ def render_result(result: dict, group_key: str | None = None):
   </div>
   <div class="badge-heat"><small>热度</small>{heat:.1f} 🔥</div>
 </div>
-</div>""",
+</div>
+<script>
+(function() {{
+  setTimeout(function() {{
+    const stickyHeader = document.getElementById('sticky-header-{idx}');
+    if (stickyHeader) {{
+      const expanderRegion = stickyHeader.closest('[role="region"]');
+      if (expanderRegion) {{
+        expanderRegion.style.position = 'relative';
+        expanderRegion.style.maxHeight = '600px';
+        expanderRegion.style.overflowY = 'auto';
+        stickyHeader.style.position = 'sticky';
+        stickyHeader.style.top = '0';
+        stickyHeader.style.zIndex = '100';
+      }}
+    }}
+  }}, 100);
+}})();
+</script>""",
                 unsafe_allow_html=True,
             )
             if time_axis:
