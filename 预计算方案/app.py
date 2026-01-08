@@ -741,7 +741,7 @@ def render_result(result: dict, group_key: str | None = None):
 </div>
 <!-- 可滚动内容区域（包含收起按钮 + 详细内容）-->
 <div class="scrollable-content">
-<div class="expander-toggle-inside" onclick="document.getElementById('cluster-{idx}').removeAttribute('open')">
+<div class="expander-toggle-inside" onclick="this.closest('details').removeAttribute('open')">
 <span class="toggle-icon">▲</span>
 <span class="toggle-text">收起详情</span>
 </div>
