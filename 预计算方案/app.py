@@ -321,11 +321,7 @@ div[data-baseweb="popover"] button.date-disabled .date-disabled-icon {
   margin: 14px 0;
 }
 .custom-expander{
-  background: linear-gradient(145deg, rgba(18,26,49,.92), rgba(15,23,42,.92));
-  border: 1px solid rgba(148,163,184,.16);
   border-radius: 18px;
-  padding: 14px 16px 12px 16px;
-  box-shadow: 0 12px 28px rgba(0,0,0,.28);
 }
 .custom-expander-summary{
   background: transparent !important;
@@ -339,23 +335,44 @@ div[data-baseweb="popover"] button.date-disabled .date-disabled-icon {
 .custom-expander-summary::-webkit-details-marker{
   display: none;
 }
-.cluster-header-compact{
-  display:flex;
-  align-items:flex-start;
-  justify-content:space-between;
-  gap: 10px;
+.custom-expander-summary .cluster-card{
+  background: linear-gradient(145deg, rgba(18,26,49,.92), rgba(15,23,42,.92));
+  border: 1px solid rgba(148,163,184,.16);
+  border-radius: 18px 18px 0 0;
+  padding: 14px 16px 12px 16px;
+  box-shadow: 0 12px 28px rgba(0,0,0,.28);
+  margin-bottom: 0;
 }
-.cluster-header-compact .cluster-title{
-  font-weight: 950;
-  font-size: 1.15rem;
-  color: #f1f5f9;
-  line-height: 1.25;
+.expander-toggle{
+  background: rgba(15,23,42,.75);
+  border: 1px solid rgba(148,163,184,.16);
+  border-top: none;
+  border-radius: 0 0 18px 18px;
+  padding: 10px 16px;
+  text-align: center;
+  color: var(--text);
+  font-weight: 900;
+  transition: all 0.2s ease;
 }
-.cluster-meta-inline{
-  display:flex;
-  gap: 8px;
-  flex-wrap: wrap;
-  margin-top: 8px;
+.expander-toggle:hover{
+  background: rgba(15,23,42,.9);
+}
+.toggle-icon{
+  display: inline-block;
+  margin-right: 8px;
+  transition: transform 0.2s;
+}
+.custom-expander[open] .toggle-icon{
+  transform: rotate(180deg);
+}
+.custom-expander[open] .toggle-text::before{
+  content: '收起';
+}
+.custom-expander:not([open]) .toggle-text::before{
+  content: '展开';
+}
+.toggle-text{
+  font-size: 0.95rem;
 }
 .custom-expander[open] .custom-expander-summary{
   display: none;
@@ -663,12 +680,18 @@ def render_result(result: dict, group_key: str | None = None):
             f"""<div class="cluster-custom-wrapper">
 <details class="custom-expander" {expanded_str}>
 <summary class="custom-expander-summary">
-<div class="cluster-header-compact">
+<div class="cluster-card">
+<div class="cluster-header">
 <div>
-<span class="cluster-title">{idx}. {title_escaped}</span>
-<div class="cluster-meta-inline">{''.join(meta_chips)}</div>
+<div class="cluster-title">{idx}. {title_escaped}</div>
+<div class="cluster-meta">{''.join(meta_chips)}</div>
 </div>
 <div class="badge-heat"><small>热度</small>{heat:.1f} 🔥</div>
+</div>
+</div>
+<div class="expander-toggle">
+<span class="toggle-icon">▼</span>
+<span class="toggle-text">展开详情（讨论点/观点/代表发言）</span>
 </div>
 </summary>
 <div class="custom-expander-content">
