@@ -873,18 +873,134 @@ def render_result(result: dict, group_key: str | None = None):
             use_container_width=True,
         )
 
+# ==================== 主页欢迎界面 ====================
+
+def show_homepage():
+    """显示欢迎主页"""
+    st.markdown(
+        """<div style="text-align: center; padding: 3rem 0 2rem 0;">
+<h1 style="font-size: 3rem; margin-bottom: 1rem; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+-webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 900;">
+🎮 玩家社群分析系统
+</h1>
+<p style="font-size: 1.3rem; color: var(--text); margin-bottom: 2rem;">
+查看每日群聊话题分析结果（从 GitHub 自动同步）
+</p>
+</div>""",
+        unsafe_allow_html=True,
+    )
+    
+    st.markdown("---")
+    
+    # 系统说明
+    st.markdown(
+        """<div style="background: linear-gradient(145deg, rgba(102,126,234,0.08), rgba(118,75,162,0.08)); 
+border: 1px solid rgba(102,126,234,0.2); border-radius: 18px; padding: 2rem; margin: 2rem 0;">
+<h3 style="color: var(--text); margin-top: 0;">📖 系统介绍</h3>
+<p style="font-size: 1.05rem; line-height: 1.8; color: var(--text);">
+本系统自动分析玩家社群中的每日聊天内容，使用AI技术提取关键话题、玩家观点和代表性发言，帮助您快速了解社群动态。
+</p>
+<ul style="font-size: 1.05rem; line-height: 1.8; color: var(--text);">
+<li><strong>📊 话题聚类</strong>：自动识别当日讨论的主要话题</li>
+<li><strong>🔥 热度排名</strong>：根据参与人数和发言数计算话题热度</li>
+<li><strong>💬 观点提取</strong>：智能总结玩家的核心观点</li>
+<li><strong>📝 代表发言</strong>：展示最具代表性的玩家发言</li>
+</ul>
+</div>""",
+        unsafe_allow_html=True,
+    )
+    
+    st.markdown("### 🔍 开始查询")
+    st.markdown("请选择社群和日期，查看分析结果：")
+    
+    # 查询选项
+    col1, col2, col3 = st.columns([2, 2, 1])
+    
+    with col1:
+        group_options = {k: GROUPS[k]["name"] for k in GROUPS.keys()}
+        selected_group = st.selectbox(
+            "选择社群",
+            options=list(group_options.keys()),
+            format_func=lambda x: group_options[x],
+            key="homepage_group",
+        )
+    
+    with col2:
+        # 加载日期列表
+        with st.spinner("加载可用日期..."):
+            index = load_index(selected_group)
+            available_dates = index.get("available_dates", [])
+        
+        if available_dates:
+            date_options = {d: datetime.strptime(d, "%Y-%m-%d").strftime("%Y年%m月%d日") for d in available_dates}
+            selected_date = st.selectbox(
+                "选择日期",
+                options=available_dates,
+                format_func=lambda x: date_options[x],
+                key="homepage_date",
+            )
+        else:
+            st.warning("该社群暂无数据")
+            selected_date = None
+    
+    with col3:
+        st.markdown("<div style='height: 1.8rem;'></div>", unsafe_allow_html=True)
+        if st.button("🚀 查看分析", use_container_width=True, type="primary", disabled=not selected_date):
+            st.session_state.show_results = True
+            st.session_state.selected_group_homepage = selected_group
+            st.session_state.selected_date_homepage = selected_date
+            st.rerun()
+    
+    if not selected_date and available_dates is not None and len(available_dates) == 0:
+        st.info("ℹ️ 该社群暂无数据，请选择其他社群")
+    
+    # 数据概览
+    st.markdown("---")
+    st.markdown("### 📊 数据概览")
+    
+    cols = st.columns(len(GROUPS))
+    for idx, (gid, group) in enumerate(GROUPS.items()):
+        with cols[idx]:
+            with st.spinner(f"加载 {group['name']}..."):
+                idx_data = load_index(gid)
+                dates = idx_data.get("available_dates", [])
+            
+            st.markdown(
+                f"""<div style="background: rgba(15,23,42,.5); border: 1px solid rgba(148,163,184,.16); 
+border-radius: 14px; padding: 1.2rem; text-align: center;">
+<h4 style="margin: 0 0 0.5rem 0; color: var(--text);">{group['name']}</h4>
+<p style="font-size: 1.8rem; font-weight: 900; margin: 0.5rem 0; color: #667eea;">{len(dates)}</p>
+<p style="margin: 0; color: var(--muted); font-size: 0.9rem;">天数据</p>
+{f'<p style="margin: 0.5rem 0 0 0; color: var(--muted2); font-size: 0.85rem;">最新: {datetime.strptime(dates[0], "%Y-%m-%d").strftime("%m月%d日")}</p>' if dates else '<p style="margin: 0.5rem 0 0 0; color: var(--muted2); font-size: 0.85rem;">暂无数据</p>'}
+</div>""",
+                unsafe_allow_html=True,
+            )
+
 # ==================== 主应用 ====================
 
 def main():
+    # 初始化session_state（需要在set_page_config之前）
+    if "show_results" not in st.session_state:
+        st.session_state.show_results = False
+    
+    # 根据是否显示结果决定侧边栏状态
+    sidebar_state = "expanded" if st.session_state.show_results else "collapsed"
+    
     st.set_page_config(
         page_title="玩家社群分析",
         page_icon="🎮",
         layout="wide",
-        initial_sidebar_state="collapsed",
+        initial_sidebar_state=sidebar_state,
     )
 
     st.markdown(STYLE_CSS, unsafe_allow_html=True)
-
+    
+    # 如果未查询，显示主页
+    if not st.session_state.show_results:
+        show_homepage()
+        return
+    
+    # 显示顶部标题
     st.markdown(
         """<div class="main-title">🎮 玩家社群分析系统</div>
 <div class="sub-title">查看每日群聊话题分析结果（从 GitHub 自动同步）</div>""",
@@ -896,11 +1012,20 @@ def main():
         st.header("🔍 查询条件")
 
         group_options = {k: GROUPS[k]["name"] for k in GROUPS.keys()}
+        
+        # 使用主页选择的社群作为默认值
+        default_group_index = 0
+        if "selected_group_homepage" in st.session_state:
+            try:
+                default_group_index = list(group_options.keys()).index(st.session_state.selected_group_homepage)
+            except:
+                pass
+        
         selected_group_key = st.selectbox(
             "选择社群",
             options=list(group_options.keys()),
             format_func=lambda x: group_options[x],
-            index=0,
+            index=default_group_index,
         )
 
         st.markdown("---")
@@ -924,7 +1049,16 @@ def main():
                 from datetime import date as date_type
 
                 sorted_date_objects = sorted(date_objects, reverse=True)
+                
+                # 使用主页选择的日期作为默认值
                 default_date = sorted_date_objects[0]
+                if "selected_date_homepage" in st.session_state:
+                    try:
+                        homepage_date = datetime.strptime(st.session_state.selected_date_homepage, "%Y-%m-%d").date()
+                        if homepage_date in date_objects:
+                            default_date = homepage_date
+                    except:
+                        pass
 
                 min_date = min(date_objects)
                 max_date = max(date_objects)
@@ -1137,6 +1271,10 @@ def main():
         if st.button("🔄 刷新数据", use_container_width=True):
             st.cache_data.clear()
             _set_nonce()
+            st.rerun()
+        
+        if st.button("🏠 返回主页", use_container_width=True):
+            st.session_state.show_results = False
             st.rerun()
 
     # 主内容区
