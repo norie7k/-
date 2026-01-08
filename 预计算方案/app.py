@@ -315,7 +315,74 @@ div[data-baseweb="popover"] button.date-disabled .date-disabled-icon {
   background: linear-gradient(90deg, rgba(99,102,241,.95), rgba(236,72,153,.92));
 }
 
-/* ===== Expander（展开详情条更贴近你截图）===== */
+/* ===== 自定义 Expander（完全控制，支持 sticky）===== */
+.cluster-custom-wrapper{
+  margin: 14px 0;
+}
+.custom-expander{
+  margin-top: 8px;
+}
+.custom-expander-summary{
+  background: rgba(15,23,42,.75) !important;
+  border: 1px solid rgba(148,163,184,.16) !important;
+  border-radius: 14px !important;
+  padding: 10px 14px !important;
+  color: var(--text) !important;
+  font-weight: 900 !important;
+  cursor: pointer !important;
+  list-style: none !important;
+  user-select: none !important;
+}
+.custom-expander-summary::-webkit-details-marker{
+  display: none;
+}
+.custom-expander-summary::before{
+  content: '▶ ';
+  display: inline-block;
+  transition: transform 0.2s;
+}
+.custom-expander[open] .custom-expander-summary::before{
+  transform: rotate(90deg);
+}
+.custom-expander-content{
+  background: rgba(15,23,42,.30) !important;
+  border: 1px solid rgba(148,163,184,.10) !important;
+  border-radius: 14px !important;
+  margin-top: 8px;
+  position: relative !important;
+  max-height: 600px !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  scrollbar-width: thin !important;
+  scrollbar-color: rgba(148,163,184,.3) transparent !important;
+}
+.custom-expander-content::-webkit-scrollbar{
+  width: 8px;
+}
+.custom-expander-content::-webkit-scrollbar-track{
+  background: transparent;
+}
+.custom-expander-content::-webkit-scrollbar-thumb{
+  background: rgba(148,163,184,.3);
+  border-radius: 4px;
+}
+.cluster-header-sticky-custom{
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 100 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  background: transparent !important;
+}
+.custom-expander-inner{
+  padding: 12px 14px;
+}
+.custom-expander-inner p,
+.custom-expander-inner h4{
+  color: var(--text);
+}
+
+/* ===== Expander（原生 Streamlit，保留兼容）===== */
 section[data-testid="stMain"] div[data-testid="stExpander"] details > summary{
   background: rgba(15,23,42,.75) !important;
   border: 1px solid rgba(148,163,184,.16) !important;
@@ -330,22 +397,7 @@ section[data-testid="stMain"] div[data-testid="stExpander"] div[role="region"]{
   background: rgba(15,23,42,.30) !important;
   border: 1px solid rgba(148,163,184,.10) !important;
   border-radius: 14px !important;
-  padding: 0 !important;
-  position: relative !important;
-  max-height: 600px !important;
-  overflow-y: auto !important;
-  overflow-x: hidden !important;
-  scrollbar-width: thin !important;
-  scrollbar-color: rgba(148,163,184,.3) transparent !important;
-}
-section[data-testid="stMain"] div[data-testid="stExpander"] div[role="region"] > *:not(.cluster-header-sticky){
-  padding-left: 14px;
-  padding-right: 14px;
-  padding-top: 12px;
-  padding-bottom: 12px;
-}
-section[data-testid="stMain"] div[data-testid="stExpander"] div[role="region"] > .cluster-header-sticky + *{
-  padding-top: 0;
+  padding: 12px 14px !important;
 }
 
 /* ===== 讨论点 / 观点 / 引用 ===== */
@@ -546,54 +598,94 @@ def render_result(result: dict, group_key: str | None = None):
             short_time = time_axis if len(time_axis) <= 70 else (time_axis[:70] + "…")
             meta_chips.append(f'<div class="meta-chip"><span>⏰ 时间</span>{short_time}</div>')
 
-        # 包装容器，用于实现sticky效果
+        # 使用纯HTML创建可展开的自定义容器（绕过st.expander限制）
+        expanded_str = "open" if idx <= 2 else ""
+        
+        # 构建讨论点内容HTML
+        discussion_content_html = ""
+        
+        discussion_list = cluster.get("讨论点列表", []) or []
+        
+        if discussion_list:
+            discussion_content_html += f'<h4 style="color: var(--text); margin: 1rem 0;">💬 讨论点与玩家观点（共 {len(discussion_list)} 条）</h4>'
+            
+            for dp_i, dp in enumerate(discussion_list, 1):
+                # 找到 "讨论点X"
+                dp_title = ""
+                for k in dp.keys():
+                    if str(k).startswith("讨论点"):
+                        dp_title = (dp.get(k) or "").strip()
+                        break
+                
+                if dp_title:
+                    discussion_content_html += f'<div class="discussion-point"><strong>📌 {dp_i}. {dp_title}</strong></div>'
+                
+                opinions = dp.get("玩家观点", []) or []
+                if opinions:
+                    discussion_content_html += '<p style="color: var(--text); font-weight: 600; margin: 0.5rem 0;">玩家观点：</p>'
+                    for opinion in opinions:
+                        discussion_content_html += f'<div class="opinion-item">{opinion}</div>'
+                
+                examples = dp.get("代表性玩家发言示例", []) or []
+                if examples:
+                    discussion_content_html += f'<p style="color: var(--text); font-weight: 600; margin: 0.5rem 0;">代表性发言（{len(examples)}）：</p>'
+                    for example in examples:
+                        discussion_content_html += f'<div class="example-quote">"{example}"</div>'
+                
+                discussion_content_html += '<hr style="border: none; border-top: 1px solid rgba(148,163,184,.1); margin: 1rem 0;">'
+        else:
+            discussion_content_html = '<p style="color: var(--muted);">暂无讨论点列表</p>'
+        
+        # 完整时间轴
+        time_axis_html = f'<p style="color: var(--text);"><strong>⏰ 完整时间轴：</strong> {time_axis}</p>' if time_axis else '<p style="color: var(--text);"><strong>⏰ 完整时间轴：</strong>（无）</p>'
+        
+        # 渲染完整的自定义HTML（包含可滚动容器和sticky header）
         st.markdown(
-            f"""<div class="cluster-wrapper">
-<div class="cluster-card">
-<div class="cluster-header">
-  <div>
-    <div class="cluster-title">{idx}. {title}</div>
-    <div class="cluster-meta">{''.join(meta_chips)}</div>
+            f"""
+<div class="cluster-custom-wrapper">
+  <div class="cluster-card">
+    <div class="cluster-header">
+      <div>
+        <div class="cluster-title">{idx}. {title}</div>
+        <div class="cluster-meta">{''.join(meta_chips)}</div>
+      </div>
+      <div class="badge-heat"><small>热度</small>{heat:.1f} 🔥</div>
+    </div>
   </div>
-  <div class="badge-heat"><small>热度</small>{heat:.1f} 🔥</div>
+  
+  <details class="custom-expander" {expanded_str}>
+    <summary class="custom-expander-summary">展开详情（讨论点/观点/代表发言）</summary>
+    <div class="custom-expander-content">
+      <!-- Sticky Header -->
+      <div class="cluster-header-sticky-custom">
+        <div class="cluster-header-inner">
+          <div>
+            <div class="cluster-title">{idx}. {title}</div>
+            <div class="cluster-meta">{''.join(meta_chips)}</div>
+          </div>
+          <div class="badge-heat"><small>热度</small>{heat:.1f} 🔥</div>
+        </div>
+      </div>
+      
+      <!-- Content -->
+      <div class="custom-expander-inner">
+        {time_axis_html}
+        {discussion_content_html}
+      </div>
+    </div>
+  </details>
 </div>
-</div>""",
+""",
             unsafe_allow_html=True,
         )
-
-        # 展开详情（全量展示）
+        
+        # 跳过原来的 expander 逻辑
+        continue_to_next = True
+        if continue_to_next:
+            continue
+        
+        # 下面的代码不会执行（保留以防需要回滚）
         with st.expander("展开详情（讨论点/观点/代表发言）", expanded=(idx <= 2)):
-            # 在expander内部添加sticky header（冻结首行）
-            st.markdown(
-                f"""<div class="cluster-header-sticky" id="sticky-header-{idx}">
-<div class="cluster-header-inner">
-  <div>
-    <div class="cluster-title">{idx}. {title}</div>
-    <div class="cluster-meta">{''.join(meta_chips)}</div>
-  </div>
-  <div class="badge-heat"><small>热度</small>{heat:.1f} 🔥</div>
-</div>
-</div>
-<script>
-(function() {{
-  setTimeout(function() {{
-    const stickyHeader = document.getElementById('sticky-header-{idx}');
-    if (stickyHeader) {{
-      const expanderRegion = stickyHeader.closest('[role="region"]');
-      if (expanderRegion) {{
-        expanderRegion.style.position = 'relative';
-        expanderRegion.style.maxHeight = '600px';
-        expanderRegion.style.overflowY = 'auto';
-        stickyHeader.style.position = 'sticky';
-        stickyHeader.style.top = '0';
-        stickyHeader.style.zIndex = '100';
-      }}
-    }}
-  }}, 100);
-}})();
-</script>""",
-                unsafe_allow_html=True,
-            )
             if time_axis:
                 st.markdown(f"**⏰ 完整时间轴：** {time_axis}")
             else:
