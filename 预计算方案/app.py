@@ -337,17 +337,19 @@ div[data-baseweb="popover"] button.date-disabled .date-disabled-icon {
 .custom-expander[open] .custom-expander-summary .cluster-card{
   display: none;
 }
-/* 内容区域中的Sticky卡片：滚动时固定在内容区域顶部 */
+/* Details包装器：展开后显示 */
+.details-wrapper{
+  position: relative;
+  margin-top: 8px;
+}
+/* Sticky卡片：固定在最顶部 */
 .cluster-card-sticky{
   position: sticky !important;
   top: 0 !important;
   z-index: 100 !important;
   background: linear-gradient(180deg, rgba(15,23,42,1) 0%, rgba(15,23,42,0.98) 85%, rgba(15,23,42,0.7) 100%) !important;
   padding-bottom: 10px;
-  margin: -12px -14px 0 -14px;
-  padding-left: 14px;
-  padding-right: 14px;
-  padding-top: 12px;
+  margin-bottom: 0;
 }
 .cluster-card-sticky .cluster-card{
   background: linear-gradient(145deg, rgba(18,26,49,.92), rgba(15,23,42,.92));
@@ -355,6 +357,52 @@ div[data-baseweb="popover"] button.date-disabled .date-disabled-icon {
   border-radius: 18px;
   padding: 14px 16px 12px 16px;
   box-shadow: 0 12px 28px rgba(0,0,0,.28);
+}
+/* 可滚动内容区域 */
+.scrollable-content{
+  max-height: 600px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  background: rgba(15,23,42,.30);
+  border: 1px solid rgba(148,163,184,.10);
+  border-radius: 14px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(148,163,184,.3) transparent;
+}
+.scrollable-content::-webkit-scrollbar{
+  width: 8px;
+}
+.scrollable-content::-webkit-scrollbar-track{
+  background: transparent;
+}
+.scrollable-content::-webkit-scrollbar-thumb{
+  background: rgba(148,163,184,.3);
+  border-radius: 4px;
+}
+/* 内部收起按钮 */
+.expander-toggle-inside{
+  background: rgba(15,23,42,.75);
+  border: 1px solid rgba(148,163,184,.16);
+  border-radius: 18px;
+  padding: 10px 16px;
+  margin: 12px 14px;
+  text-align: left;
+  color: var(--text);
+  font-weight: 900;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+.expander-toggle-inside:hover{
+  background: rgba(15,23,42,.9);
+}
+.expander-toggle-inside .toggle-icon{
+  display: inline-block;
+  margin-right: 8px;
+  font-size: 0.8rem;
+}
+.expander-toggle-inside .toggle-text{
+  font-size: 0.95rem;
 }
 .custom-expander{
   border-radius: 18px;
@@ -388,73 +436,14 @@ div[data-baseweb="popover"] button.date-disabled .date-disabled-icon {
 .toggle-icon{
   display: inline-block;
   margin-right: 8px;
-  transition: transform 0.2s;
   font-size: 0.8rem;
-}
-.custom-expander[open] .toggle-icon{
-  transform: rotate(180deg);
 }
 .toggle-text{
   font-size: 0.95rem;
 }
-.custom-expander-content{
-  background: rgba(15,23,42,.30) !important;
-  border: 1px solid rgba(148,163,184,.10) !important;
-  border-radius: 14px !important;
-  margin-top: 8px;
-  position: relative !important;
-  max-height: 600px !important;
-  overflow-y: auto !important;
-  overflow-x: hidden !important;
-  scrollbar-width: thin !important;
-  scrollbar-color: rgba(148,163,184,.3) transparent !important;
-}
-.custom-expander-content::-webkit-scrollbar{
-  width: 8px;
-}
-.custom-expander-content::-webkit-scrollbar-track{
-  background: transparent;
-}
-.custom-expander-content::-webkit-scrollbar-thumb{
-  background: rgba(148,163,184,.3);
-  border-radius: 4px;
-}
-.custom-expander-inner{
-  padding: 12px 14px;
-}
-.custom-expander-inner p,
-.custom-expander-inner h4{
-  color: var(--text);
-}
-.custom-expander-content{
-  background: rgba(15,23,42,.30) !important;
-  border: 1px solid rgba(148,163,184,.10) !important;
-  border-radius: 14px !important;
-  margin-top: 8px;
-  position: relative !important;
-  max-height: 600px !important;
-  overflow-y: auto !important;
-  overflow-x: hidden !important;
-  scrollbar-width: thin !important;
-  scrollbar-color: rgba(148,163,184,.3) transparent !important;
-}
-.custom-expander-content::-webkit-scrollbar{
-  width: 8px;
-}
-.custom-expander-content::-webkit-scrollbar-track{
-  background: transparent;
-}
-.custom-expander-content::-webkit-scrollbar-thumb{
-  background: rgba(148,163,184,.3);
-  border-radius: 4px;
-}
-.cluster-header-sticky-custom{
-  position: sticky !important;
-  top: 0 !important;
-  z-index: 100 !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  background: transparent !important;
+/* 展开后隐藏summary中的展开按钮 */
+.custom-expander[open] .custom-expander-summary .expander-toggle{
+  display: none;
 }
 .custom-expander-inner{
   padding: 12px 14px;
@@ -721,7 +710,7 @@ def render_result(result: dict, group_key: str | None = None):
         
         st.markdown(
             f"""<div class="cluster-custom-wrapper">
-<details class="custom-expander" {expanded_str}>
+<details class="custom-expander" {expanded_str} id="cluster-{idx}">
 <summary class="custom-expander-summary">
 <div class="cluster-card">
 <div class="cluster-header">
@@ -737,8 +726,8 @@ def render_result(result: dict, group_key: str | None = None):
 <span class="toggle-text">详情（讨论点/观点/代表发言）</span>
 </div>
 </summary>
-<div class="custom-expander-content">
-<!-- 内部Sticky卡片：滚动详细内容时固定 -->
+<div class="details-wrapper">
+<!-- Sticky卡片：固定在最顶部 -->
 <div class="cluster-card-sticky">
 <div class="cluster-card">
 <div class="cluster-header">
@@ -750,9 +739,16 @@ def render_result(result: dict, group_key: str | None = None):
 </div>
 </div>
 </div>
+<!-- 可滚动内容区域（包含收起按钮 + 详细内容）-->
+<div class="scrollable-content">
+<div class="expander-toggle-inside" onclick="document.getElementById('cluster-{idx}').removeAttribute('open')">
+<span class="toggle-icon">▲</span>
+<span class="toggle-text">收起详情</span>
+</div>
 <div class="custom-expander-inner">
 {time_axis_html}
 {discussion_content_html}
+</div>
 </div>
 </div>
 </details>
