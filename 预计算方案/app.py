@@ -1013,6 +1013,8 @@ def show_homepage():
     st.markdown("""
 <style>
 .stTabs [data-baseweb="tab-list"] {
+    display: flex !important;
+    width: 100% !important;
     gap: 0;
     background-color: rgba(0,0,0,0.2);
     border-radius: 0;
@@ -1020,6 +1022,7 @@ def show_homepage():
     border-bottom: 1px solid rgba(148,163,184,0.16);
 }
 .stTabs [data-baseweb="tab"] {
+    flex: 1 !important;
     height: 56px;
     padding: 0 32px;
     background-color: transparent;
@@ -1028,6 +1031,7 @@ def show_homepage():
     font-weight: 600;
     font-size: 1rem;
     position: relative;
+    justify-content: center !important;
 }
 .stTabs [aria-selected="true"] {
     background: rgba(255,255,255,0.02);
@@ -1042,6 +1046,10 @@ def show_homepage():
     height: 3px;
     background: linear-gradient(135deg, #667eea, #764ba2);
 }
+/* 减少标签内容区域的顶部留白 */
+.stTabs [data-baseweb="tab-panel"] {
+    padding: 16px 40px !important;
+}
 </style>
 """, unsafe_allow_html=True)
     
@@ -1049,7 +1057,6 @@ def show_homepage():
     
     # === 日常查询标签 ===
     with tab1:
-        st.markdown("<div style='padding: 40px; background: transparent;'>", unsafe_allow_html=True)
         col1, col2, col3 = st.columns([1, 1, 0.4])
         
         with col1:
@@ -1299,12 +1306,9 @@ def show_homepage():
         
         if not selected_date and available_dates is not None and len(available_dates) == 0:
             st.info("ℹ️ 该社群暂无数据，请选择其他社群")
-        
-        st.markdown("</div>", unsafe_allow_html=True)
     
     # === 版本查询标签 ===
     with tab2:
-        st.markdown("<div style='padding: 40px; background: transparent;'>", unsafe_allow_html=True)
         col1, col2, col3 = st.columns([1, 1, 0.4])
         
         with col1:
@@ -1341,8 +1345,6 @@ def show_homepage():
                 # TODO: 实现版本查询逻辑
         
         st.info("💡 版本查询将展示特定版本期间的社群反馈汇总")
-        
-        st.markdown("</div>", unsafe_allow_html=True)
 
 # ==================== 主应用 ====================
 
