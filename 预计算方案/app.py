@@ -940,44 +940,293 @@ def render_result(result: dict, group_key: str | None = None):
 # ==================== 主页欢迎界面 ====================
 
 def show_homepage():
-    """显示欢迎主页"""
-    st.markdown(
-        """<div style="text-align: center; padding: 3rem 0 2rem 0;">
-<h1 style="font-size: 3rem; margin-bottom: 1rem; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
--webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 900;">
-🎮 玩家社群分析系统
-</h1>
-<p style="font-size: 1.3rem; color: var(--text); margin-bottom: 2rem;">
-查看每日群聊话题分析结果（从 GitHub 自动同步）
-</p>
-</div>""",
-        unsafe_allow_html=True,
-    )
+    """显示欢迎主页（沉浸式布局）"""
     
-    st.markdown("---")
+    # 添加主页专用CSS
+    st.markdown("""
+<style>
+.homepage-container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 60px 24px 100px;
+}
+
+/* Hero Section */
+.hero-section {
+    text-align: center;
+    margin-bottom: 64px;
+}
+
+.hero-logo {
+    width: 64px; height: 64px;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    border-radius: 16px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 24px;
+    box-shadow: 0 0 30px rgba(102, 126, 234, 0.4);
+    font-size: 2rem;
+}
+
+.hero-title {
+    font-size: 3rem;
+    font-weight: 900;
+    margin-bottom: 16px;
+    letter-spacing: -0.02em;
+    color: var(--text);
+}
+
+.hero-title span {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.hero-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255, 255, 255, 0.05);
+    padding: 8px 20px;
+    border-radius: 99px;
+    font-size: 0.9rem;
+    color: var(--muted);
+}
+
+.status-dot {
+    width: 8px; height: 8px;
+    background: #22c55e;
+    border-radius: 50%;
+    box-shadow: 0 0 8px #22c55e;
+    animation: pulse-dot 2s infinite;
+}
+
+@keyframes pulse-dot {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.2); opacity: 0.7; }
+}
+
+/* Dashboard Intro */
+.dashboard-intro {
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(148, 163, 184, 0.16);
+    border-radius: 24px;
+    padding: 40px;
+    margin-bottom: 48px;
+    position: relative;
+}
+
+.intro-tag {
+    position: absolute;
+    top: 0;
+    right: 40px;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: #fff;
+    padding: 6px 14px;
+    border-radius: 0 0 12px 12px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.intro-header {
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin-bottom: 16px;
+    color: var(--text);
+}
+
+.intro-text {
+    color: var(--muted);
+    line-height: 1.8;
+    margin-bottom: 32px;
+    font-size: 1.05rem;
+}
+
+/* Feature Cards */
+.feature-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 24px;
+}
+
+.f-card {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(148, 163, 184, 0.16);
+    padding: 24px;
+    border-radius: 16px;
+    transition: all 0.3s ease;
+}
+
+.f-card:hover {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: #667eea;
+    transform: translateY(-5px);
+}
+
+.f-icon {
+    font-size: 1.8rem;
+    display: block;
+    margin-bottom: 16px;
+}
+
+.f-card h4 {
+    margin: 0 0 10px 0;
+    font-size: 1.1rem;
+    color: var(--text);
+    font-weight: 700;
+}
+
+.f-card p {
+    margin: 0;
+    font-size: 0.9rem;
+    color: var(--muted);
+    line-height: 1.6;
+}
+
+/* Query Hub */
+.query-hub {
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(148, 163, 184, 0.16);
+    border-radius: 24px;
+    overflow: hidden;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+    margin-bottom: 48px;
+}
+
+.query-hub-header {
+    background: rgba(0, 0, 0, 0.2);
+    border-bottom: 1px solid rgba(148, 163, 184, 0.16);
+    padding: 24px 40px;
+    text-align: center;
+}
+
+.query-hub-header h3 {
+    margin: 0;
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--text);
+}
+
+/* 数据概览卡片 */
+.stats-overview-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 24px;
+    margin-top: 32px;
+}
+
+.stat-card {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(148, 163, 184, 0.16);
+    border-radius: 16px;
+    padding: 24px;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.stat-card:hover {
+    background: rgba(255, 255, 255, 0.05);
+    transform: translateY(-3px);
+}
+
+.stat-card h4 {
+    margin: 0 0 12px 0;
+    color: var(--text);
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.stat-number {
+    font-size: 2.5rem;
+    font-weight: 900;
+    margin: 12px 0;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.stat-label {
+    color: var(--muted);
+    font-size: 0.85rem;
+    margin: 0;
+}
+
+.stat-latest {
+    color: var(--muted2);
+    font-size: 0.8rem;
+    margin-top: 8px;
+}
+</style>
+""", unsafe_allow_html=True)
     
-    # 系统说明
-    st.markdown(
-        """<div style="background: linear-gradient(145deg, rgba(102,126,234,0.08), rgba(118,75,162,0.08)); 
-border: 1px solid rgba(102,126,234,0.2); border-radius: 18px; padding: 2rem; margin: 2rem 0;">
-<h3 style="color: var(--text); margin-top: 0;">📖 系统介绍</h3>
-<p style="font-size: 1.05rem; line-height: 1.8; color: var(--text);">
-本系统自动分析玩家社群中的每日聊天内容，使用AI技术提取关键话题、玩家观点和代表性发言，帮助您快速了解社群动态。
-</p>
-<ul style="font-size: 1.05rem; line-height: 1.8; color: var(--text);">
-<li><strong>📊 话题聚类</strong>：自动识别当日讨论的主要话题</li>
-<li><strong>🔥 热度排名</strong>：根据参与人数和发言数计算话题热度</li>
-<li><strong>💬 观点提取</strong>：智能总结玩家的核心观点</li>
-<li><strong>📝 代表发言</strong>：展示最具代表性的玩家发言</li>
-</ul>
-</div>""",
-        unsafe_allow_html=True,
-    )
+    # Hero Section
+    st.markdown("""
+<div class="homepage-container">
+    <div class="hero-section">
+        <div class="hero-logo">🎮</div>
+        <h1 class="hero-title"><span>玩家社群</span>分析系统</h1>
+        <div class="hero-status">
+            <span class="status-dot"></span>
+            <span>AI驱动 · 实时同步 · GitHub托管</span>
+        </div>
+    </div>
+</div>
+""", unsafe_allow_html=True)
     
-    st.markdown("### 🔍 开始查询")
-    st.markdown("请选择社群和日期，查看分析结果：")
+    # Dashboard Intro
+    st.markdown("""
+<div class="homepage-container">
+    <div class="dashboard-intro">
+        <div class="intro-tag">AI-POWERED</div>
+        <div class="intro-header">📖 系统介绍</div>
+        <div class="intro-text">
+            本系统自动分析玩家社群中的每日聊天内容，使用AI技术提取关键话题、玩家观点和代表性发言，帮助您快速了解社群动态。
+        </div>
+        
+        <div class="feature-cards">
+            <div class="f-card">
+                <span class="f-icon">📊</span>
+                <h4>话题聚类</h4>
+                <p>自动识别当日讨论的主要话题，智能分组相关内容</p>
+            </div>
+            <div class="f-card">
+                <span class="f-icon">🔥</span>
+                <h4>热度排名</h4>
+                <p>根据参与人数和发言数计算话题热度，呈现Top5热门话题</p>
+            </div>
+            <div class="f-card">
+                <span class="f-icon">💬</span>
+                <h4>观点提取</h4>
+                <p>智能总结玩家的核心观点，快速了解社群态度</p>
+            </div>
+            <div class="f-card">
+                <span class="f-icon">📝</span>
+                <h4>代表发言</h4>
+                <p>展示最具代表性的玩家发言，还原真实讨论场景</p>
+            </div>
+        </div>
+    </div>
+</div>
+""", unsafe_allow_html=True)
     
-    # 查询选项
+    # Query Hub
+    st.markdown("""
+<div class="homepage-container">
+    <div class="query-hub">
+        <div class="query-hub-header">
+            <h3>🔍 开始查询分析结果</h3>
+        </div>
+    </div>
+</div>
+""", unsafe_allow_html=True)
+    
+    # 查询控件（使用Streamlit原生组件）
+    st.markdown("<div class='homepage-container'>", unsafe_allow_html=True)
     col1, col2, col3 = st.columns([2, 2, 1])
     
     with col1:
@@ -1018,27 +1267,37 @@ border: 1px solid rgba(102,126,234,0.2); border-radius: 18px; padding: 2rem; mar
     if not selected_date and available_dates is not None and len(available_dates) == 0:
         st.info("ℹ️ 该社群暂无数据，请选择其他社群")
     
-    # 数据概览
-    st.markdown("---")
-    st.markdown("### 📊 数据概览")
+    st.markdown("</div>", unsafe_allow_html=True)
     
-    cols = st.columns(len(GROUPS))
-    for idx, (gid, group) in enumerate(GROUPS.items()):
-        with cols[idx]:
-            with st.spinner(f"加载 {group['name']}..."):
-                idx_data = load_index(gid)
-                dates = idx_data.get("available_dates", [])
-            
-            st.markdown(
-                f"""<div style="background: rgba(15,23,42,.5); border: 1px solid rgba(148,163,184,.16); 
-border-radius: 14px; padding: 1.2rem; text-align: center;">
-<h4 style="margin: 0 0 0.5rem 0; color: var(--text);">{group['name']}</h4>
-<p style="font-size: 1.8rem; font-weight: 900; margin: 0.5rem 0; color: #667eea;">{len(dates)}</p>
-<p style="margin: 0; color: var(--muted); font-size: 0.9rem;">天数据</p>
-{f'<p style="margin: 0.5rem 0 0 0; color: var(--muted2); font-size: 0.85rem;">最新: {datetime.strptime(dates[0], "%Y-%m-%d").strftime("%m月%d日")}</p>' if dates else '<p style="margin: 0.5rem 0 0 0; color: var(--muted2); font-size: 0.85rem;">暂无数据</p>'}
-</div>""",
-                unsafe_allow_html=True,
-            )
+    # 数据概览
+    st.markdown("""
+<div class="homepage-container">
+    <div style="margin-top: 64px;">
+        <h3 style="text-align: center; color: var(--text); font-size: 1.5rem; margin-bottom: 32px;">📊 数据概览</h3>
+        <div class="stats-overview-grid">
+""", unsafe_allow_html=True)
+    
+    for gid, group in GROUPS.items():
+        with st.spinner(f"加载 {group['name']}..."):
+            idx_data = load_index(gid)
+            dates = idx_data.get("available_dates", [])
+        
+        latest_date = datetime.strptime(dates[0], "%Y-%m-%d").strftime("%m月%d日") if dates else "暂无"
+        
+        st.markdown(f"""
+            <div class="stat-card">
+                <h4>{group['name']}</h4>
+                <div class="stat-number">{len(dates)}</div>
+                <p class="stat-label">天数据</p>
+                <p class="stat-latest">最新: {latest_date}</p>
+            </div>
+""", unsafe_allow_html=True)
+    
+    st.markdown("""
+        </div>
+    </div>
+</div>
+""", unsafe_allow_html=True)
 
 # ==================== 主应用 ====================
 
