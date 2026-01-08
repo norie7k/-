@@ -1001,29 +1001,46 @@ def show_homepage():
     
     st.markdown("<div style='margin: 20px 0;'></div>", unsafe_allow_html=True)
     
-    # 查询区域 - 使用标签页
-    st.markdown("### 🔍 开始查询分析结果")
+    # 查询区域 - Query Hub
+    st.markdown("""
+<div style='background: rgba(255,255,255,0.03); backdrop-filter: blur(20px); 
+     border: 1px solid rgba(148,163,184,0.16); border-radius: 24px; overflow: hidden; 
+     box-shadow: 0 20px 50px rgba(0,0,0,0.3); margin-top: 32px;'>
+</div>
+""", unsafe_allow_html=True)
     
     # 添加标签页样式
     st.markdown("""
 <style>
 .stTabs [data-baseweb="tab-list"] {
-    gap: 8px;
+    gap: 0;
     background-color: rgba(0,0,0,0.2);
-    border-radius: 12px;
-    padding: 4px;
+    border-radius: 0;
+    padding: 0;
+    border-bottom: 1px solid rgba(148,163,184,0.16);
 }
 .stTabs [data-baseweb="tab"] {
-    height: 50px;
-    padding: 0 24px;
+    height: 56px;
+    padding: 0 32px;
     background-color: transparent;
-    border-radius: 8px;
+    border-radius: 0;
     color: var(--muted);
     font-weight: 600;
+    font-size: 1rem;
+    position: relative;
 }
 .stTabs [aria-selected="true"] {
-    background: linear-gradient(135deg, #667eea, #764ba2);
+    background: rgba(255,255,255,0.02);
     color: white !important;
+}
+.stTabs [aria-selected="true"]::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: linear-gradient(135deg, #667eea, #764ba2);
 }
 </style>
 """, unsafe_allow_html=True)
@@ -1032,8 +1049,8 @@ def show_homepage():
     
     # === 日常查询标签 ===
     with tab1:
-        st.markdown("<div style='margin: 16px 0;'></div>", unsafe_allow_html=True)
-        col1, col2 = st.columns(2)
+        st.markdown("<div style='padding: 40px; background: transparent;'>", unsafe_allow_html=True)
+        col1, col2, col3 = st.columns([1, 1, 0.4])
         
         with col1:
             group_options = {k: GROUPS[k]["name"] for k in GROUPS.keys()}
@@ -1271,22 +1288,24 @@ def show_homepage():
                 st.warning("该社群暂无数据")
                 selected_date = None
         
-        # 按钮区域
-        st.markdown("<div style='margin: 16px 0;'></div>", unsafe_allow_html=True)
-        if st.button("🚀 查看分析", use_container_width=True, type="primary", disabled=not selected_date, key="btn_daily"):
-            st.session_state.show_results = True
-            st.session_state.query_type = "daily"
-            st.session_state.selected_group_homepage = selected_group_daily
-            st.session_state.selected_date_homepage = selected_date
-            st.rerun()
+        with col3:
+            st.markdown("<div style='height: 1.75rem;'></div>", unsafe_allow_html=True)
+            if st.button("🚀 查看分析", use_container_width=True, type="primary", disabled=not selected_date, key="btn_daily"):
+                st.session_state.show_results = True
+                st.session_state.query_type = "daily"
+                st.session_state.selected_group_homepage = selected_group_daily
+                st.session_state.selected_date_homepage = selected_date
+                st.rerun()
         
         if not selected_date and available_dates is not None and len(available_dates) == 0:
             st.info("ℹ️ 该社群暂无数据，请选择其他社群")
+        
+        st.markdown("</div>", unsafe_allow_html=True)
     
     # === 版本查询标签 ===
     with tab2:
-        st.markdown("<div style='margin: 16px 0;'></div>", unsafe_allow_html=True)
-        col1, col2 = st.columns(2)
+        st.markdown("<div style='padding: 40px; background: transparent;'>", unsafe_allow_html=True)
+        col1, col2, col3 = st.columns([1, 1, 0.4])
         
         with col1:
             group_options = {k: GROUPS[k]["name"] for k in GROUPS.keys()}
@@ -1311,17 +1330,19 @@ def show_homepage():
                 key="homepage_version",
             )
         
-        # 按钮区域
-        st.markdown("<div style='margin: 16px 0;'></div>", unsafe_allow_html=True)
-        if st.button("🚀 查看分析", use_container_width=True, type="primary", key="btn_version"):
-            st.session_state.show_results = True
-            st.session_state.query_type = "version"
-            st.session_state.selected_group_homepage = selected_group_version
-            st.session_state.selected_version_homepage = selected_version
-            st.info("版本查询功能正在开发中...")
-            # TODO: 实现版本查询逻辑
+        with col3:
+            st.markdown("<div style='height: 1.75rem;'></div>", unsafe_allow_html=True)
+            if st.button("🚀 查看分析", use_container_width=True, type="primary", key="btn_version"):
+                st.session_state.show_results = True
+                st.session_state.query_type = "version"
+                st.session_state.selected_group_homepage = selected_group_version
+                st.session_state.selected_version_homepage = selected_version
+                st.info("版本查询功能正在开发中...")
+                # TODO: 实现版本查询逻辑
         
         st.info("💡 版本查询将展示特定版本期间的社群反馈汇总")
+        
+        st.markdown("</div>", unsafe_allow_html=True)
 
 # ==================== 主应用 ====================
 
