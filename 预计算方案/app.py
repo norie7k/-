@@ -321,15 +321,17 @@ div[data-baseweb="popover"] button.date-disabled .date-disabled-icon {
   margin: 14px 0;
 }
 .custom-expander{
-  margin-top: 8px;
+  background: linear-gradient(145deg, rgba(18,26,49,.92), rgba(15,23,42,.92));
+  border: 1px solid rgba(148,163,184,.16);
+  border-radius: 18px;
+  padding: 14px 16px 12px 16px;
+  box-shadow: 0 12px 28px rgba(0,0,0,.28);
 }
 .custom-expander-summary{
-  background: rgba(15,23,42,.75) !important;
-  border: 1px solid rgba(148,163,184,.16) !important;
-  border-radius: 14px !important;
-  padding: 10px 14px !important;
+  background: transparent !important;
+  border: none !important;
+  padding: 0 !important;
   color: var(--text) !important;
-  font-weight: 900 !important;
   cursor: pointer !important;
   list-style: none !important;
   user-select: none !important;
@@ -337,13 +339,26 @@ div[data-baseweb="popover"] button.date-disabled .date-disabled-icon {
 .custom-expander-summary::-webkit-details-marker{
   display: none;
 }
-.custom-expander-summary::before{
-  content: '▶ ';
-  display: inline-block;
-  transition: transform 0.2s;
+.cluster-header-compact{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap: 10px;
 }
-.custom-expander[open] .custom-expander-summary::before{
-  transform: rotate(90deg);
+.cluster-header-compact .cluster-title{
+  font-weight: 950;
+  font-size: 1.15rem;
+  color: #f1f5f9;
+  line-height: 1.25;
+}
+.cluster-meta-inline{
+  display:flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 8px;
+}
+.custom-expander[open] .custom-expander-summary{
+  display: none;
 }
 .custom-expander-content{
   background: rgba(15,23,42,.30) !important;
@@ -646,18 +661,16 @@ def render_result(result: dict, group_key: str | None = None):
         
         st.markdown(
             f"""<div class="cluster-custom-wrapper">
-<div class="cluster-card">
-<div class="cluster-header">
+<details class="custom-expander" {expanded_str}>
+<summary class="custom-expander-summary">
+<div class="cluster-header-compact">
 <div>
-<div class="cluster-title">{idx}. {title_escaped}</div>
-<div class="cluster-meta">{''.join(meta_chips)}</div>
+<span class="cluster-title">{idx}. {title_escaped}</span>
+<div class="cluster-meta-inline">{''.join(meta_chips)}</div>
 </div>
 <div class="badge-heat"><small>热度</small>{heat:.1f} 🔥</div>
 </div>
-</div>
-
-<details class="custom-expander" {expanded_str}>
-<summary class="custom-expander-summary">展开详情（讨论点/观点/代表发言）</summary>
+</summary>
 <div class="custom-expander-content">
 <div class="cluster-header-sticky-custom">
 <div class="cluster-header-inner">
