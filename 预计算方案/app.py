@@ -975,7 +975,7 @@ def show_homepage():
     st.markdown("### 📖 系统介绍")
     st.markdown("""
 <div style='color: var(--muted); line-height: 1.8; margin-bottom: 32px; font-size: 1.05rem;'>
-    本系统自动分析玩家社群中的每日聊天内容，使用AI技术提取关键话题、玩家观点和代表性发言，帮助您快速了解社群动态。
+    本系统分析玩家社群中的每日与游戏相关聊天内容，提供日常/版本周期内社群发言监控，给运营团队速掌握大盘情况。通过精准捕捉玩家心声，集成热度追踪、观点拆解与原声还原，让运营决策更具数据支撑。
 </div>
 """, unsafe_allow_html=True)
     
@@ -1001,48 +1001,118 @@ def show_homepage():
     
     st.markdown("<br>", unsafe_allow_html=True)
     
-    # 查询区域
+    # 查询区域 - 使用标签页
     st.markdown("### 🔍 开始查询分析结果")
     
-    col1, col2, col3 = st.columns([2, 2, 1])
+    # 添加标签页样式
+    st.markdown("""
+<style>
+.stTabs [data-baseweb="tab-list"] {
+    gap: 8px;
+    background-color: rgba(0,0,0,0.2);
+    border-radius: 12px;
+    padding: 4px;
+}
+.stTabs [data-baseweb="tab"] {
+    height: 50px;
+    padding: 0 24px;
+    background-color: transparent;
+    border-radius: 8px;
+    color: var(--muted);
+    font-weight: 600;
+}
+.stTabs [aria-selected="true"] {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white !important;
+}
+</style>
+""", unsafe_allow_html=True)
     
-    with col1:
-        group_options = {k: GROUPS[k]["name"] for k in GROUPS.keys()}
-        selected_group = st.selectbox(
-            "选择社群",
-            options=list(group_options.keys()),
-            format_func=lambda x: group_options[x],
-            key="homepage_group",
-        )
+    tab1, tab2 = st.tabs(["📅 日常查询", "🎯 版本查询"])
     
-    with col2:
-        # 加载日期列表
-        with st.spinner("加载可用日期..."):
-            index = load_index(selected_group)
-            available_dates = index.get("available_dates", [])
+    # === 日常查询标签 ===
+    with tab1:
+        st.markdown("<br>", unsafe_allow_html=True)
+        col1, col2, col3 = st.columns([2, 2, 1])
         
-        if available_dates:
-            date_options = {d: datetime.strptime(d, "%Y-%m-%d").strftime("%Y年%m月%d日") for d in available_dates}
-            selected_date = st.selectbox(
-                "选择日期",
-                options=available_dates,
-                format_func=lambda x: date_options[x],
-                key="homepage_date",
+        with col1:
+            group_options = {k: GROUPS[k]["name"] for k in GROUPS.keys()}
+            selected_group_daily = st.selectbox(
+                "监控社群",
+                options=list(group_options.keys()),
+                format_func=lambda x: group_options[x],
+                key="homepage_group_daily",
             )
-        else:
-            st.warning("该社群暂无数据")
-            selected_date = None
+        
+        with col2:
+            # 加载日期列表
+            with st.spinner("加载可用日期..."):
+                index = load_index(selected_group_daily)
+                available_dates = index.get("available_dates", [])
+            
+            if available_dates:
+                date_options = {d: datetime.strptime(d, "%Y-%m-%d").strftime("%Y年%m月%d日") for d in available_dates}
+                selected_date = st.selectbox(
+                    "监测日期",
+                    options=available_dates,
+                    format_func=lambda x: date_options[x],
+                    key="homepage_date",
+                )
+            else:
+                st.warning("该社群暂无数据")
+                selected_date = None
+        
+        with col3:
+            st.markdown("<div style='height: 1.8rem;'></div>", unsafe_allow_html=True)
+            if st.button("🚀 查看分析", use_container_width=True, type="primary", disabled=not selected_date, key="btn_daily"):
+                st.session_state.show_results = True
+                st.session_state.query_type = "daily"
+                st.session_state.selected_group_homepage = selected_group_daily
+                st.session_state.selected_date_homepage = selected_date
+                st.rerun()
+        
+        if not selected_date and available_dates is not None and len(available_dates) == 0:
+            st.info("ℹ️ 该社群暂无数据，请选择其他社群")
     
-    with col3:
-        st.markdown("<div style='height: 1.8rem;'></div>", unsafe_allow_html=True)
-        if st.button("🚀 查看分析", use_container_width=True, type="primary", disabled=not selected_date):
-            st.session_state.show_results = True
-            st.session_state.selected_group_homepage = selected_group
-            st.session_state.selected_date_homepage = selected_date
-            st.rerun()
-    
-    if not selected_date and available_dates is not None and len(available_dates) == 0:
-        st.info("ℹ️ 该社群暂无数据，请选择其他社群")
+    # === 版本查询标签 ===
+    with tab2:
+        st.markdown("<br>", unsafe_allow_html=True)
+        col1, col2, col3 = st.columns([2, 2, 1])
+        
+        with col1:
+            group_options = {k: GROUPS[k]["name"] for k in GROUPS.keys()}
+            selected_group_version = st.selectbox(
+                "监控社群",
+                options=list(group_options.keys()),
+                format_func=lambda x: group_options[x],
+                key="homepage_group_version",
+            )
+        
+        with col2:
+            # 版本列表（示例，可以从配置文件或数据库读取）
+            version_options = [
+                "v1.0 - 初始版本",
+                "v1.1 - 功能更新",
+                "v1.2 - 性能优化",
+                "v2.0 - 重大更新",
+            ]
+            selected_version = st.selectbox(
+                "版本专题总结",
+                options=version_options,
+                key="homepage_version",
+            )
+        
+        with col3:
+            st.markdown("<div style='height: 1.8rem;'></div>", unsafe_allow_html=True)
+            if st.button("🚀 查看分析", use_container_width=True, type="primary", key="btn_version"):
+                st.session_state.show_results = True
+                st.session_state.query_type = "version"
+                st.session_state.selected_group_homepage = selected_group_version
+                st.session_state.selected_version_homepage = selected_version
+                st.info("版本查询功能正在开发中...")
+                # TODO: 实现版本查询逻辑
+        
+        st.info("💡 版本查询将展示特定版本期间的社群反馈汇总")
     
     # 数据概览
     st.markdown("<br><br>", unsafe_allow_html=True)
@@ -1077,6 +1147,8 @@ def main():
     # 初始化session_state（需要在set_page_config之前）
     if "show_results" not in st.session_state:
         st.session_state.show_results = False
+    if "query_type" not in st.session_state:
+        st.session_state.query_type = "daily"
     
     # 根据是否显示结果决定侧边栏状态
     sidebar_state = "expanded" if st.session_state.show_results else "collapsed"
@@ -1370,10 +1442,32 @@ def main():
         
         if st.button("🏠 返回主页", use_container_width=True):
             st.session_state.show_results = False
+            st.session_state.query_type = "daily"
             st.rerun()
 
     # 主内容区
-    if selected_date:
+    # 检查查询类型
+    query_type = st.session_state.get("query_type", "daily")
+    
+    if query_type == "version":
+        # 版本查询功能（开发中）
+        st.markdown("""
+<div style='text-align: center; padding: 100px 20px;'>
+    <div style='font-size: 4rem; margin-bottom: 24px;'>🚧</div>
+    <h2 style='color: var(--text); margin-bottom: 16px;'>版本查询功能开发中</h2>
+    <p style='color: var(--muted); font-size: 1.1rem; margin-bottom: 32px;'>
+        该功能将汇总特定游戏版本期间的社群反馈数据，包括：
+    </p>
+    <div style='max-width: 600px; margin: 0 auto; text-align: left;'>
+        <p style='color: var(--text); margin: 12px 0;'>📊 版本热度话题趋势</p>
+        <p style='color: var(--text); margin: 12px 0;'>💬 玩家反馈汇总分析</p>
+        <p style='color: var(--text); margin: 12px 0;'>📈 问题追踪与解决状态</p>
+        <p style='color: var(--text); margin: 12px 0;'>🎯 版本满意度评估</p>
+    </div>
+</div>
+""", unsafe_allow_html=True)
+    elif selected_date:
+        # 日常查询
         with st.spinner(f"正在加载 {selected_date} 的数据..."):
             result = load_result(selected_group_key, selected_date)
 
