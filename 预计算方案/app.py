@@ -12,6 +12,7 @@ import requests
 from datetime import datetime
 from pathlib import Path
 import time
+import html
 
 # ==================== 配置 ====================
 
@@ -618,64 +619,63 @@ def render_result(result: dict, group_key: str | None = None):
                         break
                 
                 if dp_title:
-                    discussion_content_html += f'<div class="discussion-point"><strong>📌 {dp_i}. {dp_title}</strong></div>'
+                    discussion_content_html += f'<div class="discussion-point"><strong>📌 {dp_i}. {html.escape(dp_title)}</strong></div>'
                 
                 opinions = dp.get("玩家观点", []) or []
                 if opinions:
                     discussion_content_html += '<p style="color: var(--text); font-weight: 600; margin: 0.5rem 0;">玩家观点：</p>'
                     for opinion in opinions:
-                        discussion_content_html += f'<div class="opinion-item">{opinion}</div>'
+                        discussion_content_html += f'<div class="opinion-item">{html.escape(opinion)}</div>'
                 
                 examples = dp.get("代表性玩家发言示例", []) or []
                 if examples:
                     discussion_content_html += f'<p style="color: var(--text); font-weight: 600; margin: 0.5rem 0;">代表性发言（{len(examples)}）：</p>'
                     for example in examples:
-                        discussion_content_html += f'<div class="example-quote">"{example}"</div>'
+                        discussion_content_html += f'<div class="example-quote">"{html.escape(example)}"</div>'
                 
                 discussion_content_html += '<hr style="border: none; border-top: 1px solid rgba(148,163,184,.1); margin: 1rem 0;">'
         else:
             discussion_content_html = '<p style="color: var(--muted);">暂无讨论点列表</p>'
         
-        # 完整时间轴
-        time_axis_html = f'<p style="color: var(--text);"><strong>⏰ 完整时间轴：</strong> {time_axis}</p>' if time_axis else '<p style="color: var(--text);"><strong>⏰ 完整时间轴：</strong>（无）</p>'
+        # 完整时间轴（转义特殊字符）
+        time_axis_html = f'<p style="color: var(--text);"><strong>⏰ 完整时间轴：</strong> {html.escape(time_axis)}</p>' if time_axis else '<p style="color: var(--text);"><strong>⏰ 完整时间轴：</strong>（无）</p>'
         
         # 渲染完整的自定义HTML（包含可滚动容器和sticky header）
+        # 转义标题中的特殊字符
+        title_escaped = html.escape(title)
+        
         st.markdown(
-            f"""
-<div class="cluster-custom-wrapper">
-  <div class="cluster-card">
-    <div class="cluster-header">
-      <div>
-        <div class="cluster-title">{idx}. {title}</div>
-        <div class="cluster-meta">{''.join(meta_chips)}</div>
-      </div>
-      <div class="badge-heat"><small>热度</small>{heat:.1f} 🔥</div>
-    </div>
-  </div>
-  
-  <details class="custom-expander" {expanded_str}>
-    <summary class="custom-expander-summary">展开详情（讨论点/观点/代表发言）</summary>
-    <div class="custom-expander-content">
-      <!-- Sticky Header -->
-      <div class="cluster-header-sticky-custom">
-        <div class="cluster-header-inner">
-          <div>
-            <div class="cluster-title">{idx}. {title}</div>
-            <div class="cluster-meta">{''.join(meta_chips)}</div>
-          </div>
-          <div class="badge-heat"><small>热度</small>{heat:.1f} 🔥</div>
-        </div>
-      </div>
-      
-      <!-- Content -->
-      <div class="custom-expander-inner">
-        {time_axis_html}
-        {discussion_content_html}
-      </div>
-    </div>
-  </details>
+            f"""<div class="cluster-custom-wrapper">
+<div class="cluster-card">
+<div class="cluster-header">
+<div>
+<div class="cluster-title">{idx}. {title_escaped}</div>
+<div class="cluster-meta">{''.join(meta_chips)}</div>
 </div>
-""",
+<div class="badge-heat"><small>热度</small>{heat:.1f} 🔥</div>
+</div>
+</div>
+
+<details class="custom-expander" {expanded_str}>
+<summary class="custom-expander-summary">展开详情（讨论点/观点/代表发言）</summary>
+<div class="custom-expander-content">
+<div class="cluster-header-sticky-custom">
+<div class="cluster-header-inner">
+<div>
+<div class="cluster-title">{idx}. {title_escaped}</div>
+<div class="cluster-meta">{''.join(meta_chips)}</div>
+</div>
+<div class="badge-heat"><small>热度</small>{heat:.1f} 🔥</div>
+</div>
+</div>
+
+<div class="custom-expander-inner">
+{time_axis_html}
+{discussion_content_html}
+</div>
+</div>
+</details>
+</div>""",
             unsafe_allow_html=True,
         )
         
