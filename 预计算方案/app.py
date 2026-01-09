@@ -778,6 +778,17 @@ div:has(> #cc-anchor){
   padding: 0 12px;
 }
 
+/* 日常查询/版本查询 输入框宽度限制 */
+div:has(> #cc-anchor) [data-baseweb="select"] > div{
+  max-width: 320px !important;
+}
+div:has(> #cc-anchor) [data-testid="stDateInput"]{
+  max-width: 320px !important;
+}
+div:has(> #cc-anchor) [data-testid="stDateInput"] > div{
+  max-width: 320px !important;
+}
+
 /* 主查询区域整体居中 */
 .home-query-block{
   max-width: 1100px;
@@ -1542,7 +1553,7 @@ def show_homepage():
                     "beta17_暖冬测试（2025年12月31日~2026年1月20日）",
                 ]
                 selected_version = st.selectbox(
-                    "版本专题总结",
+                    "版本周期",
                     options=version_options,
                     key="homepage_version",
                 )
