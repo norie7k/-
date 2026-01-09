@@ -759,6 +759,20 @@ a:hover{ text-decoration: underline !important; }
 .stTabs [role="tablist"]::after{
   display: none !important;
 }
+
+/* 主查询区域整体居中（容器内含 #cc-anchor） */
+div:has(> #cc-anchor){
+  max-width: 1100px;
+  margin: 0 auto 12px;
+  padding: 0 12px;
+}
+
+/* 主查询区域整体居中 */
+.home-query-block{
+  max-width: 1100px;
+  margin: 0 auto 12px;
+  padding: 0 8px;
+}
 </style>
 """
 
