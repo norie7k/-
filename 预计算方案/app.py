@@ -32,22 +32,30 @@ GROUPS = {
 
 STYLE_CSS = """
 <style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+
 :root{
   --primary:#6366f1;
   --secondary:#8b5cf6;
   --accent:#ec4899;
+  --accent-primary:#a855f7;
+  --accent-secondary:#3b82f6;
 
+  --bg-dark:#020617;
   --bg0:#0b1020;
   --bg1:#111b34;
   --bg2:#1e1b4b;
 
   --card:#121a31;
   --card2:#0f172a;
+  --card-bg:rgba(15, 23, 42, 0.7);
   --line:rgba(148,163,184,.18);
+  --glass-border:rgba(255, 255, 255, 0.08);
 
   --text:#e5e7eb;
   --muted:#94a3b8;
   --muted2:#64748b;
+  --text-dim:#94a3b8;
 }
 
 /* ===== App 背景 + 基础字体色 ===== */
@@ -511,6 +519,216 @@ a:hover{ text-decoration: underline !important; }
   0%, 100% { transform: scale(1); opacity: 1; }
   50% { transform: scale(1.2); opacity: 0.7; }
 }
+
+/* ===== 主页样式（新版） ===== */
+.system-container{
+  min-height: 100vh;
+  position: relative;
+  z-index: 1;
+  font-family: 'Inter', system-ui, sans-serif;
+}
+
+/* Header */
+.system-header{
+  padding: 32px 5% 16px;
+  background: linear-gradient(to bottom, rgba(168, 85, 247, 0.1), transparent);
+}
+.logo-group{
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+.pulse-icon{
+  font-size: 2.2rem;
+  background: rgba(168, 85, 247, 0.2);
+  width: 60px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 16px;
+  border: 1px solid var(--accent-primary);
+  box-shadow: 0 0 30px rgba(168, 85, 247, 0.3);
+}
+.title-stack h1{
+  margin: 0;
+  font-size: 2rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: white;
+}
+.title-stack h1 span{
+  background: linear-gradient(to right, var(--accent-primary), var(--accent-secondary));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.status-badges{
+  display: flex;
+  gap: 10px;
+  margin-top: 8px;
+}
+.badge{
+  font-size: 0.7rem;
+  padding: 4px 10px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 99px;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border: 1px solid var(--glass-border);
+}
+.badge.live{
+  color: #4ade80;
+  border-color: rgba(74, 222, 128, 0.3);
+}
+
+/* Control Center */
+.control-center{
+  width: 90%;
+  max-width: 1200px;
+  margin: 24px auto;
+  background: var(--card-bg);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border);
+  border-radius: 24px;
+  padding: 24px;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+}
+.query-modes{
+  display: flex;
+  gap: 4px;
+  background: rgba(0,0,0,0.3);
+  padding: 4px;
+  border-radius: 12px;
+  width: fit-content;
+  margin-bottom: 20px;
+}
+.query-modes button{
+  background: transparent;
+  border: none;
+  color: var(--text-dim);
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.3s;
+}
+.query-modes button.active{
+  background: rgba(255,255,255,0.1);
+  color: white;
+}
+.filter-shelf{
+  display: grid;
+  grid-template-columns: 1fr 1fr auto;
+  gap: 20px;
+  align-items: flex-end;
+}
+.input-group label{
+  display: block;
+  font-size: 0.75rem;
+  color: var(--text-dim);
+  margin-bottom: 8px;
+  padding-left: 4px;
+}
+.input-group select, .input-group input{
+  width: 100%;
+  background: rgba(0,0,0,0.4);
+  border: 1px solid var(--glass-border);
+  color: white;
+  padding: 14px 16px;
+  border-radius: 12px;
+  font-size: 0.95rem;
+  outline: none;
+  transition: border-color 0.3s;
+}
+.input-group select:focus, .input-group input:focus{
+  border-color: var(--accent-primary);
+}
+.primary-run{
+  background: linear-gradient(to right, var(--accent-primary), #7c3aed);
+  color: white;
+  border: none;
+  padding: 14px 32px;
+  border-radius: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  box-shadow: 0 10px 20px rgba(168, 85, 247, 0.3);
+  transition: transform 0.2s, opacity 0.3s;
+}
+.primary-run:hover{ transform: translateY(-2px); }
+.primary-run:disabled{ opacity: 0.5; cursor: not-allowed; }
+
+/* Intro Cards */
+.intro-grid{
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+  width: 90%;
+  max-width: 1200px;
+  margin: 32px auto;
+}
+@media (max-width: 1024px){
+  .intro-grid{ grid-template-columns: repeat(2, 1fr); }
+  .filter-shelf{ grid-template-columns: 1fr; }
+}
+@media (max-width: 640px){
+  .intro-grid{ grid-template-columns: 1fr; }
+}
+.intro-card{
+  background: rgba(255,255,255,0.02);
+  border: 1px solid var(--glass-border);
+  padding: 24px;
+  border-radius: 20px;
+  transition: all 0.3s;
+}
+.intro-card .icon{
+  font-size: 1.8rem;
+  margin-bottom: 16px;
+  display: block;
+}
+.intro-card h3{ margin: 0 0 8px; font-size: 1rem; font-weight: 700; color: white; }
+.intro-card p{ color: var(--text-dim); font-size: 0.85rem; line-height: 1.5; margin: 0; }
+.intro-card:hover{
+  background: rgba(255,255,255,0.05);
+  transform: translateY(-5px);
+  border-color: var(--accent-primary);
+}
+
+/* Homepage Tabs Styling */
+.homepage-tabs .stTabs [data-baseweb="tab-list"]{
+  display: flex !important;
+  gap: 4px;
+  background: rgba(0,0,0,0.3);
+  padding: 4px;
+  border-radius: 12px;
+  width: fit-content;
+  margin-bottom: 20px;
+  border-bottom: none !important;
+}
+.homepage-tabs .stTabs [data-baseweb="tab"]{
+  flex: none !important;
+  height: auto;
+  padding: 10px 20px;
+  background: transparent;
+  border-radius: 8px;
+  color: var(--text-dim);
+  font-weight: 600;
+  font-size: 0.9rem;
+  justify-content: center;
+}
+.homepage-tabs .stTabs [aria-selected="true"]{
+  background: rgba(255,255,255,0.1) !important;
+  color: white !important;
+}
+.homepage-tabs .stTabs [aria-selected="true"]::after{
+  display: none !important;
+}
+.homepage-tabs .stTabs [data-baseweb="tab-panel"]{
+  padding: 16px 0 !important;
+}
 </style>
 """
 
@@ -946,118 +1164,35 @@ def render_result(result: dict, group_key: str | None = None):
 # ==================== 主页欢迎界面 ====================
 
 def show_homepage():
-    """显示欢迎主页（简洁布局）"""
+    """显示欢迎主页（新版布局）"""
     
-    st.markdown("<div style='padding: 30px 20px 40px;'>", unsafe_allow_html=True)
-    
-    # Hero区域
+    # ===== Header 区域 =====
     st.markdown("""
-<div style='text-align: center; margin-bottom: 32px;'>
-    <div style='width: 64px; height: 64px; background: linear-gradient(135deg, #667eea, #764ba2); 
-         border-radius: 16px; display: inline-flex; align-items: center; justify-content: center; 
-         margin-bottom: 20px; box-shadow: 0 0 30px rgba(102, 126, 234, 0.4); font-size: 2rem;'>
-        🎮
+<header class="system-header">
+    <div class="logo-group">
+        <div class="pulse-icon">🎮</div>
+        <div class="title-stack">
+            <h1>玩家社群<span>分析系统</span></h1>
+            <div class="status-badges">
+                <span class="badge live">● AI 驱动</span>
+                <span class="badge">实时同步</span>
+                <span class="badge">GitHub托管</span>
+            </div>
+        </div>
     </div>
-    <h1 style='font-size: 2.5rem; font-weight: 900; margin: 12px 0; color: var(--text);'>
-        玩家社群<span style='background: linear-gradient(135deg, #667eea, #764ba2); 
-        -webkit-background-clip: text; -webkit-text-fill-color: transparent;'>分析系统</span>
-    </h1>
-    <div style='display: inline-flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.05); 
-         padding: 6px 16px; border-radius: 99px; font-size: 0.85rem; color: var(--muted);'>
-        <span style='width: 8px; height: 8px; background: #22c55e; border-radius: 50%; 
-              box-shadow: 0 0 8px #22c55e; animation: pulse 2s infinite;'></span>
-        <span>AI驱动 · 实时同步 · GitHub托管</span>
-    </div>
-</div>
+</header>
 """, unsafe_allow_html=True)
     
-    # 系统介绍区域
-    st.markdown("### 📖 系统介绍")
-    st.markdown("""
-<div style='color: var(--muted); line-height: 1.6; margin-bottom: 24px; font-size: 1rem;'>
-    本系统分析玩家社群中的每日与游戏相关聊天内容，提供日常/版本周期内社群发言监控，给运营团队速掌握大盘情况。通过精准捕捉玩家心声，集成热度追踪、观点拆解与原声还原，让运营决策更具数据支撑。
-</div>
-""", unsafe_allow_html=True)
+    # ===== Control Center（查询控制中心）=====
+    st.markdown('<div class="control-center">', unsafe_allow_html=True)
     
-    # 功能卡片（使用columns布局）
-    cols = st.columns(4)
-    features = [
-        ("📊", "话题聚类", "自动识别当日讨论的主要话题，智能分组相关内容"),
-        ("🔥", "热度排名", "根据参与人数和发言数计算话题热度，呈现Top5热门话题"),
-        ("💬", "观点提取", "智能总结玩家的核心观点，快速了解社群态度"),
-        ("📝", "代表发言", "展示最具代表性的玩家发言，还原真实讨论场景")
-    ]
-    
-    for col, (icon, title, desc) in zip(cols, features):
-        with col:
-            st.markdown(f"""
-<div style='background: rgba(255,255,255,0.02); border: 1px solid rgba(148,163,184,0.16); 
-     padding: 20px; border-radius: 16px; transition: all 0.3s ease; height: 100%;'>
-    <div style='font-size: 1.6rem; margin-bottom: 12px;'>{icon}</div>
-    <h4 style='margin: 0 0 8px 0; font-size: 1rem; color: var(--text); font-weight: 700;'>{title}</h4>
-    <p style='margin: 0; font-size: 0.85rem; color: var(--muted); line-height: 1.5;'>{desc}</p>
-</div>
-""", unsafe_allow_html=True)
-    
-    st.markdown("<div style='margin: 20px 0;'></div>", unsafe_allow_html=True)
-    
-    # 查询区域 - Query Hub
-    st.markdown("""
-<div style='background: rgba(255,255,255,0.03); backdrop-filter: blur(20px); 
-     border: 1px solid rgba(148,163,184,0.16); border-radius: 24px; overflow: hidden; 
-     box-shadow: 0 20px 50px rgba(0,0,0,0.3); margin-top: 32px;'>
-</div>
-""", unsafe_allow_html=True)
-    
-    # 添加标签页样式
-    st.markdown("""
-<style>
-.stTabs [data-baseweb="tab-list"] {
-    display: flex !important;
-    width: 100% !important;
-    gap: 0;
-    background-color: rgba(0,0,0,0.2);
-    border-radius: 0;
-    padding: 0;
-    border-bottom: 1px solid rgba(148,163,184,0.16);
-}
-.stTabs [data-baseweb="tab"] {
-    flex: 1 !important;
-    height: 56px;
-    padding: 0 32px;
-    background-color: transparent;
-    border-radius: 0;
-    color: var(--muted);
-    font-weight: 600;
-    font-size: 1rem;
-    position: relative;
-    justify-content: center !important;
-}
-.stTabs [aria-selected="true"] {
-    background: rgba(255,255,255,0.02);
-    color: white !important;
-}
-.stTabs [aria-selected="true"]::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    height: 3px;
-    background: linear-gradient(135deg, #667eea, #764ba2);
-}
-/* 减少标签内容区域的顶部留白 */
-.stTabs [data-baseweb="tab-panel"] {
-    padding: 16px 40px !important;
-}
-</style>
-""", unsafe_allow_html=True)
-    
-    tab1, tab2 = st.tabs(["📅 日常查询", "🎯 版本查询"])
+    # 使用 Streamlit Tabs 模拟查询模式切换
+    st.markdown('<div class="homepage-tabs">', unsafe_allow_html=True)
+    tab1, tab2 = st.tabs(["🗓 日常查询", "🎯 版本查询"])
     
     # === 日常查询标签 ===
     with tab1:
-        col1, col2, col3 = st.columns([1, 1, 0.4])
+        col1, col2, col3 = st.columns([1, 1, 0.5])
         
         with col1:
             group_options = {k: GROUPS[k]["name"] for k in GROUPS.keys()}
@@ -1151,10 +1286,10 @@ def show_homepage():
                             formatted_invalid_date = datetime.strptime(invalid_date, "%Y-%m-%d").strftime("%Y年%m月%d日")
                             formatted_valid_date = datetime.strptime(valid_date, "%Y-%m-%d").strftime("%Y年%m月%d日")
                             st.markdown(
-                                f'<div style="padding: 0.8rem; background-color: rgba(255, 193, 7, 0.10); '
-                                f'border-left: 4px solid #ffc107; border-radius: 10px; margin: 0.5rem 0;">'
-                                f'<p style="margin: 0; font-size: 0.95rem; font-weight: 700; color: #ffd166;">'
-                                f'⚠️ {formatted_invalid_date}暂无数据，已选择最近日期：{formatted_valid_date}</p></div>',
+                                f'<div style="padding: 0.6rem; background-color: rgba(255, 193, 7, 0.10); '
+                                f'border-left: 3px solid #ffc107; border-radius: 8px; margin: 0.5rem 0;">'
+                                f'<p style="margin: 0; font-size: 0.85rem; font-weight: 600; color: #ffd166;">'
+                                f'⚠️ {formatted_invalid_date}暂无数据，已选择：{formatted_valid_date}</p></div>',
                                 unsafe_allow_html=True
                             )
                         st.session_state.homepage_need_date_correction = False
@@ -1296,8 +1431,8 @@ def show_homepage():
                 selected_date = None
         
         with col3:
-            st.markdown("<div style='height: 1.75rem;'></div>", unsafe_allow_html=True)
-            if st.button("🚀 查看分析", use_container_width=True, type="primary", disabled=not selected_date, key="btn_daily"):
+            st.markdown("<div style='height: 1.5rem;'></div>", unsafe_allow_html=True)
+            if st.button("✨ 查看分析", use_container_width=True, type="primary", disabled=not selected_date, key="btn_daily"):
                 st.session_state.show_results = True
                 st.session_state.query_type = "daily"
                 st.session_state.selected_group_homepage = selected_group_daily
@@ -1309,7 +1444,7 @@ def show_homepage():
     
     # === 版本查询标签 ===
     with tab2:
-        col1, col2, col3 = st.columns([1, 1, 0.4])
+        col1, col2, col3 = st.columns([1, 1, 0.5])
         
         with col1:
             group_options = {k: GROUPS[k]["name"] for k in GROUPS.keys()}
@@ -1333,16 +1468,51 @@ def show_homepage():
             )
         
         with col3:
-            st.markdown("<div style='height: 1.75rem;'></div>", unsafe_allow_html=True)
-            if st.button("🚀 查看分析", use_container_width=True, type="primary", key="btn_version"):
+            st.markdown("<div style='height: 1.5rem;'></div>", unsafe_allow_html=True)
+            if st.button("✨ 查看分析", use_container_width=True, type="primary", key="btn_version"):
                 st.session_state.show_results = True
                 st.session_state.query_type = "version"
                 st.session_state.selected_group_homepage = selected_group_version
                 st.session_state.selected_version_homepage = selected_version
                 st.info("版本查询功能正在开发中...")
-                # TODO: 实现版本查询逻辑
         
-        st.info("💡 版本查询将展示特定版本期间的社群反馈汇总")
+        st.markdown("""
+<div style="padding: 0.6rem 1rem; background: rgba(59,130,246,0.1); border: 1px solid rgba(59,130,246,0.2); 
+     border-radius: 10px; margin-top: 0.5rem;">
+    <p style="margin: 0; font-size: 0.85rem; color: var(--text-dim);">
+        💡 版本查询将展示特定版本期间的社群反馈汇总
+    </p>
+</div>
+""", unsafe_allow_html=True)
+    
+    st.markdown('</div>', unsafe_allow_html=True)  # 关闭 homepage-tabs
+    st.markdown('</div>', unsafe_allow_html=True)  # 关闭 control-center
+    
+    # ===== Intro Cards（功能介绍卡片）=====
+    st.markdown("""
+<div class="intro-grid">
+    <div class="intro-card">
+        <span class="icon">📊</span>
+        <h3>话题聚类</h3>
+        <p>自动识别当日讨论的主要话题，智能分组相关内容</p>
+    </div>
+    <div class="intro-card">
+        <span class="icon">🔥</span>
+        <h3>热度排名</h3>
+        <p>根据参与人数和发言数计算话题热度，呈现Top5热门话题</p>
+    </div>
+    <div class="intro-card">
+        <span class="icon">💬</span>
+        <h3>观点提取</h3>
+        <p>智能总结玩家的核心观点，快速了解社群态度</p>
+    </div>
+    <div class="intro-card">
+        <span class="icon">✍️</span>
+        <h3>代表发言</h3>
+        <p>展示最具代表性的玩家发言，还原真实讨论场景</p>
+    </div>
+</div>
+""", unsafe_allow_html=True)
 
 # ==================== 主应用 ====================
 
