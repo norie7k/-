@@ -706,12 +706,13 @@ a:hover{ text-decoration: underline !important; }
 /* Homepage Tabs Styling */
 .stTabs [data-baseweb="tab-list"]{
   display: flex !important;
-  gap: 4px;
+  gap: 8px;
   background: transparent !important;
   padding: 4px;
   border-radius: 12px;
-  width: fit-content;
-  margin-bottom: 20px;
+  width: 100% !important;
+  max-width: 100% !important;
+  margin: 0 auto 20px;
   border: none !important;
   border-bottom: none !important;
   box-shadow: none !important;
@@ -721,15 +722,17 @@ a:hover{ text-decoration: underline !important; }
   display: none !important;
 }
 .stTabs [data-baseweb="tab"]{
-  flex: none !important;
+  flex: 1 1 0% !important;
+  min-width: 0 !important;
   height: auto;
-  padding: 10px 20px;
+  padding: 12px 20px;
   background: rgba(0,0,0,0.3);
   border-radius: 8px;
   color: var(--text-dim);
   font-weight: 600;
-  font-size: 0.9rem;
+  font-size: 0.95rem;
   justify-content: center;
+  text-align: center;
   border: 1px solid var(--glass-border);
 }
 .stTabs [aria-selected="true"]{
@@ -750,16 +753,18 @@ a:hover{ text-decoration: underline !important; }
 }
 .stTabs > div:first-child{
   background: transparent !important;
-  width: auto !important;
+  width: 100% !important;
   margin: 0 auto !important;
 }
 .stTabs > div > div:first-child{
   background: transparent !important;
   border: none !important;
+  width: 100% !important;
 }
 .stTabs [role="tablist"]{
   background: transparent !important;
   gap: 8px !important;
+  width: 100% !important;
 }
 .stTabs [role="tablist"]::before,
 .stTabs [role="tablist"]::after{
