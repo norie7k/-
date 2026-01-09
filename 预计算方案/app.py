@@ -1247,23 +1247,31 @@ def show_homepage():
 
         # === 日常查询标签 ===
         with tab1:
+            selected_date = None
             col_inputs, col_button = st.columns([1.5, 0.6])
 
             with col_inputs:
-                group_options = {k: GROUPS[k]["name"] for k in GROUPS.keys()}
-                selected_group_daily = st.selectbox(
-                    "监控社群",
-                    options=list(group_options.keys()),
-                    format_func=lambda x: group_options[x],
-                    key="homepage_group_daily",
-                )
+                # 通过左右留白让控件变得更窄
+                pad1, main_col, pad2 = st.columns([0.6, 1.2, 0.6])
 
-                # 加载日期列表
-                with st.spinner("加载可用日期..."):
-                    index = load_index(selected_group_daily)
-                    available_dates = index.get("available_dates", [])
+                with main_col:
+                    group_options = {k: GROUPS[k]["name"] for k in GROUPS.keys()}
+                    selected_group_daily = st.selectbox(
+                        "监控社群",
+                        options=list(group_options.keys()),
+                        format_func=lambda x: group_options[x],
+                        key="homepage_group_daily",
+                    )
 
-                if available_dates:
+                # 日期选择也放入窄列
+                pad_d1, date_col, pad_d2 = st.columns([0.6, 1.2, 0.6])
+
+                with date_col:
+                    with st.spinner("加载可用日期..."):
+                        index = load_index(selected_group_daily)
+                        available_dates = index.get("available_dates", [])
+
+                    if available_dates:
                     # 转换为date对象
                     date_objects = []
                     for date_str in available_dates:
@@ -1330,10 +1338,11 @@ def show_homepage():
                                 st.session_state.homepage_date_cache = selected_date_str_check
                                 st.session_state.homepage_need_date_correction = False
 
-                        if st.session_state.get("homepage_need_date_correction", False):
-                            corrected_date = datetime.strptime(
-                                st.session_state.homepage_valid_date_selected, "%Y-%m-%d"
-                            ).date()
+                    if st.session_state.get("homepage_need_date_correction", False):
+                        corrected_date = datetime.strptime(
+                            st.session_state.homepage_valid_date_selected, "%Y-%m-%d"
+                        ).date()
+                        with main_col:
                             selected_date_obj = st.date_input(
                                 "监测日期",
                                 value=corrected_date,
@@ -1344,24 +1353,25 @@ def show_homepage():
                                 on_change=on_homepage_date_change,
                             )
 
-                            invalid_date = st.session_state.get("homepage_invalid_date_selected", "")
-                            valid_date = st.session_state.get("homepage_valid_date_selected", "")
-                            if invalid_date:
-                                formatted_invalid_date = datetime.strptime(invalid_date, "%Y-%m-%d").strftime(
-                                    "%Y年%m月%d日"
-                                )
-                                formatted_valid_date = datetime.strptime(valid_date, "%Y-%m-%d").strftime(
-                                    "%Y年%m月%d日"
-                                )
-                                st.markdown(
-                                    f'<div style="padding: 0.6rem; background-color: rgba(255, 193, 7, 0.10); '
-                                    f'border-left: 3px solid #ffc107; border-radius: 8px; margin: 0.5rem 0;">'
-                                    f'<p style="margin: 0; font-size: 0.85rem; font-weight: 600; color: #ffd166;">'
-                                    f'⚠️ {formatted_invalid_date}暂无数据，已选择：{formatted_valid_date}</p></div>',
-                                    unsafe_allow_html=True,
-                                )
-                            st.session_state.homepage_need_date_correction = False
-                        else:
+                        invalid_date = st.session_state.get("homepage_invalid_date_selected", "")
+                        valid_date = st.session_state.get("homepage_valid_date_selected", "")
+                        if invalid_date:
+                            formatted_invalid_date = datetime.strptime(invalid_date, "%Y-%m-%d").strftime(
+                                "%Y年%m月%d日"
+                            )
+                            formatted_valid_date = datetime.strptime(valid_date, "%Y-%m-%d").strftime(
+                                "%Y年%m月%d日"
+                            )
+                            st.markdown(
+                                f'<div style="padding: 0.6rem; background-color: rgba(255, 193, 7, 0.10); '
+                                f'border-left: 3px solid #ffc107; border-radius: 8px; margin: 0.5rem 0;">'
+                                f'<p style="margin: 0; font-size: 0.85rem; font-weight: 600; color: #ffd166;">'
+                                f'⚠️ {formatted_invalid_date}暂无数据，已选择：{formatted_valid_date}</p></div>',
+                                unsafe_allow_html=True,
+                            )
+                        st.session_state.homepage_need_date_correction = False
+                    else:
+                        with main_col:
                             selected_date_obj = st.date_input(
                                 "监测日期",
                                 value=initial_date,
@@ -1528,24 +1538,28 @@ def show_homepage():
             col_inputs_v, col_button_v = st.columns([1.5, 0.6])
 
         with col_inputs_v:
-            group_options = {k: GROUPS[k]["name"] for k in GROUPS.keys()}
-            selected_group_version = st.selectbox(
-                "监控社群",
-                options=list(group_options.keys()),
-                format_func=lambda x: group_options[x],
-                key="homepage_group_version",
-            )
+            pad1_v, main_col_v, pad2_v = st.columns([0.6, 1.2, 0.6])
+
+            with main_col_v:
+                group_options = {k: GROUPS[k]["name"] for k in GROUPS.keys()}
+                selected_group_version = st.selectbox(
+                    "监控社群",
+                    options=list(group_options.keys()),
+                    format_func=lambda x: group_options[x],
+                    key="homepage_group_version",
+                )
 
             # 版本列表（示例，可以从配置文件或数据库读取）
             version_options = [
                 "beta15_旋转木马测试（2025年12月03日~2025年12月17日）",
                 "beta17_暖冬测试（2025年12月31日~2026年1月20日）",
             ]
-            selected_version = st.selectbox(
-                "版本专题总结",
-                options=version_options,
-                key="homepage_version",
-            )
+            with main_col_v:
+                selected_version = st.selectbox(
+                    "版本专题总结",
+                    options=version_options,
+                    key="homepage_version",
+                )
 
         with col_button_v:
             st.markdown("<div style='height: 1.5rem;'></div>", unsafe_allow_html=True)
