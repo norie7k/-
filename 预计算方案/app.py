@@ -778,17 +778,6 @@ div:has(> #cc-anchor){
   padding: 0 12px;
 }
 
-/* 日常查询/版本查询 输入框宽度限制 */
-div:has(> #cc-anchor) [data-baseweb="select"] > div{
-  max-width: 150px !important;
-}
-div:has(> #cc-anchor) [data-testid="stDateInput"]{
-  max-width: 150px !important;
-}
-div:has(> #cc-anchor) [data-testid="stDateInput"] > div{
-  max-width: 150px !important;
-}
-
 /* 主查询区域整体居中 */
 .home-query-block{
   max-width: 1100px;
@@ -1258,7 +1247,8 @@ def show_homepage():
 
         # === 日常查询标签 ===
         with tab1:
-            col_inputs, col_button = st.columns([1.5, 0.6])
+            # 三列布局：左边距 | 输入区 | 按钮区
+            col_pad_left, col_inputs, col_button = st.columns([0.3, 1, 0.5])
 
             with col_inputs:
                 group_options = {k: GROUPS[k]["name"] for k in GROUPS.keys()}
@@ -1536,7 +1526,8 @@ def show_homepage():
 
         # === 版本查询标签 ===
         with tab2:
-            col_inputs_v, col_button_v = st.columns([1.5, 0.6])
+            # 三列布局：左边距 | 输入区 | 按钮区
+            col_pad_left_v, col_inputs_v, col_button_v = st.columns([0.3, 1, 0.5])
 
             with col_inputs_v:
                 group_options = {k: GROUPS[k]["name"] for k in GROUPS.keys()}
