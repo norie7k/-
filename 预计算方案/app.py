@@ -1247,9 +1247,9 @@ def show_homepage():
 
         # === 日常查询标签 ===
         with tab1:
-            col1, col2, col3 = st.columns([1, 1, 0.5])
+            col_inputs, col_button = st.columns([1.5, 0.6])
 
-            with col1:
+            with col_inputs:
                 group_options = {k: GROUPS[k]["name"] for k in GROUPS.keys()}
                 selected_group_daily = st.selectbox(
                     "监控社群",
@@ -1258,7 +1258,6 @@ def show_homepage():
                     key="homepage_group_daily",
                 )
 
-            with col2:
                 # 加载日期列表
                 with st.spinner("加载可用日期..."):
                     index = load_index(selected_group_daily)
@@ -1499,7 +1498,7 @@ def show_homepage():
                     st.warning("该社群暂无数据")
                     selected_date = None
 
-            with col3:
+            with col_button:
                 st.markdown("<div style='height: 1.5rem;'></div>", unsafe_allow_html=True)
                 if st.button(
                     "✨ 查看分析",
