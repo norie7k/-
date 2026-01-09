@@ -1214,7 +1214,7 @@ def show_homepage():
 """, unsafe_allow_html=True)
     
     # ===== Control Center（查询控制中心）=====
-    st.markdown('<div class="control-center">', unsafe_allow_html=True)
+    #st.markdown('<div class="control-center">', unsafe_allow_html=True)
     tab1, tab2 = st.tabs(["🗓 日常查询", "🎯 版本查询"])
     
     # === 日常查询标签 ===
@@ -1512,7 +1512,7 @@ def show_homepage():
 </div>
 """, unsafe_allow_html=True)
     
-    st.markdown('</div>', unsafe_allow_html=True)  # 关闭 control-center
+    #st.markdown('</div>', unsafe_allow_html=True)  # 关闭 control-center
     
     # ===== Intro Cards（功能介绍卡片）=====
     st.markdown("""
