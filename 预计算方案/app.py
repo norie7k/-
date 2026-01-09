@@ -1525,9 +1525,9 @@ def show_homepage():
 
         # === 版本查询标签 ===
         with tab2:
-            col1, col2, col3 = st.columns([1, 1, 0.5])
+            col_inputs_v, col_button_v = st.columns([1.5, 0.6])
 
-            with col1:
+            with col_inputs_v:
                 group_options = {k: GROUPS[k]["name"] for k in GROUPS.keys()}
                 selected_group_version = st.selectbox(
                     "监控社群",
@@ -1536,7 +1536,6 @@ def show_homepage():
                     key="homepage_group_version",
                 )
 
-            with col2:
                 # 版本列表（示例，可以从配置文件或数据库读取）
                 version_options = [
                     "beta15_旋转木马测试（2025年12月03日~2025年12月17日）",
@@ -1548,7 +1547,7 @@ def show_homepage():
                     key="homepage_version",
                 )
 
-            with col3:
+            with col_button_v:
                 st.markdown("<div style='height: 1.5rem;'></div>", unsafe_allow_html=True)
                 if st.button(
                     "✨ 查看分析",
