@@ -707,33 +707,57 @@ a:hover{ text-decoration: underline !important; }
 .control-center .stTabs [data-baseweb="tab-list"]{
   display: flex !important;
   gap: 4px;
-  background: rgba(0,0,0,0.3);
+  background: transparent !important;
   padding: 4px;
   border-radius: 12px;
   width: fit-content;
   margin-bottom: 20px;
+  border: none !important;
   border-bottom: none !important;
+  box-shadow: none !important;
+}
+.control-center .stTabs [data-baseweb="tab-border"],
+.control-center .stTabs [data-baseweb="tab-highlight"]{
+  display: none !important;
 }
 .control-center .stTabs [data-baseweb="tab"]{
   flex: none !important;
   height: auto;
   padding: 10px 20px;
-  background: transparent;
+  background: rgba(0,0,0,0.3);
   border-radius: 8px;
   color: var(--text-dim);
   font-weight: 600;
   font-size: 0.9rem;
   justify-content: center;
+  border: 1px solid var(--glass-border);
 }
 .control-center .stTabs [aria-selected="true"]{
-  background: rgba(255,255,255,0.1) !important;
+  background: rgba(168,85,247,0.2) !important;
   color: white !important;
+  border-color: var(--accent-primary) !important;
 }
 .control-center .stTabs [aria-selected="true"]::after{
   display: none !important;
 }
 .control-center .stTabs [data-baseweb="tab-panel"]{
   padding: 16px 0 !important;
+}
+/* 隐藏 tabs 底部横线 */
+.control-center .stTabs > div:first-child{
+  background: transparent !important;
+}
+.control-center .stTabs > div > div:first-child{
+  background: transparent !important;
+  border: none !important;
+}
+.control-center .stTabs [role="tablist"]{
+  background: transparent !important;
+  gap: 8px !important;
+}
+.control-center .stTabs [role="tablist"]::before,
+.control-center .stTabs [role="tablist"]::after{
+  display: none !important;
 }
 </style>
 """
