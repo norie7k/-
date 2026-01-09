@@ -1495,7 +1495,7 @@ def show_homepage():
             # （可选）底部一句引导文案，像你截图那样
             st.markdown("<hr class='cc-divider'/>", unsafe_allow_html=True)
             st.markdown(
-                "<div class='cc-hint'>或者直接向 AI 提问：<span>“分析昨晚维护后的核心负面反馈…”</span></div>",
+                "<div class='cc-hint'>本系统分析玩家社群中的每日与游戏相关聊天内容，提供日常/版本周期内社群发言监控，给运营团队速掌握大盘情况</div>",
                 unsafe_allow_html=True,
             )
 
