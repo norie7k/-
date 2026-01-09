@@ -780,13 +780,13 @@ div:has(> #cc-anchor){
 
 /* 日常查询/版本查询 输入框宽度限制 */
 div:has(> #cc-anchor) [data-baseweb="select"] > div{
-  max-width: 320px !important;
+  max-width: 150px !important;
 }
 div:has(> #cc-anchor) [data-testid="stDateInput"]{
-  max-width: 320px !important;
+  max-width: 150px !important;
 }
 div:has(> #cc-anchor) [data-testid="stDateInput"] > div{
-  max-width: 320px !important;
+  max-width: 150px !important;
 }
 
 /* 主查询区域整体居中 */
