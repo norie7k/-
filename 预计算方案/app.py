@@ -1242,13 +1242,11 @@ def show_homepage():
     # 之后用 CSS :has(#cc-anchor) 把这一整块画成一个方框卡片
     with st.container():
         st.markdown('<div id="cc-anchor"></div>', unsafe_allow_html=True)
-
-        tab1, tab2 = st.tabs(["🗓 日常查询", "🎯 版本查询"])
+        tab1, tab2 = st.tabs(["🗂️每日查询", "🗂️版本查询"])
 
         # === 日常查询标签 ===
         with tab1:
-            # 三列布局：左边距 | 输入区 | 按钮区
-            col_pad_left, col_inputs, col_button = st.columns([0.3, 1, 0.5])
+            col_inputs, col_button = st.columns([1.5, 0.6])
 
             with col_inputs:
                 group_options = {k: GROUPS[k]["name"] for k in GROUPS.keys()}
@@ -1502,7 +1500,7 @@ def show_homepage():
             with col_button:
                 st.markdown("<div style='height: 1.5rem;'></div>", unsafe_allow_html=True)
                 if st.button(
-                    "✨ 查看分析",
+                    "✨🔍️ 查看分析",
                     use_container_width=True,
                     type="primary",
                     disabled=not selected_date,
@@ -1526,8 +1524,7 @@ def show_homepage():
 
         # === 版本查询标签 ===
         with tab2:
-            # 三列布局：左边距 | 输入区 | 按钮区
-            col_pad_left_v, col_inputs_v, col_button_v = st.columns([0.3, 1, 0.5])
+            col_inputs_v, col_button_v = st.columns([1.5, 0.6])
 
             with col_inputs_v:
                 group_options = {k: GROUPS[k]["name"] for k in GROUPS.keys()}
@@ -1552,7 +1549,7 @@ def show_homepage():
             with col_button_v:
                 st.markdown("<div style='height: 1.5rem;'></div>", unsafe_allow_html=True)
                 if st.button(
-                    "✨ 查看分析",
+                    "🔍️✨ 查看分析",
                     use_container_width=True,
                     type="primary",
                     key="btn_version",
