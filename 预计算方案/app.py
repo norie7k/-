@@ -532,11 +532,13 @@ a:hover{ text-decoration: underline !important; }
 .system-header{
   padding: 32px 5% 16px;
   background: linear-gradient(to bottom, rgba(168, 85, 247, 0.1), transparent);
+  text-align: center;
 }
 .logo-group{
-  display: flex;
+  display: inline-flex;
+  flex-direction: column;
   align-items: center;
-  gap: 20px;
+  gap: 16px;
 }
 .pulse-icon{
   font-size: 2.2rem;
@@ -550,9 +552,12 @@ a:hover{ text-decoration: underline !important; }
   border: 1px solid var(--accent-primary);
   box-shadow: 0 0 30px rgba(168, 85, 247, 0.3);
 }
+.title-stack{
+  text-align: center;
+}
 .title-stack h1{
   margin: 0;
-  font-size: 2rem;
+  font-size: 2.2rem;
   font-weight: 800;
   letter-spacing: -0.02em;
   color: white;
@@ -564,8 +569,9 @@ a:hover{ text-decoration: underline !important; }
 }
 .status-badges{
   display: flex;
+  justify-content: center;
   gap: 10px;
-  margin-top: 8px;
+  margin-top: 10px;
 }
 .badge{
   font-size: 0.7rem;
@@ -698,7 +704,7 @@ a:hover{ text-decoration: underline !important; }
 }
 
 /* Homepage Tabs Styling */
-.homepage-tabs .stTabs [data-baseweb="tab-list"]{
+.control-center .stTabs [data-baseweb="tab-list"]{
   display: flex !important;
   gap: 4px;
   background: rgba(0,0,0,0.3);
@@ -708,7 +714,7 @@ a:hover{ text-decoration: underline !important; }
   margin-bottom: 20px;
   border-bottom: none !important;
 }
-.homepage-tabs .stTabs [data-baseweb="tab"]{
+.control-center .stTabs [data-baseweb="tab"]{
   flex: none !important;
   height: auto;
   padding: 10px 20px;
@@ -719,14 +725,14 @@ a:hover{ text-decoration: underline !important; }
   font-size: 0.9rem;
   justify-content: center;
 }
-.homepage-tabs .stTabs [aria-selected="true"]{
+.control-center .stTabs [aria-selected="true"]{
   background: rgba(255,255,255,0.1) !important;
   color: white !important;
 }
-.homepage-tabs .stTabs [aria-selected="true"]::after{
+.control-center .stTabs [aria-selected="true"]::after{
   display: none !important;
 }
-.homepage-tabs .stTabs [data-baseweb="tab-panel"]{
+.control-center .stTabs [data-baseweb="tab-panel"]{
   padding: 16px 0 !important;
 }
 </style>
@@ -1185,9 +1191,6 @@ def show_homepage():
     
     # ===== Control Center（查询控制中心）=====
     st.markdown('<div class="control-center">', unsafe_allow_html=True)
-    
-    # 使用 Streamlit Tabs 模拟查询模式切换
-    st.markdown('<div class="homepage-tabs">', unsafe_allow_html=True)
     tab1, tab2 = st.tabs(["🗓 日常查询", "🎯 版本查询"])
     
     # === 日常查询标签 ===
@@ -1485,7 +1488,6 @@ def show_homepage():
 </div>
 """, unsafe_allow_html=True)
     
-    st.markdown('</div>', unsafe_allow_html=True)  # 关闭 homepage-tabs
     st.markdown('</div>', unsafe_allow_html=True)  # 关闭 control-center
     
     # ===== Intro Cards（功能介绍卡片）=====
