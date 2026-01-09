@@ -703,85 +703,18 @@ a:hover{ text-decoration: underline !important; }
   border-color: var(--accent-primary);
 }
 
-/* ===== 查询中心卡片 ===== */
-.query-hub{
-  width: 90%;
-  max-width: 900px;
-  margin: 24px auto 32px;
-  background: linear-gradient(145deg, rgba(15, 23, 42, 0.85), rgba(10, 15, 30, 0.9));
-  backdrop-filter: blur(20px);
-  border: 1px solid rgba(168, 85, 247, 0.25);
-  border-radius: 24px;
-  padding: 28px 32px;
-  box-shadow: 0 20px 60px rgba(0,0,0,0.5), 0 0 40px rgba(168, 85, 247, 0.1);
-}
-.query-hub-title{
-  text-align: center;
-  font-size: 1.1rem;
-  font-weight: 700;
-  color: var(--muted);
-  margin-bottom: 20px;
-  letter-spacing: 0.05em;
-}
-
-/* 大号查询模式按钮 */
-.query-mode-buttons{
-  display: flex;
-  justify-content: center;
-  gap: 16px;
-  margin-bottom: 24px;
-}
-.query-mode-btn{
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  padding: 16px 32px;
-  font-size: 1.1rem;
-  font-weight: 700;
-  border-radius: 14px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  border: 2px solid transparent;
-}
-.query-mode-btn.daily{
-  background: linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(168, 85, 247, 0.15));
-  border-color: rgba(99, 102, 241, 0.4);
-  color: #a5b4fc;
-}
-.query-mode-btn.daily:hover, .query-mode-btn.daily.active{
-  background: linear-gradient(135deg, rgba(99, 102, 241, 0.3), rgba(168, 85, 247, 0.3));
-  border-color: #818cf8;
-  color: white;
-  box-shadow: 0 8px 24px rgba(99, 102, 241, 0.3);
-}
-.query-mode-btn.version{
-  background: linear-gradient(135deg, rgba(236, 72, 153, 0.15), rgba(168, 85, 247, 0.15));
-  border-color: rgba(236, 72, 153, 0.4);
-  color: #f9a8d4;
-}
-.query-mode-btn.version:hover, .query-mode-btn.version.active{
-  background: linear-gradient(135deg, rgba(236, 72, 153, 0.3), rgba(168, 85, 247, 0.3));
-  border-color: #f472b6;
-  color: white;
-  box-shadow: 0 8px 24px rgba(236, 72, 153, 0.3);
-}
-.query-mode-btn .btn-icon{
-  font-size: 1.4rem;
-}
-.query-mode-btn .btn-text{
-  font-size: 1.1rem;
-}
-
-/* Homepage Tabs Styling - 更大更醒目 */
+/* Homepage Tabs Styling */
 .stTabs [data-baseweb="tab-list"]{
   display: flex !important;
-  justify-content: center !important;
-  gap: 16px !important;
+  gap: 4px;
   background: transparent !important;
-  padding: 0 !important;
-  margin-bottom: 24px !important;
+  padding: 4px;
+  border-radius: 12px;
+  width: fit-content;
+  margin-bottom: 20px;
   border: none !important;
   border-bottom: none !important;
+  box-shadow: none !important;
 }
 .stTabs [data-baseweb="tab-border"],
 .stTabs [data-baseweb="tab-highlight"]{
@@ -789,33 +722,26 @@ a:hover{ text-decoration: underline !important; }
 }
 .stTabs [data-baseweb="tab"]{
   flex: none !important;
-  height: auto !important;
-  min-width: 160px !important;
-  padding: 16px 28px !important;
-  background: linear-gradient(135deg, rgba(30, 41, 59, 0.8), rgba(15, 23, 42, 0.9)) !important;
-  border-radius: 14px !important;
-  color: var(--text-dim) !important;
-  font-weight: 700 !important;
-  font-size: 1.05rem !important;
-  justify-content: center !important;
-  border: 2px solid rgba(148, 163, 184, 0.2) !important;
-  transition: all 0.3s ease !important;
-}
-.stTabs [data-baseweb="tab"]:hover{
-  background: linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(168, 85, 247, 0.15)) !important;
-  border-color: rgba(168, 85, 247, 0.4) !important;
+  height: auto;
+  padding: 10px 20px;
+  background: rgba(0,0,0,0.3);
+  border-radius: 8px;
+  color: var(--text-dim);
+  font-weight: 600;
+  font-size: 0.9rem;
+  justify-content: center;
+  border: 1px solid var(--glass-border);
 }
 .stTabs [aria-selected="true"]{
-  background: linear-gradient(135deg, rgba(99, 102, 241, 0.25), rgba(168, 85, 247, 0.25)) !important;
+  background: rgba(168,85,247,0.2) !important;
   color: white !important;
   border-color: var(--accent-primary) !important;
-  box-shadow: 0 8px 24px rgba(168, 85, 247, 0.25) !important;
 }
 .stTabs [aria-selected="true"]::after{
   display: none !important;
 }
 .stTabs [data-baseweb="tab-panel"]{
-  padding: 20px 0 0 !important;
+  padding: 16px 0 !important;
 }
 /* 隐藏 tabs 底部横线 */
 .stTabs > div:first-child{
@@ -827,28 +753,11 @@ a:hover{ text-decoration: underline !important; }
 }
 .stTabs [role="tablist"]{
   background: transparent !important;
-  gap: 16px !important;
-  justify-content: center !important;
+  gap: 8px !important;
 }
 .stTabs [role="tablist"]::before,
 .stTabs [role="tablist"]::after{
   display: none !important;
-}
-
-/* 查询区域分割线和提示 */
-.cc-divider{
-  border: none;
-  border-top: 1px solid rgba(148, 163, 184, 0.15);
-  margin: 20px 0 16px;
-}
-.cc-hint{
-  text-align: center;
-  font-size: 0.9rem;
-  color: var(--muted2);
-}
-.cc-hint span{
-  color: var(--accent-primary);
-  font-style: italic;
 }
 </style>
 """
@@ -1302,13 +1211,6 @@ def show_homepage():
         </div>
     </div>
 </header>
-""", unsafe_allow_html=True)
-
-    # ===== 查询中心（突出显示）=====
-    st.markdown("""
-<div class="query-hub">
-    <div class="query-hub-title">🔍 选择查询方式</div>
-</div>
 """, unsafe_allow_html=True)
     
     # 使用 Streamlit Tabs
