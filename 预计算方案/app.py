@@ -1525,42 +1525,41 @@ def show_homepage():
 
         # === 版本查询标签 ===
         with tab2:
-            col1, col2, col3 = st.columns([1, 1, 0.5])
+            col_inputs_v, col_button_v = st.columns([1.5, 0.6])
 
-            with col1:
-                group_options = {k: GROUPS[k]["name"] for k in GROUPS.keys()}
-                selected_group_version = st.selectbox(
-                    "监控社群",
-                    options=list(group_options.keys()),
-                    format_func=lambda x: group_options[x],
-                    key="homepage_group_version",
-                )
+        with col_inputs_v:
+            group_options = {k: GROUPS[k]["name"] for k in GROUPS.keys()}
+            selected_group_version = st.selectbox(
+                "监控社群",
+                options=list(group_options.keys()),
+                format_func=lambda x: group_options[x],
+                key="homepage_group_version",
+            )
 
-            with col2:
-                # 版本列表（示例，可以从配置文件或数据库读取）
-                version_options = [
-                    "beta15_旋转木马测试（2025年12月03日~2025年12月17日）",
-                    "beta17_暖冬测试（2025年12月31日~2026年1月20日）",
-                ]
-                selected_version = st.selectbox(
-                    "版本专题总结",
-                    options=version_options,
-                    key="homepage_version",
-                )
+            # 版本列表（示例，可以从配置文件或数据库读取）
+            version_options = [
+                "beta15_旋转木马测试（2025年12月03日~2025年12月17日）",
+                "beta17_暖冬测试（2025年12月31日~2026年1月20日）",
+            ]
+            selected_version = st.selectbox(
+                "版本专题总结",
+                options=version_options,
+                key="homepage_version",
+            )
 
-            with col3:
-                st.markdown("<div style='height: 1.5rem;'></div>", unsafe_allow_html=True)
-                if st.button(
-                    "✨ 查看分析",
-                    use_container_width=True,
-                    type="primary",
-                    key="btn_version",
-                ):
-                    st.session_state.show_results = True
-                    st.session_state.query_type = "version"
-                    st.session_state.selected_group_homepage = selected_group_version
-                    st.session_state.selected_version_homepage = selected_version
-                    st.info("版本查询功能正在开发中...")
+        with col_button_v:
+            st.markdown("<div style='height: 1.5rem;'></div>", unsafe_allow_html=True)
+            if st.button(
+                "✨ 查看分析",
+                use_container_width=True,
+                type="primary",
+                key="btn_version",
+            ):
+                st.session_state.show_results = True
+                st.session_state.query_type = "version"
+                st.session_state.selected_group_homepage = selected_group_version
+                st.session_state.selected_version_homepage = selected_version
+                st.info("版本查询功能正在开发中...")
 
             st.markdown("""
 <div style="padding: 0.6rem 1rem; background: rgba(59,130,246,0.1); border: 1px solid rgba(59,130,246,0.2); 
