@@ -744,8 +744,14 @@ a:hover{ text-decoration: underline !important; }
   padding: 16px 0 !important;
 }
 /* 隐藏 tabs 底部横线 */
+.stTabs{
+  display: flex !important;
+  justify-content: center !important;
+}
 .stTabs > div:first-child{
   background: transparent !important;
+  width: auto !important;
+  margin: 0 auto !important;
 }
 .stTabs > div > div:first-child{
   background: transparent !important;
