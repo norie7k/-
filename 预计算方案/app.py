@@ -988,9 +988,12 @@ def render_result(result: dict, group_key: str | None = None):
         # 转义标题中的特殊字符
         title_escaped = html.escape(title)
         
+        # 生成唯一的元素ID（包含群组和日期，确保切换时重置展开状态）
+        unique_id = f"cluster-{group_key or 'g'}-{date}-{idx}"
+        
         st.markdown(
             f"""<div class="cluster-custom-wrapper">
-<details class="custom-expander" {expanded_str} id="cluster-{idx}">
+<details class="custom-expander" {expanded_str} id="{unique_id}">
 <summary class="custom-expander-summary">
 <div class="cluster-card">
 <div class="cluster-header">
