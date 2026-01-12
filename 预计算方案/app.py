@@ -1648,13 +1648,6 @@ def main():
         show_homepage()
         return
     
-    # 显示顶部标题
-    st.markdown(
-        """<div class="main-title">🎮 玩家社群分析系统</div>
-<div class="sub-title">查看每日群聊话题分析结果（从 GitHub 自动同步）</div>""",
-        unsafe_allow_html=True,
-    )
-
     # 侧边栏
     with st.sidebar:
         st.header("🔍 查询条件")
