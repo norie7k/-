@@ -920,6 +920,29 @@ def render_result(result: dict, group_key: str | None = None):
     # 如果你只想显示 Top5，把这行打开即可：
     # sorted_clusters = sorted_clusters[:5]
 
+    # 添加JavaScript：每次渲染时强制关闭所有展开的details元素
+    # 使用components.html确保JavaScript被执行
+    reset_key = f"{group_key or 'g'}-{date}"
+    components.html(f"""
+<script>
+(function() {{
+    // 等待DOM加载完成后执行
+    function closeAllExpanders() {{
+        var allDetails = window.parent.document.querySelectorAll('details.custom-expander[open]');
+        allDetails.forEach(function(d) {{
+            d.removeAttribute('open');
+        }});
+    }}
+    // 立即执行一次
+    closeAllExpanders();
+    // 延迟执行确保DOM已渲染
+    setTimeout(closeAllExpanders, 100);
+    setTimeout(closeAllExpanders, 300);
+}})();
+</script>
+<div style="display:none;" data-reset-key="{reset_key}"></div>
+""", height=0)
+    
     st.markdown(f"#### 🔥 热门话题Top5")
 
     top1_heat = float(sorted_clusters[0].get("热度评分", 0) or 0) if sorted_clusters else 1.0
