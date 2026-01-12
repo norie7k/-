@@ -1936,8 +1936,6 @@ def main():
         # 显示当前选择的日期与已加载的日期是否不同
         current_confirmed = st.session_state.get("confirmed_date", "")
         current_selected = st.session_state.get("selected_date_cache", "")
-        if current_selected and current_confirmed and current_selected != current_confirmed:
-            st.info(f"📅 已选择: {current_selected}\n点击下方按钮加载数据")
 
         if st.button("🔄 刷新数据", use_container_width=True):
             # 将选择的日期确认为要加载的日期
