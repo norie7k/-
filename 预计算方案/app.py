@@ -943,7 +943,8 @@ def render_result(result: dict, group_key: str | None = None):
             meta_chips.append(f'<div class="meta-chip"><span>⏰ 时间</span>{short_time}</div>')
 
         # 使用纯HTML创建可展开的自定义容器（绕过st.expander限制）
-        expanded_str = "open" if idx <= 2 else ""
+        # 所有话题簇默认都是收起状态
+        expanded_str = ""
         
         # 构建讨论点内容HTML
         discussion_content_html = ""
