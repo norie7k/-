@@ -1716,8 +1716,12 @@ def main():
                 extended_min_date = date_type(min_year, 1, 1)
                 extended_max_date = date_type(max_year, 12, 31)
 
+                # selected_date_cache: 用户在日历中选择的日期（待确认）
+                # confirmed_date: 点击"刷新数据"后确认的日期（用于实际数据加载）
                 if "selected_date_cache" not in st.session_state:
                     st.session_state.selected_date_cache = default_date.strftime("%Y-%m-%d")
+                if "confirmed_date" not in st.session_state:
+                    st.session_state.confirmed_date = default_date.strftime("%Y-%m-%d")
 
                 try:
                     cached_date_obj = datetime.strptime(st.session_state.selected_date_cache, "%Y-%m-%d").date()
@@ -1726,6 +1730,7 @@ def main():
                     initial_date = default_date
 
                 def on_date_change():
+                    """日期选择改变时，只更新缓存，不自动刷新页面"""
                     selected_date_obj_check = st.session_state.get("selected_date_input", initial_date)
                     if isinstance(selected_date_obj_check, str):
                         try:
@@ -1736,6 +1741,7 @@ def main():
                     selected_date_str_check = selected_date_obj_check.strftime("%Y-%m-%d")
 
                     if selected_date_str_check not in available_dates:
+                        # 选择了不可用的日期，找到最近的可用日期
                         selected_date_obj_dt = datetime.combine(selected_date_obj_check, datetime.min.time())
                         closest_date = min(
                             date_objects,
@@ -1746,7 +1752,7 @@ def main():
                         st.session_state.need_date_correction = True
                         st.session_state.invalid_date_selected = selected_date_str_check
                         st.session_state.valid_date_selected = closest_date_str
-                        st.rerun()
+                        # 不再自动rerun，等用户点击"刷新数据"
                     else:
                         st.session_state.selected_date_cache = selected_date_str_check
                         st.session_state.need_date_correction = False
@@ -1904,9 +1910,20 @@ def main():
 """
                 st.markdown(disable_dates_js, unsafe_allow_html=True)
 
-                selected_date = selected_date_obj.strftime("%Y-%m-%d")
-                if selected_date in available_dates:
-                    st.session_state.selected_date_cache = selected_date
+                # 更新选择的日期缓存
+                picker_date = selected_date_obj.strftime("%Y-%m-%d")
+                if picker_date in available_dates:
+                    st.session_state.selected_date_cache = picker_date
+                
+                # 使用确认的日期（点击"刷新数据"后的日期）来加载数据
+                confirmed = st.session_state.get("confirmed_date", "")
+                if confirmed and confirmed in available_dates:
+                    selected_date = confirmed
+                else:
+                    # 首次加载或确认日期无效时，使用选择的日期
+                    selected_date = picker_date if picker_date in available_dates else None
+                    if selected_date:
+                        st.session_state.confirmed_date = selected_date
             else:
                 selected_date = None
         else:
@@ -1915,8 +1932,16 @@ def main():
 
         st.markdown("---")
         st.caption("💡 数据每日自动更新到 GitHub")
+        
+        # 显示当前选择的日期与已加载的日期是否不同
+        current_confirmed = st.session_state.get("confirmed_date", "")
+        current_selected = st.session_state.get("selected_date_cache", "")
+        if current_selected and current_confirmed and current_selected != current_confirmed:
+            st.info(f"📅 已选择: {current_selected}\n点击下方按钮加载数据")
 
         if st.button("🔄 刷新数据", use_container_width=True):
+            # 将选择的日期确认为要加载的日期
+            st.session_state.confirmed_date = st.session_state.get("selected_date_cache", "")
             st.cache_data.clear()
             _set_nonce()
             st.rerun()
