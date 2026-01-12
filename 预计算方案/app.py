@@ -71,24 +71,25 @@ section[data-testid="stMain"]{ color: var(--text); }
 section[data-testid="stMain"] p,
 section[data-testid="stMain"] li{ color: var(--text); }
 
-/* ===== 标题 ===== */
+/* ===== 标题（结果页紧凑版）===== */
 .main-title{
   font-family: 'Orbitron','Noto Sans SC',sans-serif;
-  font-size: 2.4rem;
-  font-weight: 900;
+  font-size: 1.4rem;
+  font-weight: 800;
   background: linear-gradient(90deg, #a5b4fc, #c4b5fd, #f0abfc);
   -webkit-background-clip:text;
   -webkit-text-fill-color:transparent;
   text-align:center;
-  margin-bottom: .35rem;
-  text-shadow: 0 0 26px rgba(129, 140, 248, 0.28);
+  margin-bottom: .15rem;
+  margin-top: 0;
+  text-shadow: 0 0 20px rgba(129, 140, 248, 0.2);
 }
 .sub-title{
   font-family: 'Noto Sans SC',sans-serif;
-  font-size: 1.02rem;
+  font-size: 0.85rem;
   color: var(--muted);
   text-align:center;
-  margin-bottom: 1.35rem;
+  margin-bottom: 0.6rem;
 }
 
 /* ===== 侧边栏：稳定选择器 ===== */
@@ -178,18 +179,18 @@ div[data-baseweb="popover"] button.date-disabled .date-disabled-icon {
 /* ===== 统计概览卡 ===== */
 .stats-overview{
   background: linear-gradient(145deg, rgba(18,26,49,.92), rgba(15,23,42,.92));
-  border-radius: 18px;
-  padding: 0.8rem 1rem 0.8rem 1rem;
-  margin: 1.1rem 0 1.1rem 0;
+  border-radius: 14px;
+  padding: 0.5rem 0.8rem;
+  margin: 0.5rem 0 0.6rem 0;
   border: 1px solid rgba(148,163,184,.16);
-  box-shadow: 0 12px 30px rgba(0,0,0,.30);
+  box-shadow: 0 8px 20px rgba(0,0,0,.25);
 }
 .stats-overview h2{
   color: #e9d5ff;
-  margin: 0 0 .6rem 0;
-  padding-bottom: .5rem;
+  margin: 0 0 .3rem 0;
+  padding-bottom: .3rem;
   border-bottom: 1px solid rgba(148,163,184,.18);
-  font-size: 1.5rem;
+  font-size: 1.15rem;
   font-weight: 600;
 }
 .stat-grid{
@@ -217,16 +218,16 @@ div[data-baseweb="popover"] button.date-disabled .date-disabled-icon {
 
 /* ===== 摘要卡 ===== */
 .cluster-wrapper{
-  margin: 14px 0 10px 0;
+  margin: 8px 0 6px 0;
   position: relative;
 }
 .cluster-card{
   background: linear-gradient(145deg, rgba(18,26,49,.92), rgba(15,23,42,.92));
   border: 1px solid rgba(148,163,184,.16);
-  border-radius: 18px;
-  padding: 14px 16px 12px 16px;
-  box-shadow: 0 12px 28px rgba(0,0,0,.28);
-  margin-bottom: 8px;
+  border-radius: 14px;
+  padding: 10px 14px 8px 14px;
+  box-shadow: 0 8px 20px rgba(0,0,0,.25);
+  margin-bottom: 4px;
 }
 .cluster-header{
   display:flex;
@@ -326,21 +327,21 @@ div[data-baseweb="popover"] button.date-disabled .date-disabled-icon {
 
 /* ===== 自定义 Expander（完全控制，支持 sticky）===== */
 .cluster-custom-wrapper{
-  margin: 14px 0;
+  margin: 8px 0;
   position: relative;
 }
 .custom-expander{
-  border-radius: 18px;
+  border-radius: 14px;
 }
 /* Summary中的卡片：未展开时显示，展开后隐藏 */
 .custom-expander:not([open]) .custom-expander-summary .cluster-card{
   display: block;
   background: linear-gradient(145deg, rgba(18,26,49,.92), rgba(15,23,42,.92));
   border: 1px solid rgba(148,163,184,.16);
-  border-radius: 18px;
-  padding: 14px 16px 12px 16px;
-  box-shadow: 0 12px 28px rgba(0,0,0,.28);
-  margin-bottom: 8px;
+  border-radius: 14px;
+  padding: 10px 14px 8px 14px;
+  box-shadow: 0 8px 20px rgba(0,0,0,.25);
+  margin-bottom: 4px;
 }
 .custom-expander[open] .custom-expander-summary .cluster-card{
   display: none;
@@ -362,9 +363,9 @@ div[data-baseweb="popover"] button.date-disabled .date-disabled-icon {
 .cluster-card-sticky .cluster-card{
   background: linear-gradient(145deg, rgba(18,26,49,.92), rgba(15,23,42,.92));
   border: 1px solid rgba(148,163,184,.16);
-  border-radius: 18px;
-  padding: 14px 16px 12px 16px;
-  box-shadow: 0 12px 28px rgba(0,0,0,.28);
+  border-radius: 14px;
+  padding: 10px 14px 8px 14px;
+  box-shadow: 0 8px 20px rgba(0,0,0,.25);
 }
 /* 可滚动内容区域 */
 .scrollable-content{
@@ -905,9 +906,9 @@ def render_result(result: dict, group_key: str | None = None):
     st.markdown(
         f"""<div class="stats-overview">
 <h2>📊 {platform_display} {group_display} {formatted_date} 分析报告</h2>
-<div style="padding: 0.3rem 0; line-height: 1.8; color: var(--text);">
-  <p style="margin: 0.2rem 0; font-size: 1.0rem;">
-    默认展示当日热度最高的Top5话题（可展开查看讨论点/玩家观点/代表性发言） • <span style="color: var(--muted2); font-style: italic;">{heat_formula}</span>
+<div style="padding: 0.15rem 0; line-height: 1.5; color: var(--text);">
+  <p style="margin: 0; font-size: 0.88rem;">
+    当日热度Top5话题（可展开查看详情） • <span style="color: var(--muted2); font-style: italic; font-size: 0.82rem;">{heat_formula}</span>
   </p>
 </div>
 </div>""",
@@ -943,7 +944,7 @@ def render_result(result: dict, group_key: str | None = None):
 <div style="display:none;" data-reset-key="{reset_key}"></div>
 """, height=0)
     
-    st.markdown(f"#### 🔥 热门话题Top5")
+    st.markdown(f"<p style='font-size: 1.05rem; font-weight: 700; margin: 0.3rem 0 0.4rem 0; color: #e5e7eb;'>🔥 热门话题Top5</p>", unsafe_allow_html=True)
 
     top1_heat = float(sorted_clusters[0].get("热度评分", 0) or 0) if sorted_clusters else 1.0
     if top1_heat <= 0:
