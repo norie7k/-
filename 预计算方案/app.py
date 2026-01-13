@@ -1282,10 +1282,8 @@ def render_result(result: dict, group_key: str | None = None):
         // 获取父页面的document
         const parentDoc = window.parent.document;
         
-        // 找到所有收起按钮
+        // 找到所有话题簇收起按钮
         const collapseButtons = parentDoc.querySelectorAll('.expander-toggle-inside');
-        
-        console.log('找到收起按钮数量:', collapseButtons.length);
         
         collapseButtons.forEach((button, index) => {
             // 检查是否已经绑定过
@@ -1294,23 +1292,40 @@ def render_result(result: dict, group_key: str | None = None):
             }
             button.dataset.bound = 'true';
             
-            console.log('绑定第', index + 1, '个按钮');
+            // 添加点击事件
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                // 向上查找最近的 details 元素
+                const details = this.closest('details');
+                if (details) {
+                    details.open = false;
+                    details.removeAttribute('open');
+                }
+            });
+        });
+        
+        // 找到所有讨论点收起按钮（sticky卡片中的）
+        const dpCollapseButtons = parentDoc.querySelectorAll('.dp-card-sticky .dp-toggle-btn');
+        
+        dpCollapseButtons.forEach((button, index) => {
+            // 检查是否已经绑定过
+            if (button.dataset.dpbound === 'true') {
+                return;
+            }
+            button.dataset.dpbound = 'true';
             
             // 添加点击事件
             button.addEventListener('click', function(e) {
                 e.preventDefault();
                 e.stopPropagation();
                 
-                console.log('收起按钮被点击');
-                
-                // 向上查找最近的 details 元素
-                const details = this.closest('details');
+                // 向上查找最近的 details.dp-expander 元素
+                const details = this.closest('details.dp-expander');
                 if (details) {
-                    console.log('找到details元素，开始收起');
                     details.open = false;
                     details.removeAttribute('open');
-                } else {
-                    console.log('未找到details元素');
                 }
             });
         });
