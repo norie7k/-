@@ -524,14 +524,29 @@ section[data-testid="stMain"] div[data-testid="stExpander"] div[role="region"]{
   color: #fff;
   flex: 1;
 }
-.dp-toggle-icon{
-  font-size: 0.7rem;
-  color: var(--muted);
-  transition: transform 0.2s ease;
+.dp-toggle-btn{
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #ec4899;
+  background: rgba(236,72,153,.15);
+  padding: 4px 10px;
+  border-radius: 6px;
+  border: 1px solid rgba(236,72,153,.3);
+  transition: all 0.2s ease;
+  white-space: nowrap;
 }
-.dp-expander[open] .dp-toggle-icon{
-  transform: rotate(180deg);
+.dp-card:hover .dp-toggle-btn{
+  background: rgba(236,72,153,.25);
+  border-color: rgba(236,72,153,.5);
+  color: #f472b6;
 }
+.dp-toggle-btn .expand-text{ display: inline; }
+.dp-toggle-btn .collapse-text{ display: none; }
+.dp-expander[open] .dp-toggle-btn{
+  background: rgba(236,72,153,.3);
+}
+.dp-expander[open] .dp-toggle-btn .expand-text{ display: none; }
+.dp-expander[open] .dp-toggle-btn .collapse-text{ display: inline; }
 .dp-expander[open] .dp-card{
   border-radius: 10px 10px 0 0;
   border-bottom: none;
@@ -1074,7 +1089,7 @@ def render_result(result: dict, group_key: str | None = None):
 <div class="dp-card">
 <div class="dp-header">
 <span class="dp-title">📌 {dp_i}. {dp_title_escaped}</span>
-<span class="dp-toggle-icon">▼</span>
+<span class="dp-toggle-btn"><span class="expand-text">展开 ▼</span><span class="collapse-text">收起 ▲</span></span>
 </div>
 </div>
 </summary>
