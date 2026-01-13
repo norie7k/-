@@ -375,6 +375,7 @@ div[data-baseweb="popover"] button.date-disabled .date-disabled-icon {
   border-radius: 14px;
   scrollbar-width: thin;
   scrollbar-color: rgba(148,163,184,.3) transparent;
+  padding-bottom: 400px; /* 底部留白，让最后的讨论点也能滚动到顶部 */
 }
 .scrollable-content::-webkit-scrollbar{
   width: 8px;
