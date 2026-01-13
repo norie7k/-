@@ -488,22 +488,92 @@ section[data-testid="stMain"] div[data-testid="stExpander"] div[role="region"]{
 }
 .discussion-point strong{ color:#fff; font-size: 1.02rem; }
 
+/* 讨论点可展开卡片 */
+.dp-expander{
+  margin: 6px 0;
+  border-radius: 10px;
+}
+.dp-expander-summary{
+  list-style: none;
+  cursor: pointer;
+  user-select: none;
+}
+.dp-expander-summary::-webkit-details-marker{
+  display: none;
+}
+.dp-card{
+  background: linear-gradient(145deg, rgba(236,72,153,.12), rgba(139,92,246,.08));
+  border: 1px solid rgba(236,72,153,.22);
+  border-radius: 10px;
+  padding: 8px 12px;
+  transition: all 0.2s ease;
+}
+.dp-card:hover{
+  background: linear-gradient(145deg, rgba(236,72,153,.18), rgba(139,92,246,.12));
+  border-color: rgba(236,72,153,.35);
+}
+.dp-header{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+.dp-title{
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: #fff;
+  flex: 1;
+}
+.dp-toggle-icon{
+  font-size: 0.7rem;
+  color: var(--muted);
+  transition: transform 0.2s ease;
+}
+.dp-expander[open] .dp-toggle-icon{
+  transform: rotate(180deg);
+}
+.dp-expander[open] .dp-card{
+  border-radius: 10px 10px 0 0;
+  border-bottom: none;
+}
+.dp-content{
+  background: rgba(15,23,42,.4);
+  border: 1px solid rgba(236,72,153,.18);
+  border-top: none;
+  border-radius: 0 0 10px 10px;
+  padding: 10px 12px;
+}
+.dp-section-title{
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--text);
+  margin: 8px 0 6px 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.dp-section-title:first-child{
+  margin-top: 0;
+}
+
 .opinion-item{
   background: rgba(34,211,238,.10);
   border: 1px solid rgba(34,211,238,.16);
-  padding: .72rem .92rem;
-  margin: .45rem 0;
-  border-radius: 12px;
+  padding: 6px 10px;
+  margin: 4px 0;
+  border-radius: 8px;
   color: var(--text);
+  font-size: 0.88rem;
 }
 .example-quote{
   background: rgba(99,102,241,.10);
   border: 1px solid rgba(99,102,241,.16);
-  padding: .68rem .9rem;
-  margin: .42rem 0;
-  border-radius: 12px;
+  padding: 6px 10px;
+  margin: 4px 0;
+  border-radius: 8px;
   color: #dbeafe;
   font-style: italic;
+  font-size: 0.88rem;
 }
 
 /* Metric */
@@ -966,7 +1036,7 @@ def render_result(result: dict, group_key: str | None = None):
         discussion_list = cluster.get("讨论点列表", []) or []
         
         if discussion_list:
-            discussion_content_html += f'<h4 style="color: var(--text); margin: 1rem 0;">💬 讨论点与玩家观点（共 {len(discussion_list)} 条）</h4>'
+            discussion_content_html += f'<div style="color: var(--text); font-size: 0.9rem; margin-bottom: 8px; font-weight: 600;">💬 讨论点（共 {len(discussion_list)} 条）</div>'
             
             for dp_i, dp in enumerate(discussion_list, 1):
                 # 找到 "讨论点X"
@@ -976,22 +1046,42 @@ def render_result(result: dict, group_key: str | None = None):
                         dp_title = (dp.get(k) or "").strip()
                         break
                 
-                if dp_title:
-                    discussion_content_html += f'<div class="discussion-point"><strong>📌 {dp_i}. {html.escape(dp_title)}</strong></div>'
-                
                 opinions = dp.get("玩家观点", []) or []
-                if opinions:
-                    discussion_content_html += '<p style="color: var(--text); font-weight: 600; margin: 0.5rem 0;">玩家观点：</p>'
-                    for opinion in opinions:
-                        discussion_content_html += f'<div class="opinion-item">{html.escape(opinion)}</div>'
-                
                 examples = dp.get("代表性玩家发言示例", []) or []
-                if examples:
-                    discussion_content_html += f'<p style="color: var(--text); font-weight: 600; margin: 0.5rem 0;">代表性发言（{len(examples)}）：</p>'
-                    for example in examples:
-                        discussion_content_html += f'<div class="example-quote">"{html.escape(example)}"</div>'
                 
-                discussion_content_html += '<hr style="border: none; border-top: 1px solid rgba(148,163,184,.1); margin: 1rem 0;">'
+                # 构建讨论点内部内容
+                dp_inner_html = ""
+                
+                if opinions:
+                    dp_inner_html += '<div class="dp-section-title">💭 玩家观点</div>'
+                    for opinion in opinions:
+                        dp_inner_html += f'<div class="opinion-item">{html.escape(opinion)}</div>'
+                
+                if examples:
+                    dp_inner_html += f'<div class="dp-section-title">📝 代表性发言（{len(examples)}）</div>'
+                    for example in examples:
+                        dp_inner_html += f'<div class="example-quote">"{html.escape(example)}"</div>'
+                
+                if not dp_inner_html:
+                    dp_inner_html = '<p style="color: var(--muted); font-size: 0.85rem; margin: 0;">暂无详细内容</p>'
+                
+                # 生成可展开的讨论点卡片
+                dp_id = f"dp-{group_key or 'g'}-{date}-{idx}-{dp_i}"
+                dp_title_escaped = html.escape(dp_title) if dp_title else f"讨论点 {dp_i}"
+                
+                discussion_content_html += f'''<details class="dp-expander" id="{dp_id}">
+<summary class="dp-expander-summary">
+<div class="dp-card">
+<div class="dp-header">
+<span class="dp-title">📌 {dp_i}. {dp_title_escaped}</span>
+<span class="dp-toggle-icon">▼</span>
+</div>
+</div>
+</summary>
+<div class="dp-content">
+{dp_inner_html}
+</div>
+</details>'''
         else:
             discussion_content_html = '<p style="color: var(--muted);">暂无讨论点列表</p>'
         
