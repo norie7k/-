@@ -901,15 +901,7 @@ a:hover{ text-decoration: underline !important; }
   display: none !important;
 }
 
-/* 主查询卡片 */
-.query-card-wrapper{
-  background: rgba(15, 23, 42, 0.85);
-  border: 2px solid var(--accent-primary);
-  border-radius: 20px;
-  padding: 20px 24px;
-  margin-bottom: 20px;
-  box-shadow: 0 15px 40px rgba(168, 85, 247, 0.2);
-}
+/* 主查询卡片 - 标题样式 */
 .query-card-header{
   text-align: center;
   font-size: 1.15rem;
@@ -918,6 +910,16 @@ a:hover{ text-decoration: underline !important; }
   margin-bottom: 16px;
   padding-bottom: 12px;
   border-bottom: 1px solid rgba(168, 85, 247, 0.3);
+}
+
+/* 查询区域容器样式 - 通过标记ID定位 */
+[data-testid="stVerticalBlock"]:has(> [data-testid="element-container"] > .query-card-header){
+  background: rgba(15, 23, 42, 0.85) !important;
+  border: 2px solid var(--accent-primary) !important;
+  border-radius: 20px !important;
+  padding: 20px 24px !important;
+  margin-bottom: 20px !important;
+  box-shadow: 0 15px 40px rgba(168, 85, 247, 0.2) !important;
 }
 </style>
 """
@@ -1440,11 +1442,8 @@ def show_homepage():
     _, center_col, _ = st.columns([1, 3, 1])
     
     with center_col:
-        # 整个查询区域的卡片容器（开始）
-        st.markdown('''
-<div class="query-card-wrapper">
-<div class="query-card-header">🔍 数据查询中心</div>
-''', unsafe_allow_html=True)
+        # 标记查询区域（用于CSS/JS定位）
+        st.markdown('<div class="query-card-header">🔍 数据查询中心</div>', unsafe_allow_html=True)
         
         tab1, tab2 = st.tabs(["🗂️每日查询", "🗂️版本查询"])
 
@@ -1777,9 +1776,47 @@ def show_homepage():
     </p>
 </div>
 """, unsafe_allow_html=True)
+
+    # ===== JavaScript：给查询区域添加卡片样式 =====
+    components.html("""
+<script>
+(function() {
+    function applyQueryCardStyle() {
+        const parentDoc = window.parent.document;
         
-        # 关闭查询卡片容器
-        st.markdown('</div>', unsafe_allow_html=True)
+        // 找到查询卡片标题
+        const header = parentDoc.querySelector('.query-card-header');
+        if (!header) return;
+        
+        // 向上找到包含整个查询区域的容器
+        let container = header.closest('[data-testid="column"]');
+        if (!container) {
+            container = header.closest('[data-testid="stVerticalBlock"]');
+        }
+        
+        if (container && !container.classList.contains('query-card-styled')) {
+            container.classList.add('query-card-styled');
+            container.style.background = 'rgba(15, 23, 42, 0.85)';
+            container.style.border = '2px solid #a855f7';
+            container.style.borderRadius = '20px';
+            container.style.padding = '20px 24px';
+            container.style.marginBottom = '20px';
+            container.style.boxShadow = '0 15px 40px rgba(168, 85, 247, 0.2)';
+        }
+    }
+    
+    // 多次尝试确保样式生效
+    setTimeout(applyQueryCardStyle, 100);
+    setTimeout(applyQueryCardStyle, 300);
+    setTimeout(applyQueryCardStyle, 600);
+    setTimeout(applyQueryCardStyle, 1000);
+    
+    // 监听DOM变化
+    const observer = new MutationObserver(applyQueryCardStyle);
+    observer.observe(window.parent.document.body, { childList: true, subtree: true });
+})();
+</script>
+""", height=0)
 
     # ===== Intro Cards（功能介绍卡片）=====
     st.markdown("""
