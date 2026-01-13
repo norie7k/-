@@ -390,12 +390,12 @@ div[data-baseweb="popover"] button.date-disabled .date-disabled-icon {
 .expander-toggle-inside{
   background: rgba(15,23,42,.75);
   border: 1px solid rgba(148,163,184,.16);
-  border-radius: 18px;
-  padding: 10px 16px;
-  margin: 12px 14px;
+  border-radius: 10px;
+  padding: 5px 12px;
+  margin: 6px 10px;
   text-align: left;
   color: var(--text);
-  font-weight: 900;
+  font-weight: 700;
   cursor: pointer;
   transition: all 0.2s ease;
   user-select: none;
@@ -405,11 +405,11 @@ div[data-baseweb="popover"] button.date-disabled .date-disabled-icon {
 }
 .expander-toggle-inside .toggle-icon{
   display: inline-block;
-  margin-right: 8px;
-  font-size: 0.8rem;
+  margin-right: 6px;
+  font-size: 0.7rem;
 }
 .expander-toggle-inside .toggle-text{
-  font-size: 0.95rem;
+  font-size: 0.85rem;
 }
 .custom-expander{
   border-radius: 14px;
