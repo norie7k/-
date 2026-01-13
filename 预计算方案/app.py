@@ -216,16 +216,16 @@ div[data-baseweb="popover"] button.date-disabled .date-disabled-icon {
 
 /* ===== 摘要卡 ===== */
 .cluster-wrapper{
-  margin: 14px 0 10px 0;
+  margin: 8px 0 6px 0;
   position: relative;
 }
 .cluster-card{
   background: linear-gradient(145deg, rgba(18,26,49,.92), rgba(15,23,42,.92));
   border: 1px solid rgba(148,163,184,.16);
-  border-radius: 18px;
-  padding: 14px 16px 12px 16px;
-  box-shadow: 0 12px 28px rgba(0,0,0,.28);
-  margin-bottom: 8px;
+  border-radius: 14px;
+  padding: 10px 14px 8px 14px;
+  box-shadow: 0 8px 20px rgba(0,0,0,.25);
+  margin-bottom: 4px;
 }
 .cluster-header{
   display:flex;
@@ -329,17 +329,17 @@ div[data-baseweb="popover"] button.date-disabled .date-disabled-icon {
   position: relative;
 }
 .custom-expander{
-  border-radius: 18px;
+  border-radius: 14px;
 }
 /* Summary中的卡片：未展开时显示，展开后隐藏 */
 .custom-expander:not([open]) .custom-expander-summary .cluster-card{
   display: block;
   background: linear-gradient(145deg, rgba(18,26,49,.92), rgba(15,23,42,.92));
   border: 1px solid rgba(148,163,184,.16);
-  border-radius: 18px;
-  padding: 14px 16px 12px 16px;
-  box-shadow: 0 12px 28px rgba(0,0,0,.28);
-  margin-bottom: 8px;
+  border-radius: 14px;
+  padding: 10px 14px 8px 14px;
+  box-shadow: 0 8px 20px rgba(0,0,0,.25);
+  margin-bottom: 4px;
 }
 .custom-expander[open] .custom-expander-summary .cluster-card{
   display: none;
@@ -347,7 +347,7 @@ div[data-baseweb="popover"] button.date-disabled .date-disabled-icon {
 /* Details包装器：展开后显示 */
 .details-wrapper{
   position: relative;
-  margin-top: 8px;
+  margin-top: 4px;
 }
 /* Sticky卡片：固定在最顶部 */
 .cluster-card-sticky{
@@ -355,15 +355,15 @@ div[data-baseweb="popover"] button.date-disabled .date-disabled-icon {
   top: 0 !important;
   z-index: 100 !important;
   background: linear-gradient(180deg, rgba(15,23,42,1) 0%, rgba(15,23,42,0.98) 85%, rgba(15,23,42,0.7) 100%) !important;
-  padding-bottom: 10px;
+  padding-bottom: 6px;
   margin-bottom: 0;
 }
 .cluster-card-sticky .cluster-card{
   background: linear-gradient(145deg, rgba(18,26,49,.92), rgba(15,23,42,.92));
   border: 1px solid rgba(148,163,184,.16);
-  border-radius: 18px;
-  padding: 14px 16px 12px 16px;
-  box-shadow: 0 12px 28px rgba(0,0,0,.28);
+  border-radius: 14px;
+  padding: 10px 14px 8px 14px;
+  box-shadow: 0 8px 20px rgba(0,0,0,.25);
 }
 /* 可滚动内容区域 */
 .scrollable-content{
@@ -412,7 +412,7 @@ div[data-baseweb="popover"] button.date-disabled .date-disabled-icon {
   font-size: 0.95rem;
 }
 .custom-expander{
-  border-radius: 18px;
+  border-radius: 14px;
 }
 .custom-expander-summary{
   background: transparent !important;
@@ -430,8 +430,8 @@ div[data-baseweb="popover"] button.date-disabled .date-disabled-icon {
 .expander-toggle{
   background: rgba(15,23,42,.75);
   border: 1px solid rgba(148,163,184,.16);
-  border-radius: 18px;
-  padding: 10px 16px;
+  border-radius: 14px;
+  padding: 6px 14px;
   text-align: left;
   color: var(--text);
   font-weight: 900;
@@ -453,7 +453,7 @@ div[data-baseweb="popover"] button.date-disabled .date-disabled-icon {
   display: none;
 }
 .custom-expander-inner{
-  padding: 12px 14px;
+  padding: 8px 12px;
 }
 .custom-expander-inner p,
 .custom-expander-inner h4{
