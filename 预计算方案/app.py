@@ -851,32 +851,40 @@ a:hover{ text-decoration: underline !important; }
 .stTabs [data-baseweb="tab-highlight"]{
   display: none !important;
 }
-.stTabs [data-baseweb="tab"]{
+/* Tab按钮基础样式 */
+div[data-baseweb="tab-list"] button[role="tab"],
+.stTabs [data-baseweb="tab"],
+button[data-baseweb="tab"]{
   flex: 1 1 0% !important;
   min-width: 0 !important;
-  height: auto;
-  padding: 16px 24px;
-  background: rgba(0,0,0,0.4);
-  border-radius: 12px;
-  color: var(--text-dim);
-  font-weight: 800;
-  font-size: 1.25rem;
-  justify-content: center;
-  text-align: center;
-  border: 2px solid var(--glass-border);
-  letter-spacing: 0.03em;
-  transition: all 0.25s ease;
+  height: auto !important;
+  padding: 18px 28px !important;
+  background: rgba(0,0,0,0.4) !important;
+  border-radius: 14px !important;
+  color: var(--text-dim) !important;
+  font-weight: 800 !important;
+  font-size: 1.4rem !important;
+  justify-content: center !important;
+  text-align: center !important;
+  border: 2px solid var(--glass-border) !important;
+  letter-spacing: 0.03em !important;
+  transition: all 0.25s ease !important;
 }
-.stTabs [data-baseweb="tab"]:hover{
-  background: rgba(168,85,247,0.15);
-  border-color: rgba(168,85,247,0.4);
+div[data-baseweb="tab-list"] button[role="tab"]:hover,
+.stTabs [data-baseweb="tab"]:hover,
+button[data-baseweb="tab"]:hover{
+  background: rgba(168,85,247,0.2) !important;
+  border-color: rgba(168,85,247,0.5) !important;
 }
-.stTabs [aria-selected="true"]{
-  background: linear-gradient(135deg, rgba(168,85,247,0.35), rgba(139,92,246,0.25)) !important;
+/* Tab按钮选中状态 */
+div[data-baseweb="tab-list"] button[aria-selected="true"],
+.stTabs [aria-selected="true"],
+button[aria-selected="true"]{
+  background: linear-gradient(135deg, rgba(168,85,247,0.4), rgba(139,92,246,0.3)) !important;
   color: white !important;
-  border-color: var(--accent-primary) !important;
-  box-shadow: 0 6px 20px rgba(168, 85, 247, 0.3) !important;
-  text-shadow: 0 0 10px rgba(168, 85, 247, 0.5);
+  border-color: #a855f7 !important;
+  box-shadow: 0 8px 24px rgba(168, 85, 247, 0.4) !important;
+  text-shadow: 0 0 12px rgba(168, 85, 247, 0.6) !important;
 }
 .stTabs [aria-selected="true"]::after{
   display: none !important;
@@ -920,10 +928,9 @@ a:hover{ text-decoration: underline !important; }
   border-bottom: 1px solid rgba(168, 85, 247, 0.3);
 }
 
-/* 主页查询区域 - 标签字体放大 */
-.query-card-styled label,
-[data-testid="column"]:has(.query-card-header) label{
-  font-size: 1.35rem !important;
+/* 主页查询区域 - 所有标签字体放大 */
+section[data-testid="stMain"] label{
+  font-size: 1.4rem !important;
   font-weight: 800 !important;
   color: #e9d5ff !important;
   margin-bottom: 10px !important;
@@ -931,17 +938,11 @@ a:hover{ text-decoration: underline !important; }
 }
 
 /* 主页查询区域 - 下拉框宽度缩短 */
-.query-card-styled [data-testid="stSelectbox"],
-.query-card-styled [data-testid="stDateInput"],
-[data-testid="column"]:has(.query-card-header) [data-testid="stSelectbox"],
-[data-testid="column"]:has(.query-card-header) [data-testid="stDateInput"]{
-  max-width: 320px !important;
+section[data-testid="stMain"] [data-testid="stSelectbox"]{
+  max-width: 350px !important;
 }
-.query-card-styled [data-testid="stSelectbox"] > div,
-.query-card-styled [data-testid="stDateInput"] > div,
-[data-testid="column"]:has(.query-card-header) [data-testid="stSelectbox"] > div,
-[data-testid="column"]:has(.query-card-header) [data-testid="stDateInput"] > div{
-  max-width: 320px !important;
+section[data-testid="stMain"] [data-testid="stDateInput"]{
+  max-width: 350px !important;
 }
 
 /* 查询区域容器样式 - 通过标记ID定位 */
@@ -1809,79 +1810,31 @@ def show_homepage():
 </div>
 """, unsafe_allow_html=True)
 
-    # ===== JavaScript：给查询区域添加样式 =====
+    # ===== JavaScript：给查询区域容器添加背景 =====
     components.html("""
 <script>
 (function() {
-    function applyQueryCardStyle() {
+    function applyCardBackground() {
         const parentDoc = window.parent.document;
-        
-        // 找到查询卡片标题
         const header = parentDoc.querySelector('.query-card-header');
-        if (!header) return;
-        
-        // 向上找到包含整个查询区域的容器
-        let container = header.closest('[data-testid="column"]');
-        if (!container) {
-            container = header.closest('[data-testid="stVerticalBlock"]');
-        }
-        
-        if (container && !container.classList.contains('query-card-styled')) {
-            container.classList.add('query-card-styled');
-            container.style.background = 'rgba(15, 23, 42, 0.85)';
-            container.style.border = '2px solid #a855f7';
-            container.style.borderRadius = '20px';
-            container.style.padding = '20px 24px';
-            container.style.marginBottom = '20px';
-            container.style.boxShadow = '0 15px 40px rgba(168, 85, 247, 0.2)';
-            
-            // 修改Tab按钮样式（每日查询/版本查询）
-            const tabs = container.querySelectorAll('[data-baseweb="tab"]');
-            tabs.forEach(tab => {
-                tab.style.fontSize = '1.3rem';
-                tab.style.fontWeight = '800';
-                tab.style.padding = '16px 24px';
-                tab.style.borderRadius = '12px';
-                tab.style.border = '2px solid rgba(255,255,255,0.1)';
-                tab.style.letterSpacing = '0.03em';
-            });
-            
-            // 修改选中的Tab样式
-            const selectedTab = container.querySelector('[aria-selected="true"]');
-            if (selectedTab) {
-                selectedTab.style.background = 'linear-gradient(135deg, rgba(168,85,247,0.4), rgba(139,92,246,0.3))';
-                selectedTab.style.borderColor = '#a855f7';
-                selectedTab.style.boxShadow = '0 6px 20px rgba(168, 85, 247, 0.35)';
-                selectedTab.style.color = 'white';
+        if (header) {
+            let container = header.closest('[data-testid="column"]');
+            if (!container) container = header.closest('[data-testid="stVerticalBlock"]');
+            if (container && !container.dataset.cardStyled) {
+                container.dataset.cardStyled = 'true';
+                container.style.background = 'rgba(15, 23, 42, 0.85)';
+                container.style.border = '2px solid #a855f7';
+                container.style.borderRadius = '20px';
+                container.style.padding = '20px 24px';
+                container.style.marginBottom = '20px';
+                container.style.boxShadow = '0 15px 40px rgba(168, 85, 247, 0.2)';
             }
-            
-            // 修改标签字体（监控社群/监测日期）
-            const labels = container.querySelectorAll('label');
-            labels.forEach(label => {
-                label.style.fontSize = '1.4rem';
-                label.style.fontWeight = '800';
-                label.style.color = '#e9d5ff';
-                label.style.marginBottom = '10px';
-                label.style.letterSpacing = '0.02em';
-            });
-            
-            // 缩短下拉框宽度
-            const selectboxes = container.querySelectorAll('[data-testid="stSelectbox"], [data-testid="stDateInput"]');
-            selectboxes.forEach(box => {
-                box.style.maxWidth = '350px';
-            });
         }
     }
-    
-    // 多次尝试确保样式生效
-    setTimeout(applyQueryCardStyle, 100);
-    setTimeout(applyQueryCardStyle, 300);
-    setTimeout(applyQueryCardStyle, 600);
-    setTimeout(applyQueryCardStyle, 1000);
-    setTimeout(applyQueryCardStyle, 2000);
-    
-    // 监听DOM变化
-    const observer = new MutationObserver(applyQueryCardStyle);
+    setTimeout(applyCardBackground, 200);
+    setTimeout(applyCardBackground, 500);
+    setTimeout(applyCardBackground, 1000);
+    const observer = new MutationObserver(applyCardBackground);
     observer.observe(window.parent.document.body, { childList: true, subtree: true });
 })();
 </script>
