@@ -1809,7 +1809,7 @@ def show_homepage():
 </div>
 """, unsafe_allow_html=True)
 
-    # ===== JavaScript：给查询区域添加卡片样式 =====
+    # ===== JavaScript：给查询区域添加样式 =====
     components.html("""
 <script>
 (function() {
@@ -1834,6 +1834,42 @@ def show_homepage():
             container.style.padding = '20px 24px';
             container.style.marginBottom = '20px';
             container.style.boxShadow = '0 15px 40px rgba(168, 85, 247, 0.2)';
+            
+            // 修改Tab按钮样式（每日查询/版本查询）
+            const tabs = container.querySelectorAll('[data-baseweb="tab"]');
+            tabs.forEach(tab => {
+                tab.style.fontSize = '1.3rem';
+                tab.style.fontWeight = '800';
+                tab.style.padding = '16px 24px';
+                tab.style.borderRadius = '12px';
+                tab.style.border = '2px solid rgba(255,255,255,0.1)';
+                tab.style.letterSpacing = '0.03em';
+            });
+            
+            // 修改选中的Tab样式
+            const selectedTab = container.querySelector('[aria-selected="true"]');
+            if (selectedTab) {
+                selectedTab.style.background = 'linear-gradient(135deg, rgba(168,85,247,0.4), rgba(139,92,246,0.3))';
+                selectedTab.style.borderColor = '#a855f7';
+                selectedTab.style.boxShadow = '0 6px 20px rgba(168, 85, 247, 0.35)';
+                selectedTab.style.color = 'white';
+            }
+            
+            // 修改标签字体（监控社群/监测日期）
+            const labels = container.querySelectorAll('label');
+            labels.forEach(label => {
+                label.style.fontSize = '1.4rem';
+                label.style.fontWeight = '800';
+                label.style.color = '#e9d5ff';
+                label.style.marginBottom = '10px';
+                label.style.letterSpacing = '0.02em';
+            });
+            
+            // 缩短下拉框宽度
+            const selectboxes = container.querySelectorAll('[data-testid="stSelectbox"], [data-testid="stDateInput"]');
+            selectboxes.forEach(box => {
+                box.style.maxWidth = '350px';
+            });
         }
     }
     
@@ -1842,6 +1878,7 @@ def show_homepage():
     setTimeout(applyQueryCardStyle, 300);
     setTimeout(applyQueryCardStyle, 600);
     setTimeout(applyQueryCardStyle, 1000);
+    setTimeout(applyQueryCardStyle, 2000);
     
     // 监听DOM变化
     const observer = new MutationObserver(applyQueryCardStyle);
