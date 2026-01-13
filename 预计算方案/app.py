@@ -578,23 +578,9 @@ section[data-testid="stMain"] div[data-testid="stExpander"] div[role="region"]{
   background: linear-gradient(145deg, rgba(236,72,153,.22), rgba(139,92,246,.15));
   border-color: rgba(236,72,153,.4);
 }
-/* 讨论点可滚动内容 */
+/* 讨论点内容区域（自适应高度，无需滚动） */
 .dp-scrollable{
-  max-height: 280px;
-  overflow-y: auto;
-  overflow-x: hidden;
-  scrollbar-width: thin;
-  scrollbar-color: rgba(236,72,153,.3) transparent;
-}
-.dp-scrollable::-webkit-scrollbar{
-  width: 6px;
-}
-.dp-scrollable::-webkit-scrollbar-track{
-  background: transparent;
-}
-.dp-scrollable::-webkit-scrollbar-thumb{
-  background: rgba(236,72,153,.3);
-  border-radius: 3px;
+  overflow: visible;
 }
 /* 讨论点收起按钮 */
 .dp-collapse-btn{
