@@ -1537,7 +1537,9 @@ def show_homepage():
                     st.session_state.query_type = "daily"
                     st.session_state.selected_group_homepage = selected_group_daily
                     st.session_state.selected_date_homepage = selected_date
-                    # 设置 confirmed_date，确保进入结果页时加载正确的日期
+                    # 设置 confirmed 值，确保进入结果页时加载正确的社群和日期
+                    st.session_state.confirmed_group = selected_group_daily
+                    st.session_state.selected_group_cache = selected_group_daily
                     st.session_state.confirmed_date = selected_date
                     st.session_state.selected_date_cache = selected_date
                     st.rerun()
@@ -1665,17 +1667,33 @@ def main():
             except:
                 pass
         
+        # 初始化 confirmed_group（用于实际数据加载的社群）
+        if "confirmed_group" not in st.session_state:
+            default_group_key = list(group_options.keys())[default_group_index]
+            st.session_state.confirmed_group = default_group_key
+        
+        # 初始化 selected_group_cache（用户当前选择的社群，待确认）
+        if "selected_group_cache" not in st.session_state:
+            st.session_state.selected_group_cache = st.session_state.confirmed_group
+        
         selected_group_key = st.selectbox(
             "选择社群",
             options=list(group_options.keys()),
             format_func=lambda x: group_options[x],
             index=default_group_index,
         )
+        
+        # 更新用户选择的社群缓存
+        st.session_state.selected_group_cache = selected_group_key
+        
+        # 使用确认的社群来加载日期列表（用于显示）
+        # 但侧边栏的日期列表还是要显示当前选择社群的日期，方便用户查看
+        display_group_key = selected_group_key
 
         st.markdown("---")
 
         with st.spinner("加载数据列表..."):
-            index = load_index(selected_group_key)
+            index = load_index(display_group_key)
             available_dates = index.get("available_dates", [])
 
         if available_dates:
@@ -1911,23 +1929,39 @@ def main():
                 if picker_date in available_dates:
                     st.session_state.selected_date_cache = picker_date
                 
-                # 使用确认的日期（点击"刷新数据"后的日期）来加载数据
-                # 只有在首次进入页面时才自动设置 confirmed_date
-                confirmed = st.session_state.get("confirmed_date", "")
+                # 使用确认的社群和日期来加载数据
+                confirmed_group = st.session_state.get("confirmed_group", "")
+                confirmed_date = st.session_state.get("confirmed_date", "")
                 
-                # 首次进入结果页面时，初始化 confirmed_date
-                if not confirmed:
-                    # 首次加载，使用默认日期（最新日期）
-                    st.session_state.confirmed_date = default_date.strftime("%Y-%m-%d")
-                    confirmed = st.session_state.confirmed_date
-                
-                # 始终使用 confirmed_date 来加载数据
-                if confirmed in available_dates:
-                    selected_date = confirmed
+                # 获取确认社群的可用日期（用于验证）
+                if confirmed_group and confirmed_group != display_group_key:
+                    # 社群有变化，需要加载确认社群的日期列表来验证
+                    confirmed_group_index = load_index(confirmed_group)
+                    confirmed_available_dates = confirmed_group_index.get("available_dates", [])
                 else:
-                    # confirmed_date 不在可用日期中（可能是切换了社群），使用默认日期
+                    # 社群没有变化，使用当前显示的日期列表
+                    confirmed_available_dates = available_dates
+                
+                # 首次进入结果页面时，初始化
+                if not confirmed_date:
                     st.session_state.confirmed_date = default_date.strftime("%Y-%m-%d")
-                    selected_date = st.session_state.confirmed_date
+                    confirmed_date = st.session_state.confirmed_date
+                
+                if not confirmed_group:
+                    st.session_state.confirmed_group = display_group_key
+                    confirmed_group = display_group_key
+                    confirmed_available_dates = available_dates
+                
+                # 验证确认的日期在确认的社群中是否有效
+                if confirmed_date in confirmed_available_dates:
+                    selected_date = confirmed_date
+                else:
+                    # 日期无效，使用确认社群的最新日期
+                    if confirmed_available_dates:
+                        st.session_state.confirmed_date = confirmed_available_dates[0]
+                        selected_date = st.session_state.confirmed_date
+                    else:
+                        selected_date = None
             else:
                 selected_date = None
         else:
@@ -1941,16 +1975,31 @@ def main():
         current_confirmed = st.session_state.get("confirmed_date", "")
         current_selected = st.session_state.get("selected_date_cache", "")
         
-        # 如果用户选择了新日期但还没点击刷新，显示提示
-        if current_selected and current_confirmed and current_selected != current_confirmed:
-            try:
-                selected_formatted = datetime.strptime(current_selected, "%Y-%m-%d").strftime("%m月%d日")
-                st.info(f"📅 已选择 {selected_formatted}，点击下方按钮加载数据")
-            except:
-                pass
+        # 检查社群是否有变更
+        current_confirmed_group = st.session_state.get("confirmed_group", "")
+        current_selected_group = st.session_state.get("selected_group_cache", "")
+        group_changed = current_selected_group and current_confirmed_group and current_selected_group != current_confirmed_group
+        
+        # 如果用户选择了新日期或新社群但还没点击刷新，显示提示
+        date_changed = current_selected and current_confirmed and current_selected != current_confirmed
+        
+        if group_changed or date_changed:
+            hint_parts = []
+            if group_changed:
+                new_group_name = GROUPS.get(current_selected_group, {}).get("name", current_selected_group)
+                hint_parts.append(f"社群「{new_group_name}」")
+            if date_changed:
+                try:
+                    selected_formatted = datetime.strptime(current_selected, "%Y-%m-%d").strftime("%m月%d日")
+                    hint_parts.append(f"{selected_formatted}")
+                except:
+                    pass
+            if hint_parts:
+                st.info(f"📅 已选择 {'、'.join(hint_parts)}，点击下方按钮加载数据")
 
         if st.button("🔄 刷新数据", use_container_width=True):
-            # 将选择的日期确认为要加载的日期
+            # 将选择的社群和日期确认为要加载的
+            st.session_state.confirmed_group = st.session_state.get("selected_group_cache", "")
             st.session_state.confirmed_date = st.session_state.get("selected_date_cache", "")
             st.cache_data.clear()
             _set_nonce()
@@ -1983,12 +2032,13 @@ def main():
 </div>
 """, unsafe_allow_html=True)
     elif selected_date:
-        # 日常查询
+        # 日常查询 - 使用确认的社群和日期
+        confirmed_group_for_load = st.session_state.get("confirmed_group", selected_group_key)
         with st.spinner(f"正在加载 {selected_date} 的数据..."):
-            result = load_result(selected_group_key, selected_date)
+            result = load_result(confirmed_group_for_load, selected_date)
 
         if result:
-            render_result(result, selected_group_key)
+            render_result(result, confirmed_group_for_load)
         else:
             st.error(f"❌  {selected_date} 的数据待上传")
     else:
