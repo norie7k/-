@@ -571,6 +571,12 @@ section[data-testid="stMain"] div[data-testid="stExpander"] div[role="region"]{
   border: 1px solid rgba(236,72,153,.28);
   border-radius: 10px;
   margin: 0;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.dp-card-sticky .dp-card:hover{
+  background: linear-gradient(145deg, rgba(236,72,153,.22), rgba(139,92,246,.15));
+  border-color: rgba(236,72,153,.4);
 }
 /* 讨论点可滚动内容 */
 .dp-scrollable{
@@ -1306,18 +1312,19 @@ def render_result(result: dict, group_key: str | None = None):
             });
         });
         
-        // 找到所有讨论点收起按钮（sticky卡片中的）
-        const dpCollapseButtons = parentDoc.querySelectorAll('.dp-card-sticky .dp-toggle-btn');
+        // 找到所有讨论点sticky卡片（整个卡片可点击收起）
+        const dpStickyCards = parentDoc.querySelectorAll('.dp-card-sticky');
         
-        dpCollapseButtons.forEach((button, index) => {
+        dpStickyCards.forEach((card, index) => {
             // 检查是否已经绑定过
-            if (button.dataset.dpbound === 'true') {
+            if (card.dataset.dpbound === 'true') {
                 return;
             }
-            button.dataset.dpbound = 'true';
+            card.dataset.dpbound = 'true';
             
-            // 添加点击事件
-            button.addEventListener('click', function(e) {
+            // 添加点击事件到整个sticky卡片
+            card.style.cursor = 'pointer';
+            card.addEventListener('click', function(e) {
                 e.preventDefault();
                 e.stopPropagation();
                 
