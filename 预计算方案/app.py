@@ -1004,9 +1004,6 @@ def render_result(result: dict, group_key: str | None = None):
         else:
             discussion_content_html = '<p style="color: var(--muted);">暂无讨论点列表</p>'
         
-        # 完整时间轴（转义特殊字符）
-        time_axis_html = f'<p style="color: var(--text);"><strong>⏰ 完整时间轴：</strong> {html.escape(time_axis)}</p>' if time_axis else '<p style="color: var(--text);"><strong>⏰ 完整时间轴：</strong>（无）</p>'
-        
         # 渲染完整的自定义HTML（包含可滚动容器和sticky header）
         # 转义标题中的特殊字符
         title_escaped = html.escape(title)
@@ -1052,7 +1049,6 @@ def render_result(result: dict, group_key: str | None = None):
 <span class="toggle-text">收起详情</span>
 </div>
 <div class="custom-expander-inner">
-{time_axis_html}
 {discussion_content_html}
 </div>
 </div>
