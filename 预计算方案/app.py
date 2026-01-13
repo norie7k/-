@@ -186,9 +186,8 @@ div[data-baseweb="popover"] button.date-disabled .date-disabled-icon {
 }
 .stats-overview h2{
   color: #e9d5ff;
-  margin: 0 0 .6rem 0;
-  padding-bottom: .5rem;
-  border-bottom: 1px solid rgba(148,163,184,.18);
+  margin: 0;
+  padding-bottom: 0;
   font-size: 1.5rem;
   font-weight: 600;
 }
