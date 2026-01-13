@@ -912,6 +912,29 @@ a:hover{ text-decoration: underline !important; }
   border-bottom: 1px solid rgba(168, 85, 247, 0.3);
 }
 
+/* 主页查询区域 - 标签字体放大 */
+.query-card-styled label,
+[data-testid="column"]:has(.query-card-header) label{
+  font-size: 1.1rem !important;
+  font-weight: 700 !important;
+  color: #e9d5ff !important;
+  margin-bottom: 8px !important;
+}
+
+/* 主页查询区域 - 下拉框宽度缩短 */
+.query-card-styled [data-testid="stSelectbox"],
+.query-card-styled [data-testid="stDateInput"],
+[data-testid="column"]:has(.query-card-header) [data-testid="stSelectbox"],
+[data-testid="column"]:has(.query-card-header) [data-testid="stDateInput"]{
+  max-width: 320px !important;
+}
+.query-card-styled [data-testid="stSelectbox"] > div,
+.query-card-styled [data-testid="stDateInput"] > div,
+[data-testid="column"]:has(.query-card-header) [data-testid="stSelectbox"] > div,
+[data-testid="column"]:has(.query-card-header) [data-testid="stDateInput"] > div{
+  max-width: 320px !important;
+}
+
 /* 查询区域容器样式 - 通过标记ID定位 */
 [data-testid="stVerticalBlock"]:has(> [data-testid="element-container"] > .query-card-header){
   background: rgba(15, 23, 42, 0.85) !important;
@@ -1449,7 +1472,7 @@ def show_homepage():
 
         # === 日常查询标签 ===
         with tab1:
-            col_inputs, col_button = st.columns([1.5, 0.6])
+            col_inputs, col_button = st.columns([1, 1])
 
             with col_inputs:
                 group_options = {k: GROUPS[k]["name"] for k in GROUPS.keys()}
@@ -1732,7 +1755,7 @@ def show_homepage():
 
         # === 版本查询标签 ===
         with tab2:
-            col_inputs_v, col_button_v = st.columns([1.5, 0.6])
+            col_inputs_v, col_button_v = st.columns([1, 1])
 
             with col_inputs_v:
                 group_options = {k: GROUPS[k]["name"] for k in GROUPS.keys()}
