@@ -903,14 +903,20 @@ a:hover{ text-decoration: underline !important; }
 
 /* 主查询区域整体居中（容器内含 #cc-anchor） */
 div:has(> #cc-anchor){
-  max-width: 1100px;
+  max-width: 800px;
   margin: 0 auto 12px;
   padding: 0 12px;
+  background: var(--card-bg);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--accent-primary);
+  border-radius: 20px;
+  padding: 20px 24px;
+  box-shadow: 0 15px 40px rgba(168, 85, 247, 0.15);
 }
 
 /* 主查询区域整体居中 */
 .home-query-block{
-  max-width: 1100px;
+  max-width: 800px;
   margin: 0 auto 12px;
   padding: 0 8px;
 }
