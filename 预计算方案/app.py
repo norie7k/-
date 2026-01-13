@@ -1126,7 +1126,7 @@ def render_result(result: dict, group_key: str | None = None):
                         dp_inner_html += f'<div class="opinion-item">{html.escape(opinion)}</div>'
                 
                 if examples:
-                    dp_inner_html += f'<div class="dp-section-title">📝 代表性发言（{len(examples)}）</div>'
+                    dp_inner_html += f'<div class="dp-section-title">📝 代表性发言</div>'
                     for example in examples:
                         dp_inner_html += f'<div class="example-quote">"{html.escape(example)}"</div>'
                 
