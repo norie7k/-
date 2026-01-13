@@ -855,20 +855,28 @@ a:hover{ text-decoration: underline !important; }
   flex: 1 1 0% !important;
   min-width: 0 !important;
   height: auto;
-  padding: 12px 20px;
-  background: rgba(0,0,0,0.3);
-  border-radius: 8px;
+  padding: 16px 24px;
+  background: rgba(0,0,0,0.4);
+  border-radius: 12px;
   color: var(--text-dim);
-  font-weight: 600;
-  font-size: 0.95rem;
+  font-weight: 800;
+  font-size: 1.25rem;
   justify-content: center;
   text-align: center;
-  border: 1px solid var(--glass-border);
+  border: 2px solid var(--glass-border);
+  letter-spacing: 0.03em;
+  transition: all 0.25s ease;
+}
+.stTabs [data-baseweb="tab"]:hover{
+  background: rgba(168,85,247,0.15);
+  border-color: rgba(168,85,247,0.4);
 }
 .stTabs [aria-selected="true"]{
-  background: rgba(168,85,247,0.2) !important;
+  background: linear-gradient(135deg, rgba(168,85,247,0.35), rgba(139,92,246,0.25)) !important;
   color: white !important;
   border-color: var(--accent-primary) !important;
+  box-shadow: 0 6px 20px rgba(168, 85, 247, 0.3) !important;
+  text-shadow: 0 0 10px rgba(168, 85, 247, 0.5);
 }
 .stTabs [aria-selected="true"]::after{
   display: none !important;
@@ -915,10 +923,11 @@ a:hover{ text-decoration: underline !important; }
 /* 主页查询区域 - 标签字体放大 */
 .query-card-styled label,
 [data-testid="column"]:has(.query-card-header) label{
-  font-size: 1.1rem !important;
-  font-weight: 700 !important;
+  font-size: 1.35rem !important;
+  font-weight: 800 !important;
   color: #e9d5ff !important;
-  margin-bottom: 8px !important;
+  margin-bottom: 10px !important;
+  letter-spacing: 0.02em !important;
 }
 
 /* 主页查询区域 - 下拉框宽度缩短 */
