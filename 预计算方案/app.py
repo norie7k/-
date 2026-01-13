@@ -900,7 +900,7 @@ def render_result(result: dict, group_key: str | None = None):
     # 报告标题
     st.markdown(
         f"""<div class="stats-overview">
-<h2 style="margin-bottom: 0;">📊 {platform_display} {group_display} {formatted_date} 分析报告</h2>
+<h2 style="margin-bottom: 0;">📊 {platform_display} {group_display} {formatted_date} 分析报告 <span style="color: #fbbf24;">_热门讨论TOP5</span></h2>
 </div>""",
         unsafe_allow_html=True,
     )
@@ -933,8 +933,6 @@ def render_result(result: dict, group_key: str | None = None):
 </script>
 <div style="display:none;" data-reset-key="{reset_key}"></div>
 """, height=0)
-    
-    st.markdown(f"#### 🔥 热门话题Top5")
 
     top1_heat = float(sorted_clusters[0].get("热度评分", 0) or 0) if sorted_clusters else 1.0
     if top1_heat <= 0:
