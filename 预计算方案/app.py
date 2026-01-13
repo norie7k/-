@@ -898,16 +898,10 @@ def render_result(result: dict, group_key: str | None = None):
     except:
         formatted_date = date
     
-    # 获取热度公式（如果有）
-    heat_formula = result.get("heat_formula", "热度值 = 发言玩家数 × sqrt(发言总数)")
-    
-    # 报告说明（标题和说明在同一区块）
+    # 报告标题
     st.markdown(
         f"""<div class="stats-overview">
-<h2 style="margin-bottom: 0.3rem;">📊 {platform_display} {group_display} {formatted_date} 分析报告</h2>
-<p style="margin: 0; font-size: 0.92rem; color: var(--muted); line-height: 1.6;">
-  默认展示当日热度最高的Top5话题（可展开查看讨论点/玩家观点/代表性发言） • <span style="font-style: italic;">{heat_formula}</span>
-</p>
+<h2 style="margin-bottom: 0;">📊 {platform_display} {group_display} {formatted_date} 分析报告</h2>
 </div>""",
         unsafe_allow_html=True,
     )
