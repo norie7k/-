@@ -897,10 +897,12 @@ def render_result(result: dict, group_key: str | None = None):
     except:
         formatted_date = date
     
-    # 报告标题
+    # 报告标题（居中显示，无卡片背景）
     st.markdown(
-        f"""<div class="stats-overview">
-<h2 style="margin-bottom: 0;">📊 {platform_display} {group_display} {formatted_date} 分析报告 <span style="color: #fbbf24;">_热门讨论TOP5</span></h2>
+        f"""<div style="text-align: center; padding: 0.8rem 0 1.2rem 0;">
+<h2 style="margin: 0; color: #e9d5ff; font-size: 1.5rem; font-weight: 600;">
+📊 {platform_display} {group_display} {formatted_date} 分析报告 <span style="color: #fbbf24;">_热门讨论TOP5</span>
+</h2>
 </div>""",
         unsafe_allow_html=True,
     )
