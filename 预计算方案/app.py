@@ -547,15 +547,68 @@ section[data-testid="stMain"] div[data-testid="stExpander"] div[role="region"]{
 }
 .dp-expander[open] .dp-toggle-btn .expand-text{ display: none; }
 .dp-expander[open] .dp-toggle-btn .collapse-text{ display: inline; }
-.dp-expander[open] .dp-card{
-  border-radius: 10px 10px 0 0;
-  border-bottom: none;
+/* 展开后隐藏summary中的卡片 */
+.dp-expander[open] .dp-expander-summary .dp-card{
+  display: none;
+}
+/* 讨论点详情包装器 */
+.dp-details-wrapper{
+  position: relative;
+  border: 1px solid rgba(236,72,153,.22);
+  border-radius: 10px;
+  overflow: hidden;
+}
+/* 讨论点Sticky卡片 */
+.dp-card-sticky{
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: linear-gradient(180deg, rgba(15,23,42,1) 0%, rgba(15,23,42,0.98) 90%, rgba(15,23,42,0.8) 100%);
+  padding-bottom: 4px;
+}
+.dp-card-sticky .dp-card{
+  background: linear-gradient(145deg, rgba(236,72,153,.15), rgba(139,92,246,.10));
+  border: 1px solid rgba(236,72,153,.28);
+  border-radius: 10px;
+  margin: 0;
+}
+/* 讨论点可滚动内容 */
+.dp-scrollable{
+  max-height: 280px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(236,72,153,.3) transparent;
+}
+.dp-scrollable::-webkit-scrollbar{
+  width: 6px;
+}
+.dp-scrollable::-webkit-scrollbar-track{
+  background: transparent;
+}
+.dp-scrollable::-webkit-scrollbar-thumb{
+  background: rgba(236,72,153,.3);
+  border-radius: 3px;
+}
+/* 讨论点收起按钮 */
+.dp-collapse-btn{
+  background: rgba(236,72,153,.12);
+  border: 1px solid rgba(236,72,153,.2);
+  border-radius: 8px;
+  padding: 6px 12px;
+  margin: 8px 10px;
+  text-align: left;
+  color: #ec4899;
+  font-weight: 600;
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.dp-collapse-btn:hover{
+  background: rgba(236,72,153,.2);
 }
 .dp-content{
   background: rgba(15,23,42,.4);
-  border: 1px solid rgba(236,72,153,.18);
-  border-top: none;
-  border-radius: 0 0 10px 10px;
   padding: 10px 12px;
 }
 .dp-section-title{
@@ -1051,7 +1104,7 @@ def render_result(result: dict, group_key: str | None = None):
         discussion_list = cluster.get("讨论点列表", []) or []
         
         if discussion_list:
-            discussion_content_html += f'<div style="color: var(--text); font-size: 0.9rem; margin-bottom: 8px; font-weight: 600;">💬 讨论点（共 {len(discussion_list)} 条）</div>'
+            discussion_content_html += f'<div style="color: #e9d5ff; font-size: 1.05rem; margin-bottom: 10px; font-weight: 700;">💬 讨论点（共 {len(discussion_list)} 条）</div>'
             
             for dp_i, dp in enumerate(discussion_list, 1):
                 # 找到 "讨论点X"
@@ -1093,8 +1146,20 @@ def render_result(result: dict, group_key: str | None = None):
 </div>
 </div>
 </summary>
+<div class="dp-details-wrapper">
+<div class="dp-card-sticky">
+<div class="dp-card">
+<div class="dp-header">
+<span class="dp-title">📌 {dp_i}. {dp_title_escaped}</span>
+<span class="dp-toggle-btn"><span class="collapse-text">收起 ▲</span></span>
+</div>
+</div>
+</div>
+<div class="dp-scrollable">
 <div class="dp-content">
 {dp_inner_html}
+</div>
+</div>
 </div>
 </details>'''
         else:
@@ -1198,7 +1263,7 @@ def render_result(result: dict, group_key: str | None = None):
 
                 examples = dp.get("代表性玩家发言示例", []) or []
                 if examples:
-                    st.markdown(f"**代表性发言（{len(examples)}）：**")
+                    st.markdown(f"**代表性发言：**")
                     for example in examples:
                         st.markdown(
                             f"""<div class="example-quote">"{example}"</div>""",
