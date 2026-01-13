@@ -1537,6 +1537,9 @@ def show_homepage():
                     st.session_state.query_type = "daily"
                     st.session_state.selected_group_homepage = selected_group_daily
                     st.session_state.selected_date_homepage = selected_date
+                    # 设置 confirmed_date，确保进入结果页时加载正确的日期
+                    st.session_state.confirmed_date = selected_date
+                    st.session_state.selected_date_cache = selected_date
                     st.rerun()
 
             if not selected_date and available_dates is not None and len(available_dates) == 0:
@@ -1903,20 +1906,28 @@ def main():
 """
                 st.markdown(disable_dates_js, unsafe_allow_html=True)
 
-                # 更新选择的日期缓存
+                # 更新选择的日期缓存（仅用于显示用户选择了什么日期）
                 picker_date = selected_date_obj.strftime("%Y-%m-%d")
                 if picker_date in available_dates:
                     st.session_state.selected_date_cache = picker_date
                 
                 # 使用确认的日期（点击"刷新数据"后的日期）来加载数据
+                # 只有在首次进入页面时才自动设置 confirmed_date
                 confirmed = st.session_state.get("confirmed_date", "")
-                if confirmed and confirmed in available_dates:
+                
+                # 首次进入结果页面时，初始化 confirmed_date
+                if not confirmed:
+                    # 首次加载，使用默认日期（最新日期）
+                    st.session_state.confirmed_date = default_date.strftime("%Y-%m-%d")
+                    confirmed = st.session_state.confirmed_date
+                
+                # 始终使用 confirmed_date 来加载数据
+                if confirmed in available_dates:
                     selected_date = confirmed
                 else:
-                    # 首次加载或确认日期无效时，使用选择的日期
-                    selected_date = picker_date if picker_date in available_dates else None
-                    if selected_date:
-                        st.session_state.confirmed_date = selected_date
+                    # confirmed_date 不在可用日期中（可能是切换了社群），使用默认日期
+                    st.session_state.confirmed_date = default_date.strftime("%Y-%m-%d")
+                    selected_date = st.session_state.confirmed_date
             else:
                 selected_date = None
         else:
@@ -1929,6 +1940,14 @@ def main():
         # 显示当前选择的日期与已加载的日期是否不同
         current_confirmed = st.session_state.get("confirmed_date", "")
         current_selected = st.session_state.get("selected_date_cache", "")
+        
+        # 如果用户选择了新日期但还没点击刷新，显示提示
+        if current_selected and current_confirmed and current_selected != current_confirmed:
+            try:
+                selected_formatted = datetime.strptime(current_selected, "%Y-%m-%d").strftime("%m月%d日")
+                st.info(f"📅 已选择 {selected_formatted}，点击下方按钮加载数据")
+            except:
+                pass
 
         if st.button("🔄 刷新数据", use_container_width=True):
             # 将选择的日期确认为要加载的日期
