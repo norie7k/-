@@ -901,24 +901,23 @@ a:hover{ text-decoration: underline !important; }
   display: none !important;
 }
 
-/* 主查询区域整体居中（容器内含 #cc-anchor） */
-div:has(> #cc-anchor){
-  max-width: 800px;
-  margin: 0 auto 12px;
-  padding: 0 12px;
-  background: var(--card-bg);
-  backdrop-filter: blur(20px);
-  border: 1px solid var(--accent-primary);
+/* 主查询卡片 */
+.query-card-wrapper{
+  background: rgba(15, 23, 42, 0.85);
+  border: 2px solid var(--accent-primary);
   border-radius: 20px;
   padding: 20px 24px;
-  box-shadow: 0 15px 40px rgba(168, 85, 247, 0.15);
+  margin-bottom: 20px;
+  box-shadow: 0 15px 40px rgba(168, 85, 247, 0.2);
 }
-
-/* 主查询区域整体居中 */
-.home-query-block{
-  max-width: 800px;
-  margin: 0 auto 12px;
-  padding: 0 8px;
+.query-card-header{
+  text-align: center;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #e9d5ff;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(168, 85, 247, 0.3);
 }
 </style>
 """
@@ -1437,10 +1436,16 @@ def show_homepage():
 </header>
 """, unsafe_allow_html=True)
 
-    # ✅ Control Center（正确做法）：用 st.container() + anchor
-    # 之后用 CSS :has(#cc-anchor) 把这一整块画成一个方框卡片
-    with st.container():
-        st.markdown('<div id="cc-anchor"></div>', unsafe_allow_html=True)
+    # ✅ 查询卡片：使用columns居中 + 卡片样式
+    _, center_col, _ = st.columns([1, 3, 1])
+    
+    with center_col:
+        # 整个查询区域的卡片容器（开始）
+        st.markdown('''
+<div class="query-card-wrapper">
+<div class="query-card-header">🔍 数据查询中心</div>
+''', unsafe_allow_html=True)
+        
         tab1, tab2 = st.tabs(["🗂️每日查询", "🗂️版本查询"])
 
         # === 日常查询标签 ===
@@ -1772,6 +1777,9 @@ def show_homepage():
     </p>
 </div>
 """, unsafe_allow_html=True)
+        
+        # 关闭查询卡片容器
+        st.markdown('</div>', unsafe_allow_html=True)
 
     # ===== Intro Cards（功能介绍卡片）=====
     st.markdown("""
