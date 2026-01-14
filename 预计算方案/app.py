@@ -1587,7 +1587,7 @@ def show_homepage():
     
     with center_col:
         # 标记查询区域（用于CSS/JS定位）
-        st.markdown('<div class="query-card-header">🔍 数据查询中心</div>', unsafe_allow_html=True)
+        st.markdown('<div class="query-card-header">🔍 数据查询</div>', unsafe_allow_html=True)
         
         tab1, tab2 = st.tabs(["🗂️每日查询", "🗂️版本查询"])
         
