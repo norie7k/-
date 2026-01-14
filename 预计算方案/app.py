@@ -1916,12 +1916,6 @@ def show_homepage():
                     st.session_state.selected_date_cache = selected_date
                     st.rerun()
 
-            # （可选）底部一句引导文案，像你截图那样
-            st.markdown("<hr class='cc-divider'/>", unsafe_allow_html=True)
-            st.markdown(
-                "<div class='cc-hint'>本系统分析玩家社群中的每日与游戏相关聊天内容，提供日常/版本周期内社群发言监控，给运营团队速掌握大盘情况</div>",
-                unsafe_allow_html=True,
-            )
 
         # === 版本查询标签 ===
         with tab2:
@@ -2001,6 +1995,15 @@ def show_homepage():
 })();
 </script>
 """, height=0)
+
+    # ===== 系统说明文字 =====
+    st.markdown("""
+<div style="text-align: center; margin: 32px auto 24px; max-width: 900px; padding: 0 20px;">
+    <p style="font-size: 1.05rem; color: var(--text); line-height: 1.8; font-weight: 500;">
+        本系统分析玩家社群中的每日与游戏相关聊天内容，提供日常/版本周期内社群发言监控，给运营团队速掌握大盘情况
+    </p>
+</div>
+""", unsafe_allow_html=True)
 
     # ===== Intro Cards（功能介绍卡片）=====
     st.markdown("""
