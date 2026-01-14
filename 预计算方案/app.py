@@ -928,6 +928,80 @@ button[aria-selected="true"]{
   border-bottom: 1px solid rgba(168, 85, 247, 0.3);
 }
 
+/* ===== Tooltip 悬停提示样式（Streamlit 兼容）===== */
+/* 确保父容器不会裁剪 tooltip */
+.cluster-meta{
+  overflow: visible !important;
+}
+.meta-chip.time-chip{
+  position: relative !important;
+  overflow: visible !important;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.meta-chip.time-chip:hover{
+  background: rgba(236, 72, 153, 0.18);
+  border-color: rgba(236, 72, 153, 0.35);
+}
+.time-tooltip-wrapper{
+  position: relative !important;
+  display: inline-block;
+  cursor: pointer;
+  overflow: visible !important;
+}
+.time-tooltip-wrapper .tooltip-content{
+  visibility: hidden;
+  opacity: 0;
+  position: absolute !important;
+  bottom: calc(100% + 12px);
+  left: 50%;
+  transform: translateX(-50%) translateY(5px);
+  background: linear-gradient(145deg, rgba(18, 26, 49, 0.98), rgba(15, 23, 42, 0.98));
+  border: 1px solid rgba(236, 72, 153, 0.35);
+  border-radius: 12px;
+  padding: 12px 16px;
+  min-width: 280px;
+  max-width: 450px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.45), 0 0 20px rgba(236, 72, 153, 0.15);
+  z-index: 99999 !important;
+  transition: opacity 0.25s ease, visibility 0.25s ease, transform 0.25s ease;
+  white-space: normal;
+  word-break: break-all;
+  line-height: 1.5;
+  pointer-events: none;
+}
+.time-tooltip-wrapper .tooltip-content::after{
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 8px solid transparent;
+  border-top-color: rgba(18, 26, 49, 0.98);
+}
+.time-tooltip-wrapper .tooltip-content .tooltip-title{
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #ec4899;
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.time-tooltip-wrapper .tooltip-content .tooltip-text{
+  font-size: 0.88rem;
+  color: #e5e7eb;
+}
+.time-tooltip-wrapper:hover .tooltip-content{
+  visibility: visible;
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+/* 悬停时的高亮效果 */
+.time-tooltip-wrapper:hover{
+  color: #f472b6;
+}
+
 /* 主页查询区域 - 所有标签字体放大 */
 section[data-testid="stMain"] label{
   font-size: 1.4rem !important;
@@ -1124,8 +1198,24 @@ def render_result(result: dict, group_key: str | None = None):
         meta_chips.append(f'<div class="meta-chip"><span>👥 玩家</span>{players}</div>')
         meta_chips.append(f'<div class="meta-chip"><span>💬 发言</span>{msgs}</div>')
         if time_axis:
-            short_time = time_axis if len(time_axis) <= 70 else (time_axis[:70] + "…")
-            meta_chips.append(f'<div class="meta-chip"><span>⏰ 时间</span>{short_time}</div>')
+            # 对完整时间进行HTML转义
+            full_time_escaped = html.escape(time_axis)
+            # 判断是否需要截断显示
+            if len(time_axis) <= 70:
+                # 时间较短，直接显示完整时间，无需 tooltip
+                meta_chips.append(f'<div class="meta-chip"><span>⏰ 时间</span>{full_time_escaped}</div>')
+            else:
+                # 时间较长，截断显示并添加 tooltip
+                short_time = html.escape(time_axis[:70] + "…")
+                meta_chips.append(f'''<div class="meta-chip time-chip">
+<div class="time-tooltip-wrapper">
+<span>⏰ 时间</span>{short_time}
+<div class="tooltip-content">
+<div class="tooltip-title">📅 完整时间轴</div>
+<div class="tooltip-text">{full_time_escaped}</div>
+</div>
+</div>
+</div>''')
 
         # 使用纯HTML创建可展开的自定义容器（绕过st.expander限制）
         # 所有话题簇默认都是收起状态
