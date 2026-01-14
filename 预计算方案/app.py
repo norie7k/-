@@ -1759,7 +1759,8 @@ def render_version_result(result: dict, group_key: str | None = None):
 <div class="cluster-header">
 <div style="flex: 1;">
 <div class="cluster-title">{rank}. {title_escaped}</div>
-<div style="display: flex; gap: 12px; margin-top: 8px;">
+</div>
+<div style="display: flex; gap: 12px; align-items: center;">
 <div style="display: flex; flex-direction: column; gap: 4px; align-items: center;">
 <div style="font-size: 1.5rem; font-weight: 800; color: #c7d2fe;">{players}</div>
 <div style="font-size: 0.75rem; color: var(--muted);">参与玩家</div>
@@ -1768,9 +1769,8 @@ def render_version_result(result: dict, group_key: str | None = None):
 <div style="font-size: 1.5rem; font-weight: 800; color: #c7d2fe;">{msgs}</div>
 <div style="font-size: 0.75rem; color: var(--muted);">发言数</div>
 </div>
-</div>
-</div>
 <div class="badge-heat"><small>热度</small>{heat:.2f} 🔥</div>
+</div>
 </div>
 
 <!-- 热度趋势区域 -->
