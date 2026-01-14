@@ -67,7 +67,10 @@ STYLE_CSS = """
 }
 
 /* 主内容区基础文字 */
-section[data-testid="stMain"]{ color: var(--text); }
+section[data-testid="stMain"]{ 
+  color: var(--text);
+  padding-top: 0 !important;
+}
 section[data-testid="stMain"] p,
 section[data-testid="stMain"] li{ color: var(--text); }
 
@@ -660,7 +663,7 @@ a:hover{ text-decoration: underline !important; }
 
 /* Header */
 .system-header{
-  padding: 32px 5% 16px;
+  padding: 8px 5% 16px;
   background: linear-gradient(to bottom, rgba(168, 85, 247, 0.1), transparent);
   text-align: center;
 }
