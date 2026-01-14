@@ -1608,9 +1608,9 @@ def show_homepage():
             textElements.forEach(function(elem) {
                 if (!elem.dataset.tabStyled) {
                     elem.dataset.tabStyled = 'true';
-                    elem.style.fontSize = '1.6rem';
-                    elem.style.fontWeight = '900';
-                    elem.style.letterSpacing = '0.08em';
+                    elem.style.fontSize = '1.2rem';
+                    elem.style.fontWeight = '700';
+                    elem.style.letterSpacing = '0.03em';
                 }
             });
         });
