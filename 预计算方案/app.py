@@ -914,15 +914,26 @@ button[aria-selected="true"]{
   text-align: center;
   font-size: 1.5rem;
   font-weight: 700;
-  background: linear-gradient(135deg, #818cf8 0%, #c084fc 50%, #e879f9 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
   margin-bottom: 18px;
   padding-bottom: 14px;
   border-bottom: 1px solid rgba(168, 85, 247, 0.25);
   letter-spacing: 0.05em;
   position: relative;
+}
+/* emoji 图标 - 保持原色 */
+.query-card-header .header-icon{
+  font-size: 1.5rem;
+  display: inline-block;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+}
+/* 文字部分 - 应用渐变色 */
+.query-card-header .header-text{
+  background: linear-gradient(135deg, #818cf8 0%, #c084fc 50%, #e879f9 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-weight: 700;
+  letter-spacing: 0.05em;
   filter: drop-shadow(0 0 8px rgba(168, 85, 247, 0.2));
 }
 
@@ -1587,7 +1598,7 @@ def show_homepage():
     
     with center_col:
         # 标记查询区域（用于CSS/JS定位）
-        st.markdown('<div class="query-card-header">🔍 数据查询</div>', unsafe_allow_html=True)
+        st.markdown('<div class="query-card-header"><span class="header-icon">🔍</span> <span class="header-text">数据查询</span></div>', unsafe_allow_html=True)
         
         tab1, tab2 = st.tabs(["🗂️每日查询", "🗂️版本查询"])
         
