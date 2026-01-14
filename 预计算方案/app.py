@@ -850,9 +850,9 @@ button[data-baseweb="tab"]{
   flex: 1 1 0% !important;
   min-width: 0 !important;
   height: auto !important;
-  padding: 18px 28px !important;
+  padding: 12px 20px !important;
   background: rgba(0,0,0,0.4) !important;
-  border-radius: 14px !important;
+  border-radius: 12px !important;
   color: var(--text-dim) !important;
   font-weight: 800 !important;
   font-size: 1.4rem !important;
