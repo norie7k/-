@@ -666,9 +666,9 @@ a:hover{ text-decoration: underline !important; }
 }
 .logo-group{
   display: inline-flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
-  gap: 16px;
+  gap: 20px;
 }
 .pulse-icon{
   font-size: 2.2rem;
@@ -683,7 +683,7 @@ a:hover{ text-decoration: underline !important; }
   box-shadow: 0 0 30px rgba(168, 85, 247, 0.3);
 }
 .title-stack{
-  text-align: center;
+  text-align: left;
 }
 .title-stack h1{
   margin: 0;
@@ -699,7 +699,7 @@ a:hover{ text-decoration: underline !important; }
 }
 .status-badges{
   display: flex;
-  justify-content: center;
+  justify-content: flex-start;
   gap: 10px;
   margin-top: 10px;
 }
