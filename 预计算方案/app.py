@@ -1397,15 +1397,13 @@ def render_result(result: dict, group_key: str | None = None):
 </div>
 </div>
 
-<!-- 时间轴信息 -->
-<div style="margin-top: 12px; margin-bottom: 12px;">
+<!-- 时间轴信息 + 展开按钮 -->
+<div style="margin-top: 12px; display: flex; justify-content: space-between; align-items: flex-start;">
+<div style="flex: 1;">
 <div style="display: inline-block; background: rgba(99,102,241,0.15); color: #a5b4fc; padding: 4px 10px; border-radius: 6px; font-size: 0.8rem; font-weight: 700; margin-bottom: 0;">⏰ 时间轴</div>
 <div style="font-size: 0.88rem; color: var(--text); line-height: 1.6; margin-top: 4px;">{display_time_escaped}</div>
 </div>
-
-<!-- 底部展开按钮 -->
-<div style="display: flex; justify-content: flex-end; align-items: center; margin-top: 12px;">
-<div style="font-size: 0.85rem; font-weight: 700; color: #ec4899; cursor: pointer;">点击查看详情</div>
+<div style="font-size: 0.85rem; font-weight: 700; color: #ec4899; cursor: pointer; white-space: nowrap; margin-left: 12px;">点击查看详情</div>
 </div>
 </div>
 </summary>
