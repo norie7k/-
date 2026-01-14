@@ -1998,8 +1998,8 @@ def show_homepage():
 
     # ===== 系统说明文字 =====
     st.markdown("""
-<div style="text-align: center; margin: 32px auto 24px; max-width: 900px; padding: 0 20px;">
-    <p style="font-size: 1.05rem; color: var(--text); line-height: 1.8; font-weight: 500;">
+<div style="text-align: center; margin: 32px auto 28px; padding: 0 20px;">
+    <p style="font-size: 1.3rem; color: var(--text); line-height: 1.5; font-weight: 500; white-space: nowrap;">
         本系统分析玩家社群中的每日与游戏相关聊天内容，提供日常/版本周期内社群发言监控，给运营团队速掌握大盘情况
     </p>
 </div>
