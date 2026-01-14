@@ -850,16 +850,16 @@ button[data-baseweb="tab"]{
   flex: 1 1 0% !important;
   min-width: 0 !important;
   height: auto !important;
-  padding: 18px 28px !important;
+  padding: 20px 32px !important;
   background: rgba(0,0,0,0.4) !important;
   border-radius: 14px !important;
   color: var(--text-dim) !important;
   font-weight: 800 !important;
-  font-size: 1.4rem !important;
+  font-size: 1.55rem !important;
   justify-content: center !important;
   text-align: center !important;
   border: 2px solid var(--glass-border) !important;
-  letter-spacing: 0.03em !important;
+  letter-spacing: 0.05em !important;
   transition: all 0.25s ease !important;
 }
 div[data-baseweb="tab-list"] button[role="tab"]:hover,
