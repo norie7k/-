@@ -1642,18 +1642,12 @@ def render_version_result(result: dict, group_key: str | None = None):
         "Discord": "Discord"
     }.get(platform, platform)
     
-    # 报告标题
+    # 报告标题（一行显示）
     st.markdown(
         f"""<div style="text-align: center; padding: 0 0 1.5rem 0; margin-top: -4rem;">
-<h1 style="margin: 0; color: #e9d5ff; font-size: 2rem; font-weight: 700;">
-📊 {platform_display} {group_display}版本分析报告
+<h1 style="margin: 0; color: #e9d5ff; font-size: 1.8rem; font-weight: 700; white-space: nowrap;">
+📊 {platform_display} {group_display}版本分析报告_{version} ({period})
 </h1>
-<h2 style="margin: 0.5rem 0 0 0; color: #a5b4fc; font-size: 1.3rem; font-weight: 600;">
-{version}
-</h2>
-<p style="margin: 0.3rem 0 0 0; color: var(--muted); font-size: 1.1rem;">
-{period}
-</p>
 </div>""",
         unsafe_allow_html=True,
     )
