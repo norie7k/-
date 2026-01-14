@@ -1777,7 +1777,7 @@ def render_version_result(result: dict, group_key: str | None = None):
 
 <!-- 热度趋势区域 -->
 <div style="margin-top: 12px; margin-bottom: 12px;">
-<div style="display: inline-block; background: rgba(59,130,246,0.15); color: #60a5fa; padding: 4px 10px; border-radius: 6px; font-size: 0.8rem; font-weight: 700; margin-bottom: 8px;">热度趋势</div>
+<div style="display: inline-block; background: rgba(59,130,246,0.15); color: #60a5fa; padding: 4px 10px; border-radius: 6px; font-size: 0.8rem; font-weight: 700; margin-bottom: 6px;">热度趋势</div>
 <div style="font-size: 0.88rem; color: var(--text); line-height: 1.6;">{heat_trend_escaped}</div>
 </div>
 
