@@ -1494,8 +1494,19 @@ def render_result(result: dict, group_key: str | None = None):
                 // 向上查找最近的 details 元素
                 const details = this.closest('details');
                 if (details) {
+                    // 关闭 details
                     details.open = false;
                     details.removeAttribute('open');
+                    
+                    // 强制触发重绘
+                    details.style.display = 'none';
+                    details.offsetHeight; // 触发 reflow
+                    details.style.display = '';
+                    
+                    // 滚动到卡片顶部
+                    setTimeout(() => {
+                        details.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                    }, 50);
                 }
             });
         });
@@ -1817,6 +1828,59 @@ def render_version_result(result: dict, group_key: str | None = None):
 </div>""",
             unsafe_allow_html=True,
         )
+    
+    # 为版本分析页面注入 JavaScript 设置展开/收起功能
+    components.html("""
+<script>
+(function() {
+    function setupVersionCollapseButtons() {
+        const parentDoc = window.parent.document;
+        
+        // 找到所有版本话题收起按钮
+        const collapseButtons = parentDoc.querySelectorAll('.expander-toggle-inside');
+        
+        collapseButtons.forEach((button) => {
+            // 检查是否已经绑定过
+            if (button.dataset.vbound === 'true') {
+                return;
+            }
+            button.dataset.vbound = 'true';
+            
+            // 添加点击事件
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                // 向上查找最近的 details 元素
+                const details = this.closest('details');
+                if (details) {
+                    // 关闭 details
+                    details.open = false;
+                    details.removeAttribute('open');
+                    
+                    // 强制触发重绘
+                    details.style.display = 'none';
+                    details.offsetHeight; // 触发 reflow
+                    details.style.display = '';
+                    
+                    // 滚动到卡片顶部
+                    setTimeout(() => {
+                        details.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                    }, 50);
+                }
+            });
+        });
+    }
+    
+    // 立即执行
+    setupVersionCollapseButtons();
+    // 延迟执行确保DOM已渲染
+    setTimeout(setupVersionCollapseButtons, 100);
+    setTimeout(setupVersionCollapseButtons, 300);
+    setTimeout(setupVersionCollapseButtons, 500);
+})();
+</script>
+""", height=0)
 
 # ==================== 主页欢迎界面 ====================
 
