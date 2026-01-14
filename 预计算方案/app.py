@@ -327,17 +327,18 @@ div[data-baseweb="popover"] button.date-disabled .date-disabled-icon {
 }
 
 .heatbar-wrap{
-  margin-top: 10px;
-  background: rgba(148,163,184,.10);
+  margin-top: 6px;
+  background: rgba(148,163,184,.08);
   border-radius: 999px;
-  height: 10px;
+  height: 8px;
   overflow: hidden;
-  border: 1px solid rgba(148,163,184,.10);
+  border: 1px solid rgba(148,163,184,.08);
 }
 .heatbar{
   height: 100%;
   border-radius: 999px;
-  background: linear-gradient(90deg, rgba(99,102,241,.95), rgba(236,72,153,.92));
+  background: linear-gradient(90deg, #fb923c, #f97316, #dc2626);
+  box-shadow: 0 2px 8px rgba(251,146,60,0.3);
 }
 
 /* ===== 自定义 Expander（完全控制，支持 sticky）===== */
@@ -1738,39 +1739,60 @@ def render_version_result(result: dict, group_key: str | None = None):
         # 生成唯一ID
         unique_id = f"vtopic-{group_key or 'g'}-{version}-{rank}"
         
-        # 渲染话题卡片
+        # 渲染话题卡片（新版设计）
         st.markdown(
             f"""<div class="cluster-custom-wrapper">
 <details class="custom-expander" id="{unique_id}">
 <summary class="custom-expander-summary">
-<div class="cluster-card">
-<div class="cluster-header">
-<div>
-<div class="cluster-title">{rank}. {title_escaped}</div>
-<div class="cluster-meta">
-<div class="meta-chip"><span>📅 讨论覆盖</span>{days}天 ({date_range})</div>
-<div class="meta-chip"><span>👥 玩家</span>{players}</div>
-<div class="meta-chip"><span>💬 发言</span>{msgs}</div>
+<div class="cluster-card" style="position: relative; padding: 14px 18px;">
+<!-- 左上角排名徽章 -->
+<div style="position: absolute; left: 18px; top: 18px; background: linear-gradient(135deg, #8b5cf6, #6366f1); color: white; padding: 6px 12px; border-radius: 8px; font-weight: 800; font-size: 0.9rem;">#{rank}</div>
+
+<!-- 卡片主体 -->
+<div style="padding-left: 50px;">
+<!-- 标题行 + 右上角数据统计 -->
+<div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px;">
+<div class="cluster-title" style="flex: 1; padding-right: 20px;">{title_escaped}</div>
+<div style="display: flex; gap: 20px; align-items: center;">
+<div style="display: flex; flex-direction: column; gap: 4px; align-items: center;">
+<div style="font-size: 1.5rem; font-weight: 800; color: #c7d2fe;">{players}</div>
+<div style="font-size: 0.75rem; color: var(--muted);">参与玩家</div>
 </div>
-<div style="margin-top: 12px; padding: 10px; background: rgba(99,102,241,0.08); border-left: 3px solid #818cf8; border-radius: 8px;">
-<div style="font-size: 0.85rem; font-weight: 700; color: #a5b4fc; margin-bottom: 6px;">📈 热度趋势</div>
-<div style="font-size: 0.9rem; color: var(--text); line-height: 1.6;">{heat_trend_escaped}</div>
+<div style="display: flex; flex-direction: column; gap: 4px; align-items: center;">
+<div style="font-size: 1.5rem; font-weight: 800; color: #c7d2fe;">{msgs}</div>
+<div style="font-size: 0.75rem; color: var(--muted);">发言数</div>
+</div>
+<div style="display: flex; flex-direction: column; gap: 4px; align-items: center;">
+<div style="font-size: 1.5rem; font-weight: 800; color: #fbbf24;">{heat:.2f}</div>
+<div style="font-size: 0.75rem; color: var(--muted);">热度</div>
 </div>
 </div>
-<div class="badge-heat"><small>热度</small>{heat:.2f} 🔥</div>
+</div>
+
+<!-- 热度趋势区域 -->
+<div style="margin-top: 12px; margin-bottom: 12px;">
+<div style="display: inline-block; background: rgba(59,130,246,0.15); color: #60a5fa; padding: 4px 10px; border-radius: 6px; font-size: 0.8rem; font-weight: 700; margin-bottom: 8px;">热度趋势</div>
+<div style="font-size: 0.88rem; color: var(--text); line-height: 1.6;">{heat_trend_escaped}</div>
+</div>
+
+<!-- 底部日期和展开按钮 -->
+<div style="display: flex; justify-content: space-between; align-items: center; margin-top: 12px;">
+<div style="font-size: 0.85rem; color: var(--muted);">{date_range} · 持续 {days} 天</div>
+<div style="font-size: 0.85rem; font-weight: 700; color: #ec4899; cursor: pointer;">点击查看详情</div>
 </div>
 </div>
-<div class="expander-toggle">
-<span class="toggle-icon">▼</span>
-<span class="toggle-text">展开详情（{len(discussion_points)}个核心讨论点）</span>
 </div>
 </summary>
 <div class="details-wrapper">
 <div class="cluster-card-sticky">
-<div class="cluster-card">
-<div class="cluster-header">
+<div class="cluster-card" style="position: relative; padding: 10px 14px;">
+<!-- 左侧排名徽章 -->
+<div style="position: absolute; left: 14px; top: 10px; background: linear-gradient(135deg, #8b5cf6, #6366f1); color: white; padding: 4px 10px; border-radius: 6px; font-weight: 800; font-size: 0.85rem;">#{rank}</div>
+
+<!-- 卡片主体 -->
+<div style="padding-left: 45px; display: flex; justify-content: space-between; align-items: center;">
 <div>
-<div class="cluster-title">{rank}. {title_escaped}</div>
+<div class="cluster-title">{title_escaped}</div>
 <div class="cluster-meta">
 <div class="meta-chip"><span>📅</span>{days}天</div>
 <div class="meta-chip"><span>👥</span>{players}人</div>
