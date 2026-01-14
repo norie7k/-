@@ -670,12 +670,6 @@ a:hover{ text-decoration: underline !important; }
   align-items: center;
   gap: 12px;
 }
-.pulse-icon{
-  font-size: 2.2rem;
-  line-height: 1;
-  display: inline-flex;
-  align-items: center;
-}
 .title-stack{
   text-align: left;
 }
@@ -686,7 +680,11 @@ a:hover{ text-decoration: underline !important; }
   letter-spacing: -0.02em;
   color: white;
 }
-.title-stack h1 span{
+.title-stack h1 .title-icon{
+  -webkit-text-fill-color: initial;
+  background: none;
+}
+.title-stack h1 span:not(.title-icon){
   background: linear-gradient(to right, var(--accent-primary), var(--accent-secondary));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -1566,9 +1564,8 @@ def show_homepage():
     st.markdown("""
 <header class="system-header">
     <div class="logo-group">
-        <div class="pulse-icon">🎮</div>
         <div class="title-stack">
-            <h1>玩家社群<span>分析系统</span></h1>
+            <h1><span class="title-icon">🎮</span> 玩家社群<span>分析系统</span></h1>
             <div class="status-badges">
                 <span class="badge live">● AI 驱动</span>
                 <span class="badge">实时同步</span>
