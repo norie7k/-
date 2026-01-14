@@ -1127,17 +1127,37 @@ def load_result(group_id: str, date: str) -> dict:
     if not group:
         return {}
 
-    local_path = LOCAL_RESULTS_DIR / group["dir"] / f"{date}.json"
+    local_path = LOCAL_RESULTS_DIR / group["dir"] / "daily" / f"{date}.json"
     if local_path.exists():
         with open(local_path, "r", encoding="utf-8") as f:
             return json.load(f)
 
     try:
-        url = f"{GITHUB_RAW_BASE}/{group['dir']}/{date}.json"
+        url = f"{GITHUB_RAW_BASE}/{group['dir']}/daily/{date}.json"
         data = fetch_json(url)
         return data or {}
     except Exception as e:
         st.error(f"加载数据失败: {e}")
+        return {}
+
+@st.cache_data(ttl=300, show_spinner=False)
+def load_version_result(group_id: str, version_key: str) -> dict:
+    """加载版本分析数据"""
+    group = GROUPS.get(group_id)
+    if not group:
+        return {}
+
+    local_path = LOCAL_RESULTS_DIR / group["dir"] / "version" / f"{version_key}.json"
+    if local_path.exists():
+        with open(local_path, "r", encoding="utf-8") as f:
+            return json.load(f)
+
+    try:
+        url = f"{GITHUB_RAW_BASE}/{group['dir']}/version/{version_key}.json"
+        data = fetch_json(url)
+        return data or {}
+    except Exception as e:
+        st.error(f"加载版本数据失败: {e}")
         return {}
 
 # ==================== 渲染 ====================
@@ -1589,6 +1609,201 @@ def render_result(result: dict, group_key: str | None = None):
             use_container_width=True,
         )
 
+def render_version_result(result: dict, group_key: str | None = None):
+    """渲染版本分析结果页面"""
+    if not result:
+        st.warning("⚠️ 暂无版本数据")
+        return
+
+    version = result.get("version", "")
+    period = result.get("period", "")
+    topics = result.get("topics", [])
+
+    # 群名称格式化
+    group_display = ""
+    if group_key and group_key in GROUPS:
+        group_name = GROUPS[group_key]["name"]
+        import re
+        cleaned_name = re.sub(r'[^\w\s\u4e00-\u9fff]', '', group_name).strip()
+        match = re.search(r'([\u4e00-\u9fff]+)群(\d+)', cleaned_name)
+        if match:
+            group_type = match.group(1)
+            group_num = match.group(2)
+            group_display = f"《{group_type}》{group_num}群 "
+        else:
+            group_display = cleaned_name + " "
+
+    # 获取平台信息
+    platform = result.get("source", "QQ")
+    platform_display = {
+        "QQ": "QQ",
+        "微信": "微信",
+        "WeChat": "微信",
+        "Discord": "Discord"
+    }.get(platform, platform)
+    
+    # 报告标题
+    st.markdown(
+        f"""<div style="text-align: center; padding: 0 0 1.5rem 0; margin-top: -4rem;">
+<h1 style="margin: 0; color: #e9d5ff; font-size: 2rem; font-weight: 700;">
+📊 {platform_display} {group_display}版本分析报告
+</h1>
+<h2 style="margin: 0.5rem 0 0 0; color: #a5b4fc; font-size: 1.3rem; font-weight: 600;">
+{version}
+</h2>
+<p style="margin: 0.3rem 0 0 0; color: var(--muted); font-size: 1.1rem;">
+{period}
+</p>
+</div>""",
+        unsafe_allow_html=True,
+    )
+
+    # ========= 热点话题列表 =========
+    st.markdown(
+        f"""<div style="text-align: center; margin-bottom: 1.5rem;">
+<h2 style="color: #f0abfc; font-size: 1.5rem; font-weight: 700;">
+🔥 热点话题排行 TOP{len(topics)}
+</h2>
+</div>""",
+        unsafe_allow_html=True,
+    )
+
+    for topic in topics:
+        rank = topic.get("rank", 0)
+        title = topic.get("title", "(未命名话题)")
+        heat = topic.get("heat_score", 0)
+        days = topic.get("discussion_days", 0)
+        date_range = topic.get("date_range", "")
+        players = topic.get("total_players", 0)
+        msgs = topic.get("total_messages", 0)
+        heat_trend = topic.get("heat_trend", "")
+        discussion_points = topic.get("discussion_points", [])
+
+        # 转义标题
+        title_escaped = html.escape(title)
+        heat_trend_escaped = html.escape(heat_trend)
+        
+        # 构建讨论点内容
+        discussion_content_html = ""
+        if discussion_points:
+            discussion_content_html += f'<div style="color: #e9d5ff; font-size: 1.05rem; margin-bottom: 10px; font-weight: 700;">📋 核心讨论点（共 {len(discussion_points)} 条）</div>'
+            
+            for dp_i, dp in enumerate(discussion_points, 1):
+                dp_title = dp.get("point", "")
+                opinions = dp.get("opinions", [])
+                examples = dp.get("examples", [])
+                
+                # 构建讨论点内部内容
+                dp_inner_html = ""
+                
+                if opinions:
+                    dp_inner_html += '<div class="dp-section-title">💭 玩家观点</div>'
+                    for i, opinion in enumerate(opinions, 1):
+                        dp_inner_html += f'<div class="opinion-item">{i}. {html.escape(opinion)}</div>'
+                
+                if examples:
+                    dp_inner_html += f'<div class="dp-section-title">📝 代表性发言</div>'
+                    for example in examples:
+                        dp_inner_html += f'<div class="example-quote">"{html.escape(example)}"</div>'
+                
+                if not dp_inner_html:
+                    dp_inner_html = '<p style="color: var(--muted); font-size: 0.85rem; margin: 0;">暂无详细内容</p>'
+                
+                # 生成可展开的讨论点卡片
+                dp_id = f"vdp-{group_key or 'g'}-{version}-{rank}-{dp_i}"
+                dp_title_escaped = html.escape(dp_title) if dp_title else f"讨论点 {dp_i}"
+                
+                discussion_content_html += f'''<details class="dp-expander" id="{dp_id}">
+<summary class="dp-expander-summary">
+<div class="dp-card">
+<div class="dp-header">
+<span class="dp-title">📌 {dp_i}. {dp_title_escaped}</span>
+<span class="dp-toggle-btn"><span class="expand-text">展开 ▼</span><span class="collapse-text">收起 ▲</span></span>
+</div>
+</div>
+</summary>
+<div class="dp-details-wrapper">
+<div class="dp-card-sticky">
+<div class="dp-card">
+<div class="dp-header">
+<span class="dp-title">📌 {dp_i}. {dp_title_escaped}</span>
+<span class="dp-toggle-btn"><span class="collapse-text">收起 ▲</span></span>
+</div>
+</div>
+</div>
+<div class="dp-scrollable">
+<div class="dp-content">
+{dp_inner_html}
+</div>
+</div>
+</div>
+</details>'''
+        else:
+            discussion_content_html = '<p style="color: var(--muted);">暂无讨论点列表</p>'
+        
+        # 生成唯一ID
+        unique_id = f"vtopic-{group_key or 'g'}-{version}-{rank}"
+        
+        # 渲染话题卡片
+        st.markdown(
+            f"""<div class="cluster-custom-wrapper">
+<details class="custom-expander" id="{unique_id}">
+<summary class="custom-expander-summary">
+<div class="cluster-card">
+<div class="cluster-header">
+<div style="flex: 1;">
+<div class="cluster-title">{rank}. {title_escaped}</div>
+<div style="margin-top: 10px;">
+<div class="meta-chip"><span>📅 讨论覆盖</span>{days}天 ({date_range})</div>
+</div>
+<div style="margin-top: 8px;">
+<div class="meta-chip"><span>👥 发言玩家</span>{players}人</div>
+<div class="meta-chip" style="margin-left: 8px;"><span>💬 发言总量</span>{msgs}条</div>
+</div>
+<div style="margin-top: 12px; padding: 10px; background: rgba(99,102,241,0.08); border-left: 3px solid #818cf8; border-radius: 8px;">
+<div style="font-size: 0.85rem; font-weight: 700; color: #a5b4fc; margin-bottom: 6px;">📈 热度趋势</div>
+<div style="font-size: 0.9rem; color: var(--text); line-height: 1.6;">{heat_trend_escaped}</div>
+</div>
+</div>
+<div class="badge-heat"><small>热度</small>{heat:.2f} 🔥</div>
+</div>
+</div>
+<div class="expander-toggle">
+<span class="toggle-icon">▼</span>
+<span class="toggle-text">展开详情（{len(discussion_points)}个核心讨论点）</span>
+</div>
+</summary>
+<div class="details-wrapper">
+<div class="cluster-card-sticky">
+<div class="cluster-card">
+<div class="cluster-header">
+<div style="flex: 1;">
+<div class="cluster-title">{rank}. {title_escaped}</div>
+<div style="margin-top: 8px;">
+<div class="meta-chip"><span>📅</span>{days}天</div>
+<div class="meta-chip" style="margin-left: 8px;"><span>👥</span>{players}人</div>
+<div class="meta-chip" style="margin-left: 8px;"><span>💬</span>{msgs}条</div>
+</div>
+</div>
+<div class="badge-heat"><small>热度</small>{heat:.2f} 🔥</div>
+</div>
+</div>
+</div>
+<div class="scrollable-content">
+<div class="expander-toggle-inside">
+<span class="toggle-icon">▲</span>
+<span class="toggle-text">收起详情</span>
+</div>
+<div class="custom-expander-inner">
+{discussion_content_html}
+</div>
+</div>
+</div>
+</details>
+</div>""",
+            unsafe_allow_html=True,
+        )
+
 # ==================== 主页欢迎界面 ====================
 
 def show_homepage():
@@ -1630,7 +1845,7 @@ def show_homepage():
         # 标记查询区域（用于CSS/JS定位）
         st.markdown('<div class="query-card-header"><span class="header-icon">🔍</span> <span class="header-text">数据查询</span></div>', unsafe_allow_html=True)
         
-        tab1, tab2 = st.tabs(["🗂️每日查询", "🗂️版本查询"])
+        tab1, tab2 = st.tabs(["🗂️每日查询", "🗃版本查询"])
         
         # JavaScript：动态修改 tab 文字样式
         components.html("""
@@ -1961,14 +2176,15 @@ def show_homepage():
                 )
 
             with col_version_v:
-                # 版本列表（示例，可以从配置文件或数据库读取）
-                version_options = [
-                    "beta15_旋转木马测试（2025年12月03日~2025年12月17日）",
-                    "beta17_暖冬测试（2025年12月31日~2026年1月20日）",
-                ]
-                selected_version = st.selectbox(
+                # 版本列表（与文件名对应）
+                version_options = {
+                    "beta15": "beta15_旋转木马测试（2025-12-03~2025-12-17）",
+                    "beta17": "beta17_暖冬测试（2025-12-31~2026-01-20）",
+                }
+                selected_version_key = st.selectbox(
                     "📦 版本周期",
-                    options=version_options,
+                    options=list(version_options.keys()),
+                    format_func=lambda x: version_options[x],
                     key="homepage_version",
                 )
 
@@ -1984,8 +2200,8 @@ def show_homepage():
                     st.session_state.show_results = True
                     st.session_state.query_type = "version"
                     st.session_state.selected_group_homepage = selected_group_version
-                    st.session_state.selected_version_homepage = selected_version
-                    st.info("版本查询功能正在开发中...")
+                    st.session_state.selected_version_homepage = selected_version_key
+                    st.rerun()
 
             st.markdown("""
 <div style="padding: 0.6rem 1rem; background: rgba(59,130,246,0.1); border: 1px solid rgba(59,130,246,0.2); 
@@ -2462,22 +2678,20 @@ def main():
     query_type = st.session_state.get("query_type", "daily")
     
     if query_type == "version":
-        # 版本查询功能（开发中）
-        st.markdown("""
-<div style='text-align: center; padding: 100px 20px;'>
-    <div style='font-size: 4rem; margin-bottom: 24px;'>🚧</div>
-    <h2 style='color: var(--text); margin-bottom: 16px;'>版本查询功能开发中</h2>
-    <p style='color: var(--muted); font-size: 1.1rem; margin-bottom: 32px;'>
-        该功能将汇总特定游戏版本期间的社群反馈数据，包括：
-    </p>
-    <div style='max-width: 600px; margin: 0 auto; text-align: left;'>
-        <p style='color: var(--text); margin: 12px 0;'>📊 版本热度话题趋势</p>
-        <p style='color: var(--text); margin: 12px 0;'>💬 玩家反馈汇总分析</p>
-        <p style='color: var(--text); margin: 12px 0;'>📈 问题追踪与解决状态</p>
-        <p style='color: var(--text); margin: 12px 0;'>🎯 版本满意度评估</p>
-    </div>
-</div>
-""", unsafe_allow_html=True)
+        # 版本查询
+        selected_version = st.session_state.get("selected_version_homepage", "")
+        selected_group_version = st.session_state.get("selected_group_homepage", "")
+        
+        if selected_version and selected_group_version:
+            with st.spinner(f"正在加载版本数据..."):
+                version_result = load_version_result(selected_group_version, selected_version)
+            
+            if version_result:
+                render_version_result(version_result, selected_group_version)
+            else:
+                st.error(f"❌ 该版本的数据待上传")
+        else:
+            st.info("👈 请返回主页选择社群和版本")
     elif selected_date:
         # 日常查询 - 使用确认的社群和日期
         confirmed_group_for_load = st.session_state.get("confirmed_group", selected_group_key)
