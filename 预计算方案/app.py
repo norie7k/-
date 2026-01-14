@@ -850,16 +850,16 @@ button[data-baseweb="tab"]{
   flex: 1 1 0% !important;
   min-width: 0 !important;
   height: auto !important;
-  padding: 20px 32px !important;
+  padding: 18px 28px !important;
   background: rgba(0,0,0,0.4) !important;
   border-radius: 14px !important;
   color: var(--text-dim) !important;
   font-weight: 800 !important;
-  font-size: 1.55rem !important;
+  font-size: 1.4rem !important;
   justify-content: center !important;
   text-align: center !important;
   border: 2px solid var(--glass-border) !important;
-  letter-spacing: 0.05em !important;
+  letter-spacing: 0.03em !important;
   transition: all 0.25s ease !important;
 }
 div[data-baseweb="tab-list"] button[role="tab"]:hover,
@@ -1585,6 +1585,45 @@ def show_homepage():
         st.markdown('<div class="query-card-header">🔍 数据查询中心</div>', unsafe_allow_html=True)
         
         tab1, tab2 = st.tabs(["🗂️每日查询", "🗂️版本查询"])
+        
+        # JavaScript：动态修改 tab 文字样式
+        components.html("""
+<script>
+(function() {
+    function enhanceTabStyles() {
+        const parentDoc = window.parent.document;
+        
+        // 查找所有 tab 按钮
+        const tabButtons = parentDoc.querySelectorAll('[data-testid="stTabs"] button[role="tab"]');
+        
+        tabButtons.forEach(function(button) {
+            // 查找按钮内的所有文本元素
+            const textElements = button.querySelectorAll('p, div, span');
+            
+            textElements.forEach(function(elem) {
+                if (!elem.dataset.tabStyled) {
+                    elem.dataset.tabStyled = 'true';
+                    elem.style.fontSize = '1.6rem';
+                    elem.style.fontWeight = '900';
+                    elem.style.letterSpacing = '0.08em';
+                }
+            });
+        });
+    }
+    
+    // 多次尝试应用样式
+    setTimeout(enhanceTabStyles, 100);
+    setTimeout(enhanceTabStyles, 300);
+    setTimeout(enhanceTabStyles, 500);
+    setTimeout(enhanceTabStyles, 800);
+    setTimeout(enhanceTabStyles, 1200);
+    
+    // 监听 DOM 变化
+    const observer = new MutationObserver(enhanceTabStyles);
+    observer.observe(window.parent.document.body, { childList: true, subtree: true });
+})();
+</script>
+""", height=0)
 
         # === 日常查询标签 ===
         with tab1:
