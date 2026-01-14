@@ -968,8 +968,21 @@ button[aria-selected="true"]{
   white-space: normal;
   word-break: break-all;
   line-height: 1.5;
-  pointer-events: none;
+  /* 允许鼠标与 tooltip 交互 */
+  pointer-events: auto;
+  cursor: default;
 }
+/* 桥接区域：填充 tooltip 和触发元素之间的间隙，防止鼠标移动时窗口消失 */
+.time-tooltip-wrapper .tooltip-content::before{
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  height: 20px; /* 覆盖间隙区域 */
+  background: transparent;
+}
+/* 小三角箭头 */
 .time-tooltip-wrapper .tooltip-content::after{
   content: '';
   position: absolute;
@@ -978,6 +991,7 @@ button[aria-selected="true"]{
   transform: translateX(-50%);
   border: 8px solid transparent;
   border-top-color: rgba(18, 26, 49, 0.98);
+  z-index: 1;
 }
 .time-tooltip-wrapper .tooltip-content .tooltip-title{
   font-size: 0.78rem;
@@ -991,8 +1005,18 @@ button[aria-selected="true"]{
 .time-tooltip-wrapper .tooltip-content .tooltip-text{
   font-size: 0.88rem;
   color: #e5e7eb;
+  /* 允许选择文本 */
+  user-select: text;
+  cursor: text;
 }
+/* 触发显示：鼠标悬停在触发元素上 */
 .time-tooltip-wrapper:hover .tooltip-content{
+  visibility: visible;
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+/* 保持显示：鼠标悬停在 tooltip 窗口上时也保持显示 */
+.time-tooltip-wrapper .tooltip-content:hover{
   visibility: visible;
   opacity: 1;
   transform: translateX(-50%) translateY(0);
