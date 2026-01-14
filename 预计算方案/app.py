@@ -74,6 +74,21 @@ section[data-testid="stMain"]{
 section[data-testid="stMain"] p,
 section[data-testid="stMain"] li{ color: var(--text); }
 
+/* 去除顶部嵌套容器和工具栏 */
+header[data-testid="stHeader"]{
+  display: none !important;
+}
+.stApp > header{
+  display: none !important;
+}
+/* 去除顶部空白 */
+.block-container{
+  padding-top: 0 !important;
+}
+div[data-testid="stToolbar"]{
+  display: none !important;
+}
+
 /* ===== 标题 ===== */
 .main-title{
   font-family: 'Orbitron','Noto Sans SC',sans-serif;
