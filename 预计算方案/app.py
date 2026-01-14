@@ -668,19 +668,13 @@ a:hover{ text-decoration: underline !important; }
   display: inline-flex;
   flex-direction: row;
   align-items: center;
-  gap: 20px;
+  gap: 12px;
 }
 .pulse-icon{
   font-size: 2.2rem;
-  background: rgba(168, 85, 247, 0.2);
-  width: 60px;
-  height: 60px;
-  display: flex;
+  line-height: 1;
+  display: inline-flex;
   align-items: center;
-  justify-content: center;
-  border-radius: 16px;
-  border: 1px solid var(--accent-primary);
-  box-shadow: 0 0 30px rgba(168, 85, 247, 0.3);
 }
 .title-stack{
   text-align: left;
