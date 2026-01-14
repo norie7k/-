@@ -1745,14 +1745,12 @@ def render_version_result(result: dict, group_key: str | None = None):
 <summary class="custom-expander-summary">
 <div class="cluster-card">
 <div class="cluster-header">
-<div style="flex: 1;">
+<div>
 <div class="cluster-title">{rank}. {title_escaped}</div>
-<div style="margin-top: 10px;">
+<div class="cluster-meta">
 <div class="meta-chip"><span>📅 讨论覆盖</span>{days}天 ({date_range})</div>
-</div>
-<div style="margin-top: 8px;">
-<div class="meta-chip"><span>👥 发言玩家</span>{players}人</div>
-<div class="meta-chip" style="margin-left: 8px;"><span>💬 发言总量</span>{msgs}条</div>
+<div class="meta-chip"><span>👥 玩家</span>{players}</div>
+<div class="meta-chip"><span>💬 发言</span>{msgs}</div>
 </div>
 <div style="margin-top: 12px; padding: 10px; background: rgba(99,102,241,0.08); border-left: 3px solid #818cf8; border-radius: 8px;">
 <div style="font-size: 0.85rem; font-weight: 700; color: #a5b4fc; margin-bottom: 6px;">📈 热度趋势</div>
@@ -1771,12 +1769,12 @@ def render_version_result(result: dict, group_key: str | None = None):
 <div class="cluster-card-sticky">
 <div class="cluster-card">
 <div class="cluster-header">
-<div style="flex: 1;">
+<div>
 <div class="cluster-title">{rank}. {title_escaped}</div>
-<div style="margin-top: 8px;">
+<div class="cluster-meta">
 <div class="meta-chip"><span>📅</span>{days}天</div>
-<div class="meta-chip" style="margin-left: 8px;"><span>👥</span>{players}人</div>
-<div class="meta-chip" style="margin-left: 8px;"><span>💬</span>{msgs}条</div>
+<div class="meta-chip"><span>👥</span>{players}人</div>
+<div class="meta-chip"><span>💬</span>{msgs}条</div>
 </div>
 </div>
 <div class="badge-heat"><small>热度</small>{heat:.2f} 🔥</div>
