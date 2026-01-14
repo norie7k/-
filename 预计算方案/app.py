@@ -642,7 +642,8 @@ section[data-testid="stMain"] div[data-testid="stExpander"] div[role="region"]{
   margin: 4px 0;
   border-radius: 8px;
   color: var(--text);
-  font-size: 0.88rem;
+  font-size: 1.05rem;
+  line-height: 1.6;
 }
 .example-quote{
   background: rgba(99,102,241,.10);
@@ -652,7 +653,8 @@ section[data-testid="stMain"] div[data-testid="stExpander"] div[role="region"]{
   border-radius: 8px;
   color: #dbeafe;
   font-style: italic;
-  font-size: 0.88rem;
+  font-size: 1.05rem;
+  line-height: 1.6;
 }
 
 /* Metric */
