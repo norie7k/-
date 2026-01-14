@@ -912,16 +912,12 @@ button[aria-selected="true"]{
 /* 主查询卡片 - 标题样式 */
 .query-card-header{
   text-align: center;
-  font-size: 1.6rem;
-  font-weight: 900;
-  background: linear-gradient(90deg, #c4b5fd, #f0abfc, #fbbf24);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #e9d5ff;
   margin-bottom: 16px;
-  padding-bottom: 14px;
-  border-bottom: 2px solid rgba(168, 85, 247, 0.4);
-  letter-spacing: 0.05em;
-  text-shadow: 0 0 30px rgba(168, 85, 247, 0.3);
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(168, 85, 247, 0.3);
 }
 
 /* ===== Tooltip 悬停提示样式（Streamlit 兼容）===== */
