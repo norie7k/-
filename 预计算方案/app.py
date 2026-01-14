@@ -1375,13 +1375,10 @@ def render_result(result: dict, group_key: str | None = None):
 <div>
 <div class="cluster-title">{idx}. {title_escaped}</div>
 <div class="cluster-meta">{''.join(meta_chips)}</div>
+<div style="text-align: right; margin-top: 8px; font-size: 0.85rem; font-weight: 700; color: #ec4899;">点击查看详情</div>
 </div>
 <div class="badge-heat"><small>热度</small>{heat:.1f} 🔥</div>
 </div>
-</div>
-<div class="expander-toggle">
-<span class="toggle-icon">▼</span>
-<span class="toggle-text">详情（讨论点/观点/代表发言）</span>
 </div>
 </summary>
 <div class="details-wrapper">
