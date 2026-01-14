@@ -74,18 +74,17 @@ section[data-testid="stMain"]{
 section[data-testid="stMain"] p,
 section[data-testid="stMain"] li{ color: var(--text); }
 
-/* 去除顶部嵌套容器和工具栏 */
-header[data-testid="stHeader"]{
+/* 主页专用：隐藏顶部 header（通过 class 标记控制）*/
+.homepage-mode header[data-testid="stHeader"]{
   display: none !important;
 }
-.stApp > header{
+.homepage-mode .stApp > header{
   display: none !important;
 }
-/* 去除顶部空白 */
-.block-container{
+.homepage-mode .block-container{
   padding-top: 0 !important;
 }
-div[data-testid="stToolbar"]{
+.homepage-mode div[data-testid="stToolbar"]{
   display: none !important;
 }
 
@@ -1595,6 +1594,19 @@ def render_result(result: dict, group_key: str | None = None):
 def show_homepage():
     """显示欢迎主页（新版布局）——✅修正版：真正把 tabs/筛选控件包进 Control Center 卡片"""
 
+    # 标记主页模式，隐藏顶部 header
+    components.html("""
+<script>
+(function() {
+    const parentDoc = window.parent.document;
+    const appContainer = parentDoc.querySelector('.stApp');
+    if (appContainer && !appContainer.classList.contains('homepage-mode')) {
+        appContainer.classList.add('homepage-mode');
+    }
+})();
+</script>
+""", height=0)
+
     # ===== Header 区域 =====
     st.markdown("""
 <header class="system-header">
@@ -2074,6 +2086,19 @@ def main():
     if not st.session_state.show_results:
         show_homepage()
         return
+    
+    # 移除主页模式标记，显示 header
+    components.html("""
+<script>
+(function() {
+    const parentDoc = window.parent.document;
+    const appContainer = parentDoc.querySelector('.stApp');
+    if (appContainer && appContainer.classList.contains('homepage-mode')) {
+        appContainer.classList.remove('homepage-mode');
+    }
+})();
+</script>
+""", height=0)
     
     # 侧边栏
     with st.sidebar:
