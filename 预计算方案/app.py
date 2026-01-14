@@ -1836,7 +1836,7 @@ def render_version_result(result: dict, group_key: str | None = None):
     function setupVersionCollapseButtons() {
         const parentDoc = window.parent.document;
         
-        // 找到所有版本话题收起按钮
+        // 1. 找到所有版本话题收起按钮
         const collapseButtons = parentDoc.querySelectorAll('.expander-toggle-inside');
         
         collapseButtons.forEach((button) => {
@@ -1870,6 +1870,42 @@ def render_version_result(result: dict, group_key: str | None = None):
                 }
             });
         });
+        
+        // 2. 找到所有讨论点sticky卡片（整个卡片可点击收起）
+        const dpStickyCards = parentDoc.querySelectorAll('.dp-card-sticky');
+        
+        dpStickyCards.forEach((card) => {
+            // 检查是否已经绑定过
+            if (card.dataset.vdpbound === 'true') {
+                return;
+            }
+            card.dataset.vdpbound = 'true';
+            
+            // 添加点击事件到整个sticky卡片
+            card.style.cursor = 'pointer';
+            card.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                // 向上查找最近的 details.dp-expander 元素
+                const details = this.closest('details.dp-expander');
+                if (details) {
+                    // 关闭 details
+                    details.open = false;
+                    details.removeAttribute('open');
+                    
+                    // 强制触发重绘
+                    details.style.display = 'none';
+                    details.offsetHeight; // 触发 reflow
+                    details.style.display = '';
+                    
+                    // 滚动到讨论点卡片顶部
+                    setTimeout(() => {
+                        details.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                    }, 50);
+                }
+            });
+        });
     }
     
     // 立即执行
@@ -1878,6 +1914,8 @@ def render_version_result(result: dict, group_key: str | None = None):
     setTimeout(setupVersionCollapseButtons, 100);
     setTimeout(setupVersionCollapseButtons, 300);
     setTimeout(setupVersionCollapseButtons, 500);
+    setTimeout(setupVersionCollapseButtons, 800);
+    setTimeout(setupVersionCollapseButtons, 1200);
 })();
 </script>
 """, height=0)
