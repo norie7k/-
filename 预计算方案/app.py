@@ -1643,22 +1643,23 @@ def show_homepage():
 
         # === 日常查询标签 ===
         with tab1:
-            col_inputs, col_button = st.columns([1, 1])
+            col_group, col_date, col_button = st.columns([1, 1, 0.8])
 
-            with col_inputs:
+            with col_group:
                 group_options = {k: GROUPS[k]["name"] for k in GROUPS.keys()}
                 selected_group_daily = st.selectbox(
-                    "监控社群",
+                    "🌐 监控社群",
                     options=list(group_options.keys()),
                     format_func=lambda x: group_options[x],
                     key="homepage_group_daily",
                 )
 
-                # 加载日期列表
-                with st.spinner("加载可用日期..."):
-                    index = load_index(selected_group_daily)
-                    available_dates = index.get("available_dates", [])
+            # 加载日期列表
+            with st.spinner("加载可用日期..."):
+                index = load_index(selected_group_daily)
+                available_dates = index.get("available_dates", [])
 
+            with col_date:
                 if available_dates:
                     # 转换为date对象
                     date_objects = []
@@ -1731,7 +1732,7 @@ def show_homepage():
                                 st.session_state.homepage_valid_date_selected, "%Y-%m-%d"
                             ).date()
                             selected_date_obj = st.date_input(
-                                "监测日期",
+                                "📅 监测日期",
                                 value=corrected_date,
                                 min_value=extended_min_date,
                                 max_value=extended_max_date,
@@ -1759,7 +1760,7 @@ def show_homepage():
                             st.session_state.homepage_need_date_correction = False
                         else:
                             selected_date_obj = st.date_input(
-                                "监测日期",
+                                "📅 监测日期",
                                 value=initial_date,
                                 min_value=extended_min_date,
                                 max_value=extended_max_date,
@@ -1895,9 +1896,10 @@ def show_homepage():
                     selected_date = None
 
             with col_button:
-                st.markdown("<div style='height: 1.5rem;'></div>", unsafe_allow_html=True)
+                # 添加顶部间距对齐
+                st.markdown("<div style='height: 1.75rem;'></div>", unsafe_allow_html=True)
                 if st.button(
-                    "✨🔍️ 查看分析",
+                    "✨ 查看分析",
                     use_container_width=True,
                     type="primary",
                     disabled=not selected_date,
@@ -1914,9 +1916,6 @@ def show_homepage():
                     st.session_state.selected_date_cache = selected_date
                     st.rerun()
 
-            if not selected_date and available_dates is not None and len(available_dates) == 0:
-                st.info("ℹ️ 该社群暂无数据，请选择其他社群")
-
             # （可选）底部一句引导文案，像你截图那样
             st.markdown("<hr class='cc-divider'/>", unsafe_allow_html=True)
             st.markdown(
@@ -1926,32 +1925,34 @@ def show_homepage():
 
         # === 版本查询标签 ===
         with tab2:
-            col_inputs_v, col_button_v = st.columns([1, 1])
+            col_group_v, col_version_v, col_button_v = st.columns([1, 1, 0.8])
 
-            with col_inputs_v:
+            with col_group_v:
                 group_options = {k: GROUPS[k]["name"] for k in GROUPS.keys()}
                 selected_group_version = st.selectbox(
-                    "监控社群",
+                    "🌐 监控社群",
                     options=list(group_options.keys()),
                     format_func=lambda x: group_options[x],
                     key="homepage_group_version",
                 )
 
+            with col_version_v:
                 # 版本列表（示例，可以从配置文件或数据库读取）
                 version_options = [
                     "beta15_旋转木马测试（2025年12月03日~2025年12月17日）",
                     "beta17_暖冬测试（2025年12月31日~2026年1月20日）",
                 ]
                 selected_version = st.selectbox(
-                    "版本周期",
+                    "📦 版本周期",
                     options=version_options,
                     key="homepage_version",
                 )
 
             with col_button_v:
-                st.markdown("<div style='height: 1.5rem;'></div>", unsafe_allow_html=True)
+                # 添加顶部间距对齐
+                st.markdown("<div style='height: 1.75rem;'></div>", unsafe_allow_html=True)
                 if st.button(
-                    "🔍️✨ 查看分析",
+                    "✨ 查看分析",
                     use_container_width=True,
                     type="primary",
                     key="btn_version",
