@@ -1370,15 +1370,15 @@ def render_result(result: dict, group_key: str | None = None):
             f"""<div class="cluster-custom-wrapper">
 <details class="custom-expander" {expanded_str} id="{unique_id}">
 <summary class="custom-expander-summary">
-<div class="cluster-card">
+<div class="cluster-card" style="position: relative;">
 <div class="cluster-header">
 <div>
 <div class="cluster-title">{idx}. {title_escaped}</div>
 <div class="cluster-meta">{''.join(meta_chips)}</div>
-<div style="text-align: right; margin-top: 8px; font-size: 0.85rem; font-weight: 700; color: #ec4899;">点击查看详情</div>
 </div>
 <div class="badge-heat"><small>热度</small>{heat:.1f} 🔥</div>
 </div>
+<div style="position: absolute; right: 14px; bottom: 10px; font-size: 0.85rem; font-weight: 700; color: #ec4899;">点击查看详情</div>
 </div>
 </summary>
 <div class="details-wrapper">
