@@ -2191,8 +2191,23 @@ def show_homepage():
         }}
       }});
       
-      // 翻译星期表头（thead 中的 th 或 div）
-      const weekHeaders = popover.querySelectorAll('thead th, thead div, [role="columnheader"]');
+      // 翻译星期表头 - 多种选择器尝试
+      // 方法1：直接查找 thead 中的所有元素
+      const thead = popover.querySelector('thead');
+      if(thead){{
+        const allElements = thead.querySelectorAll('*');
+        allElements.forEach(el => {{
+          if(el.children.length === 0){{ // 只处理叶子节点
+            let text = (el.textContent || '').trim();
+            if(weekdayMap[text]){{
+              el.textContent = weekdayMap[text];
+            }}
+          }}
+        }});
+      }}
+      
+      // 方法2：查找所有可能的星期表头元素
+      const weekHeaders = popover.querySelectorAll('[role="columnheader"], th, [aria-label*="day"]');
       weekHeaders.forEach(header => {{
         let text = (header.textContent || '').trim();
         if(weekdayMap[text]){{
@@ -2200,13 +2215,27 @@ def show_homepage():
         }}
       }});
       
-      // 也查找表格头部行中的单元格
+      // 方法3：直接替换表格第一行
       const table = popover.querySelector('table');
       if(table){{
-        const headerRow = table.querySelector('thead tr') || table.querySelector('tr');
-        if(headerRow){{
-          const cells = headerRow.querySelectorAll('th, td, div');
+        const firstRow = table.querySelector('tr');
+        if(firstRow){{
+          const cells = firstRow.querySelectorAll('th, td');
           cells.forEach(cell => {{
+            // 递归查找最内层的文本节点
+            function replaceText(node){{
+              if(node.nodeType === 3){{ // 文本节点
+                let text = node.textContent.trim();
+                if(weekdayMap[text]){{
+                  node.textContent = weekdayMap[text];
+                }}
+              }}else{{
+                node.childNodes.forEach(child => replaceText(child));
+              }}
+            }}
+            replaceText(cell);
+            
+            // 也直接检查单元格文本
             let text = (cell.textContent || '').trim();
             if(weekdayMap[text]){{
               cell.textContent = weekdayMap[text];
@@ -2214,6 +2243,16 @@ def show_homepage():
           }});
         }}
       }}
+      
+      // 方法4：查找带有特定 class 的 div（baseui 可能使用 div 而不是 th）
+      const dayDivs = popover.querySelectorAll('div');
+      dayDivs.forEach(div => {{
+        let text = (div.textContent || '').trim();
+        // 只匹配纯星期缩写（两个字母）
+        if(text.length <= 3 && weekdayMap[text]){{
+          div.textContent = weekdayMap[text];
+        }}
+      }});
     }});
     
     // 也检查独立的下拉菜单（可能在 popover 外部）
