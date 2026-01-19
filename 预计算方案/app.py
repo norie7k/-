@@ -2138,9 +2138,10 @@ def show_homepage():
                                 on_change=on_homepage_date_change,
                             )
 
-                        # JavaScript禁用不可用日期
+                        # JavaScript禁用不可用日期 - 使用 components.html
                         available_dates_js = json.dumps(available_dates)
-                        disable_dates_js = f"""
+                        
+                        components.html(f"""
 <script>
 (function(){{
   const availableDates = {available_dates_js};
@@ -2254,8 +2255,7 @@ def show_homepage():
   }}, 500);
 }})();
 </script>
-"""
-                        st.markdown(disable_dates_js, unsafe_allow_html=True)
+""", height=0)
 
                         selected_date = selected_date_obj.strftime("%Y-%m-%d")
                         if selected_date in available_dates:
