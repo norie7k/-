@@ -2160,6 +2160,84 @@ def show_homepage():
     'Mon': '一', 'Tue': '二', 'Wed': '三', 'Thu': '四', 'Fri': '五', 'Sat': '六', 'Sun': '日'
   }};
   
+  // 月份英文到数字的映射（含缩写）
+  const monthIndexMap = {{
+    'January': '01', 'Jan': '01',
+    'February': '02', 'Feb': '02',
+    'March': '03', 'Mar': '03',
+    'April': '04', 'Apr': '04',
+    'May': '05',
+    'June': '06', 'Jun': '06',
+    'July': '07', 'Jul': '07',
+    'August': '08', 'Aug': '08',
+    'September': '09', 'Sep': '09',
+    'October': '10', 'Oct': '10',
+    'November': '11', 'Nov': '11',
+    'December': '12', 'Dec': '12'
+  }};
+  
+  function parseDateFromAria(label){{
+    const match = label.match(/(January|February|March|April|May|June|July|August|September|October|November|December|Jan|Feb|Mar|Apr|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\\s+(\\d{{1,2}}),?\\s*(\\d{{4}})/);
+    if(!match) return null;
+    const month = monthIndexMap[match[1]];
+    const day = String(match[2]).padStart(2, '0');
+    const year = match[3];
+    if(!month) return null;
+    return `${{year}}-${{month}}-${{day}}`;
+  }}
+  
+  // 月份英文到数字的映射（含缩写）
+  const monthIndexMap = {{
+    'January': '01', 'Jan': '01',
+    'February': '02', 'Feb': '02',
+    'March': '03', 'Mar': '03',
+    'April': '04', 'Apr': '04',
+    'May': '05',
+    'June': '06', 'Jun': '06',
+    'July': '07', 'Jul': '07',
+    'August': '08', 'Aug': '08',
+    'September': '09', 'Sep': '09',
+    'October': '10', 'Oct': '10',
+    'November': '11', 'Nov': '11',
+    'December': '12', 'Dec': '12'
+  }};
+  
+  function parseDateFromAria(label){{
+    const match = label.match(/(January|February|March|April|May|June|July|August|September|October|November|December|Jan|Feb|Mar|Apr|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\\s+(\\d{{1,2}}),?\\s*(\\d{{4}})/);
+    if(!match) return null;
+    const month = monthIndexMap[match[1]];
+    const day = String(match[2]).padStart(2, '0');
+    const year = match[3];
+    if(!month) return null;
+    return `${{year}}-${{month}}-${{day}}`;
+  }}
+  
+  // 月份英文到数字的映射（含缩写）
+  const monthIndexMap = {{
+    'January': '01', 'Jan': '01',
+    'February': '02', 'Feb': '02',
+    'March': '03', 'Mar': '03',
+    'April': '04', 'Apr': '04',
+    'May': '05',
+    'June': '06', 'Jun': '06',
+    'July': '07', 'Jul': '07',
+    'August': '08', 'Aug': '08',
+    'September': '09', 'Sep': '09',
+    'October': '10', 'Oct': '10',
+    'November': '11', 'Nov': '11',
+    'December': '12', 'Dec': '12'
+  }};
+  
+  function parseDateFromAria(label){{
+    const match = label.match(/(January|February|March|April|May|June|July|August|September|October|November|December|Jan|Feb|Mar|Apr|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\\s+(\\d{{1,2}}),?\\s*(\\d{{4}})/);
+    if(!match) return null;
+    const month = monthIndexMap[match[1]];
+    const day = String(match[2]).padStart(2, '0');
+    const year = match[3];
+    if(!month) return null;
+    return `${{year}}-${{month}}-${{day}}`;
+  }}
+  
   // 将日历翻译为中文（月份+星期）
   function translateMonthToChinese(){{
     const parentDoc = window.parent.document;
@@ -2278,6 +2356,35 @@ def show_homepage():
     // 先翻译月份
     translateMonthToChinese();
     if(!popover) return;
+    
+    // 优先使用 aria-label 解析日期（BaseWeb 日历通常包含完整日期）
+    const ariaButtons = popover.querySelectorAll('button[aria-label]');
+    let handledByAria = false;
+    ariaButtons.forEach(button => {{
+      const label = button.getAttribute('aria-label') || '';
+      const dateStr = parseDateFromAria(label);
+      if(!dateStr) return;
+      handledByAria = true;
+      
+      if(!availableDates.includes(dateStr)){{
+        button.disabled = true;
+        button.setAttribute('aria-disabled','true');
+        button.style.color = '#666666';
+        button.style.backgroundColor = '#2a2a2a';
+        button.style.cursor = 'not-allowed';
+        button.style.pointerEvents = 'none';
+        button.classList.add('date-disabled');
+      }} else {{
+        button.disabled = false;
+        button.removeAttribute('aria-disabled');
+        button.style.color = '';
+        button.style.backgroundColor = '';
+        button.style.cursor = '';
+        button.style.pointerEvents = 'auto';
+        button.classList.remove('date-disabled');
+      }}
+    }});
+    if(handledByAria) return;
     const table = popover.querySelector('table');
     if(!table) return;
     
@@ -2879,6 +2986,35 @@ def main():
     
     // 先翻译日历
     translateCalendar();
+    
+    // 优先使用 aria-label 解析日期（BaseWeb 日历通常包含完整日期）
+    const ariaButtons = popover.querySelectorAll('button[aria-label]');
+    let handledByAria = false;
+    ariaButtons.forEach(button => {{
+      const label = button.getAttribute('aria-label') || '';
+      const dateStr = parseDateFromAria(label);
+      if(!dateStr) return;
+      handledByAria = true;
+      
+      if(!availableDates.includes(dateStr)) {{
+        button.disabled = true;
+        button.setAttribute('aria-disabled','true');
+        button.style.color = '#666666';
+        button.style.backgroundColor = '#2a2a2a';
+        button.style.cursor = 'not-allowed';
+        button.style.pointerEvents = 'none';
+        button.classList.add('date-disabled');
+      }} else {{
+        button.disabled = false;
+        button.removeAttribute('aria-disabled');
+        button.style.color = '';
+        button.style.backgroundColor = '';
+        button.style.cursor = '';
+        button.style.pointerEvents = 'auto';
+        button.classList.remove('date-disabled');
+      }}
+    }});
+    if(handledByAria) return;
     
     const table = popover.querySelector('table');
     if(!table) return;
