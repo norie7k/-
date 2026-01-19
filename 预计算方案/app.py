@@ -2140,7 +2140,7 @@ def show_homepage():
 
                         # JavaScript禁用不可用日期 + 月份中文化 - 使用 components.html
                         available_dates_js = json.dumps(available_dates)
-                        
+
                         components.html(f"""
 <script>
 (function(){{
@@ -2279,17 +2279,17 @@ def show_homepage():
   function disableUnavailableDates(){{
     const parentDoc = window.parent.document;
     const popover = parentDoc.querySelector('div[data-baseweb="popover"]');
-    
+
     // 先翻译月份
     translateMonthToChinese();
     if(!popover) return;
-    
+
     const table = popover.querySelector('table');
     if(!table) return;
-    
+
     let currentYear = null;
     let currentMonth = null;
-    
+
     const headerButtons = popover.querySelectorAll('button[role="combobox"]');
     headerButtons.forEach(btn => {{
       const text = (btn.textContent || btn.getAttribute('aria-label') || '').trim();
@@ -2303,9 +2303,9 @@ def show_homepage():
         }}
       }}
     }});
-    
+
     if(currentYear === null || currentMonth === null){{
-      const dateInput = document.querySelector('input[type="date"]') || 
+      const dateInput = document.querySelector('input[type="date"]') ||
                         document.querySelector('input[aria-label*="日期"]') ||
                         document.querySelector('input[aria-label*="Date"]');
       if(dateInput && dateInput.value){{
@@ -2319,10 +2319,10 @@ def show_homepage():
       if(currentYear === null) currentYear = now.getFullYear();
       if(currentMonth === null) currentMonth = now.getMonth();
     }}
-    
+
     const tbody = table.querySelector('tbody');
     if(!tbody) return;
-    
+
     const dateButtons = tbody.querySelectorAll('button');
     dateButtons.forEach(button => {{
       let dayText = button.textContent.trim();
@@ -2330,18 +2330,19 @@ def show_homepage():
       if(button.dataset.originalText) dayText = button.dataset.originalText;
       const day = parseInt(dayText);
       if(isNaN(day) || day<1 || day>31) return;
-      
+
       const dateStr = `${{currentYear}}-${{String(currentMonth+1).padStart(2,'0')}}-${{String(day).padStart(2,'0')}}`;
-      
+
       if(!availableDates.includes(dateStr)){{
         // 没有数据的日期：灰色显示且不可选
         if(!button.dataset.originalText) button.dataset.originalText = dayText;
         button.disabled = true;
         button.setAttribute('aria-disabled','true');
-        button.style.color = '#666666';  // 灰色文字
-        button.style.backgroundColor = '#2a2a2a';  // 深灰色背景
+        button.style.color = '#64748b';
+        button.style.backgroundColor = 'rgba(15, 23, 42, 0.3)';
         button.style.cursor = 'not-allowed';
         button.style.pointerEvents = 'none';
+        button.style.opacity = '0.4';
         button.classList.add('date-disabled');
         button.textContent = dayText;
       }}else{{
@@ -2352,6 +2353,7 @@ def show_homepage():
         button.style.backgroundColor = '';
         button.style.cursor = '';
         button.style.pointerEvents = 'auto';
+        button.style.opacity = '';
         button.classList.remove('date-disabled');
         if(button.dataset.originalText){{
           button.textContent = button.dataset.originalText;
@@ -2364,25 +2366,31 @@ def show_homepage():
   const parentDoc = window.parent.document;
   const observer = new MutationObserver(function(){{
     const hasPopover = parentDoc.querySelector('div[data-baseweb="popover"]');
-    if(hasPopover) disableUnavailableDates();
+    if(hasPopover){{
+      translateMonthToChinese();
+      disableUnavailableDates();
+    }}
   }});
   observer.observe(parentDoc.body, {{ childList:true, subtree:true }});
-  
+
+  // 监听点击事件，在日历打开时立即禁用
   parentDoc.addEventListener('click', function(e){{
     const t = e.target;
     if(t.closest('[data-baseweb="popover"]') ||
        t.closest('input[type="date"]') ||
        t.closest('button[aria-label*="date"]') ||
        t.closest('button[role="combobox"]')){{
-      setTimeout(disableUnavailableDates, 60);
-      setTimeout(disableUnavailableDates, 250);
+      setTimeout(disableUnavailableDates, 10);
+      setTimeout(disableUnavailableDates, 50);
+      setTimeout(disableUnavailableDates, 150);
     }}
   }}, true);
-  
-  setTimeout(disableUnavailableDates, 80);
+
+  // 初始化
+  setTimeout(disableUnavailableDates, 100);
   setTimeout(disableUnavailableDates, 300);
-  
-  // 定期检查并翻译月份 + 禁用日期
+
+  // 定期检查并翻译月份 + 禁用日期（增加频率）
   setInterval(function(){{
     const parentDoc = window.parent.document;
     const popover = parentDoc.querySelector('div[data-baseweb="popover"]');
@@ -2390,13 +2398,13 @@ def show_homepage():
       translateMonthToChinese();
       disableUnavailableDates();
     }}
-  }}, 100);
-  
+  }}, 50);
+
   // 监听所有点击，在下拉菜单打开时翻译
   parentDoc.addEventListener('click', function(){{
+    setTimeout(translateMonthToChinese, 10);
     setTimeout(translateMonthToChinese, 50);
     setTimeout(translateMonthToChinese, 150);
-    setTimeout(translateMonthToChinese, 300);
   }});
 }})();
 </script>
@@ -2927,6 +2935,7 @@ def main():
     const dateButtons = tbody.querySelectorAll('button');
     dateButtons.forEach(button => {{
       let dayText = button.textContent.trim();
+      dayText = dayText.replace(/🚫/g,'').replace(/\\s+/g,'').trim();
       if(button.dataset.originalText) dayText = button.dataset.originalText;
       const day = parseInt(dayText);
       if(isNaN(day) || day<1 || day>31) return;
@@ -2937,10 +2946,11 @@ def main():
         if(!button.dataset.originalText) button.dataset.originalText = dayText;
         button.disabled = true;
         button.setAttribute('aria-disabled','true');
-        button.style.color = '#666666';
-        button.style.backgroundColor = '#2a2a2a';
+        button.style.color = '#64748b';
+        button.style.backgroundColor = 'rgba(15, 23, 42, 0.3)';
         button.style.cursor = 'not-allowed';
         button.style.pointerEvents = 'none';
+        button.style.opacity = '0.4';
         button.classList.add('date-disabled');
         button.textContent = dayText;
       }} else {{
@@ -2950,6 +2960,7 @@ def main():
         button.style.backgroundColor = '';
         button.style.cursor = '';
         button.style.pointerEvents = 'auto';
+        button.style.opacity = '';
         button.classList.remove('date-disabled');
         if(button.dataset.originalText){{
           button.textContent = button.dataset.originalText;
@@ -2970,11 +2981,15 @@ def main():
   observer.observe(parentDoc.body, {{ childList:true, subtree:true }});
 
   parentDoc.addEventListener('click', function(e){{
+    setTimeout(translateCalendar, 10);
     setTimeout(translateCalendar, 50);
-    setTimeout(translateCalendar, 150);
-    setTimeout(disableUnavailableDates, 60);
-    setTimeout(disableUnavailableDates, 250);
+    setTimeout(disableUnavailableDates, 10);
+    setTimeout(disableUnavailableDates, 50);
+    setTimeout(disableUnavailableDates, 150);
   }});
+
+  setTimeout(disableUnavailableDates, 100);
+  setTimeout(disableUnavailableDates, 300);
 
   setInterval(function(){{
     const parentDoc = window.parent.document;
@@ -2983,7 +2998,7 @@ def main():
       translateCalendar();
       disableUnavailableDates();
     }}
-  }}, 100);
+  }}, 50);
 }})();
 </script>
 """, height=0)
