@@ -2196,29 +2196,25 @@ def show_homepage():
       const dateStr = `${{currentYear}}-${{String(currentMonth+1).padStart(2,'0')}}-${{String(day).padStart(2,'0')}}`;
       
       if(!availableDates.includes(dateStr)){{
+        // 没有数据的日期：灰色显示且不可选
         if(!button.dataset.originalText) button.dataset.originalText = dayText;
         button.disabled = true;
         button.setAttribute('aria-disabled','true');
-        button.style.opacity = '0.4';
+        button.style.color = '#666666';  // 灰色文字
+        button.style.backgroundColor = '#2a2a2a';  // 深灰色背景
+        button.style.cursor = 'not-allowed';
         button.style.pointerEvents = 'none';
         button.classList.add('date-disabled');
-        
-        const existingIcon = button.querySelector('.date-disabled-icon');
-        if(existingIcon) existingIcon.remove();
-        const icon = document.createElement('span');
-        icon.className = 'date-disabled-icon';
-        icon.textContent = '🚫';
-        icon.style.cssText = 'font-size:12px;margin-left:3px;vertical-align:middle;display:inline-block;';
-        button.innerHTML = button.dataset.originalText + ' ' + icon.outerHTML;
+        button.textContent = dayText;
       }}else{{
+        // 有数据的日期：正常显示
         button.disabled = false;
         button.removeAttribute('aria-disabled');
-        button.style.opacity = '1';
+        button.style.color = '';
+        button.style.backgroundColor = '';
+        button.style.cursor = '';
         button.style.pointerEvents = 'auto';
         button.classList.remove('date-disabled');
-        
-        const icon = button.querySelector('.date-disabled-icon');
-        if(icon) icon.remove();
         if(button.dataset.originalText){{
           button.textContent = button.dataset.originalText;
           delete button.dataset.originalText;
