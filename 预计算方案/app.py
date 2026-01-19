@@ -2157,31 +2157,48 @@ def show_homepage():
   // 将月份名称改为中文
   function translateMonthToChinese(){{
     const parentDoc = window.parent.document;
-    const popover = parentDoc.querySelector('div[data-baseweb="popover"]');
-    if(!popover) return;
     
-    // 查找月份按钮
-    const buttons = popover.querySelectorAll('button[role="combobox"]');
-    buttons.forEach(btn => {{
-      let text = btn.textContent || '';
-      for(const [en, cn] of Object.entries(monthMap)){{
-        if(text.includes(en)){{
-          btn.textContent = text.replace(en, cn);
-          break;
+    // 查找所有 popover（包括嵌套的下拉菜单）
+    const popovers = parentDoc.querySelectorAll('div[data-baseweb="popover"]');
+    popovers.forEach(popover => {{
+      // 查找月份按钮
+      const buttons = popover.querySelectorAll('button');
+      buttons.forEach(btn => {{
+        let text = btn.textContent || '';
+        for(const [en, cn] of Object.entries(monthMap)){{
+          if(text.includes(en) && !text.includes(cn)){{
+            btn.textContent = text.replace(en, cn);
+            break;
+          }}
         }}
-      }}
+      }});
+      
+      // 查找下拉菜单中的月份选项（ul/li 结构）
+      const listItems = popover.querySelectorAll('ul li, [role="listbox"] [role="option"], [role="option"]');
+      listItems.forEach(item => {{
+        let text = item.textContent || '';
+        for(const [en, cn] of Object.entries(monthMap)){{
+          if(text.includes(en) && !text.includes(cn)){{
+            item.textContent = text.replace(en, cn);
+            break;
+          }}
+        }}
+      }});
     }});
     
-    // 查找下拉菜单中的月份选项
-    const listboxes = popover.querySelectorAll('[role="listbox"] [role="option"]');
-    listboxes.forEach(option => {{
-      let text = option.textContent || '';
-      for(const [en, cn] of Object.entries(monthMap)){{
-        if(text.includes(en)){{
-          option.textContent = text.replace(en, cn);
-          break;
+    // 也检查独立的下拉菜单（可能在 popover 外部）
+    const menus = parentDoc.querySelectorAll('[role="listbox"], [data-baseweb="menu"], [data-baseweb="select"]');
+    menus.forEach(menu => {{
+      const options = menu.querySelectorAll('[role="option"], li');
+      options.forEach(option => {{
+        let text = option.textContent || '';
+        for(const [en, cn] of Object.entries(monthMap)){{
+          if(text.includes(en) && !text.includes(cn)){{
+            option.textContent = text.replace(en, cn);
+            break;
+          }}
         }}
-      }}
+      }});
     }});
   }}
   
@@ -2289,11 +2306,23 @@ def show_homepage():
   
   setTimeout(disableUnavailableDates, 80);
   setTimeout(disableUnavailableDates, 300);
+  
+  // 定期检查并翻译月份 + 禁用日期
   setInterval(function(){{
     const parentDoc = window.parent.document;
     const popover = parentDoc.querySelector('div[data-baseweb="popover"]');
-    if(popover && popover.style.display !== 'none') disableUnavailableDates();
-  }}, 500);
+    if(popover && popover.style.display !== 'none'){{
+      translateMonthToChinese();
+      disableUnavailableDates();
+    }}
+  }}, 100);
+  
+  // 监听所有点击，在下拉菜单打开时翻译
+  parentDoc.addEventListener('click', function(){{
+    setTimeout(translateMonthToChinese, 50);
+    setTimeout(translateMonthToChinese, 150);
+    setTimeout(translateMonthToChinese, 300);
+  }});
 }})();
 </script>
 """, height=0)
