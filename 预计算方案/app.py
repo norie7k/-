@@ -2002,10 +2002,10 @@ def show_homepage():
                     key="homepage_group_daily",
                 )
 
-            # 加载日期列表
-            with st.spinner("加载可用日期..."):
-                index = load_index(selected_group_daily)
-                available_dates = index.get("available_dates", [])
+                # 加载日期列表
+                with st.spinner("加载可用日期..."):
+                    index = load_index(selected_group_daily)
+                    available_dates = index.get("available_dates", [])
 
             with col_date:
                 if available_dates:
@@ -2452,17 +2452,65 @@ def main():
         # 更新用户选择的社群缓存
         st.session_state.selected_group_cache = selected_group_key
         
-        # 使用确认的社群来加载日期列表（用于显示）
-        # 但侧边栏的日期列表还是要显示当前选择社群的日期，方便用户查看
+        # 使用确认的社群来加载列表（用于显示）
         display_group_key = selected_group_key
 
         st.markdown("---")
 
+        # 获取当前查询类型
+        current_query_type = st.session_state.get("query_type", "daily")
+
         with st.spinner("加载数据列表..."):
             index = load_index(display_group_key)
-            available_dates = index.get("available_dates", [])
+            
+            if current_query_type == "version":
+                # 版本查询：显示版本列表
+                available_versions = index.get("available_versions", [])
+            else:
+                # 每日查询：显示日期列表
+                available_dates = index.get("available_dates", [])
 
-        if available_dates:
+        # 根据查询类型显示不同的选择器
+        if current_query_type == "version":
+            # ===== 版本查询：显示版本选择器 =====
+            if available_versions:
+                st.success(f"✅ 共有 {len(available_versions)} 个版本")
+                
+                # 初始化 confirmed_version（首次进入或从主页进入）
+                if "confirmed_version" not in st.session_state:
+                    if "selected_version_homepage" in st.session_state:
+                        st.session_state.confirmed_version = st.session_state.selected_version_homepage
+                    else:
+                        st.session_state.confirmed_version = available_versions[0] if available_versions else ""
+                
+                # 使用主页选择的版本或确认的版本作为默认值
+                default_version_index = 0
+                if st.session_state.get("confirmed_version") in available_versions:
+                    try:
+                        default_version_index = available_versions.index(st.session_state.confirmed_version)
+                    except:
+                        pass
+                elif "selected_version_homepage" in st.session_state:
+                    try:
+                        default_version_index = available_versions.index(st.session_state.selected_version_homepage)
+                    except:
+                        pass
+                
+                selected_version = st.selectbox(
+                    "选择版本",
+                    options=available_versions,
+                    index=default_version_index,
+                    help="选择要查看的测试版本"
+                )
+                
+                # 更新版本缓存
+                st.session_state.selected_version_cache = selected_version
+            else:
+                st.warning("⚠️ 该社群暂无版本数据")
+                selected_version = None
+        
+        elif available_dates:
+            # ===== 每日查询：显示日期选择器 =====
             st.success(f"✅ 共有 {len(available_dates)} 天的数据")
 
             # 转 date 对象
@@ -2764,9 +2812,15 @@ def main():
                 st.info(f"📅 已选择 {'、'.join(hint_parts)}，点击下方按钮加载数据")
 
         if st.button("🔄 刷新数据", use_container_width=True):
-            # 将选择的社群和日期确认为要加载的
+            # 将选择的社群确认为要加载的
             st.session_state.confirmed_group = st.session_state.get("selected_group_cache", "")
-            st.session_state.confirmed_date = st.session_state.get("selected_date_cache", "")
+            
+            # 根据查询类型确认不同的数据
+            if current_query_type == "version":
+                st.session_state.confirmed_version = st.session_state.get("selected_version_cache", "")
+            else:
+                st.session_state.confirmed_date = st.session_state.get("selected_date_cache", "")
+            
             st.cache_data.clear()
             _set_nonce()
             st.rerun()
@@ -2781,32 +2835,40 @@ def main():
     query_type = st.session_state.get("query_type", "daily")
     
     if query_type == "version":
-        # 版本查询
-        selected_version = st.session_state.get("selected_version_homepage", "")
-        selected_group_version = st.session_state.get("selected_group_homepage", "")
+        # 版本查询 - 使用确认的社群和版本
+        confirmed_version = st.session_state.get("confirmed_version", "")
+        confirmed_group_version = st.session_state.get("confirmed_group", "")
         
-        if selected_version and selected_group_version:
+        # 如果没有确认的版本，尝试使用主页选择的版本（首次进入）
+        if not confirmed_version:
+            confirmed_version = st.session_state.get("selected_version_homepage", "")
+            confirmed_group_version = st.session_state.get("selected_group_homepage", "")
+        
+        if confirmed_version and confirmed_group_version:
             with st.spinner(f"正在加载版本数据..."):
-                version_result = load_version_result(selected_group_version, selected_version)
+                version_result = load_version_result(confirmed_group_version, confirmed_version)
             
             if version_result:
-                render_version_result(version_result, selected_group_version)
+                render_version_result(version_result, confirmed_group_version)
             else:
-                st.error(f"❌ 该版本的数据待上传")
+                st.error(f"❌ 版本 {confirmed_version} 的数据待上传")
         else:
-            st.info("👈 请返回主页选择社群和版本")
-    elif selected_date:
-        # 日常查询 - 使用确认的社群和日期
-        confirmed_group_for_load = st.session_state.get("confirmed_group", selected_group_key)
-        with st.spinner(f"正在加载 {selected_date} 的数据..."):
-            result = load_result(confirmed_group_for_load, selected_date)
-
-        if result:
-            render_result(result, confirmed_group_for_load)
-        else:
-            st.error(f"❌  {selected_date} 的数据待上传")
+            st.info("👈 请在侧边栏选择社群和版本")
     else:
-        st.info("👈 请在侧边栏选择社群和日期")
+        # 每日查询 - 使用确认的社群和日期
+        confirmed_group_for_load = st.session_state.get("confirmed_group", selected_group_key)
+        confirmed_date = st.session_state.get("confirmed_date", "")
+        
+        if confirmed_date:
+            with st.spinner(f"正在加载 {confirmed_date} 的数据..."):
+                result = load_result(confirmed_group_for_load, confirmed_date)
+
+            if result:
+                render_result(result, confirmed_group_for_load)
+            else:
+                st.error(f"❌  {confirmed_date} 的数据待上传")
+        else:
+            st.info("👈 请在侧边栏选择社群和日期")
 
 if __name__ == "__main__":
     main()
