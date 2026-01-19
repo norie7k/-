@@ -2154,7 +2154,13 @@ def show_homepage():
     'September': '九月', 'October': '十月', 'November': '十一月', 'December': '十二月'
   }};
   
-  // 将月份名称改为中文
+  // 星期英文到中文的映射
+  const weekdayMap = {{
+    'Mo': '一', 'Tu': '二', 'We': '三', 'Th': '四', 'Fr': '五', 'Sa': '六', 'Su': '日',
+    'Mon': '一', 'Tue': '二', 'Wed': '三', 'Thu': '四', 'Fri': '五', 'Sat': '六', 'Sun': '日'
+  }};
+  
+  // 将日历翻译为中文（月份+星期）
   function translateMonthToChinese(){{
     const parentDoc = window.parent.document;
     
@@ -2184,6 +2190,30 @@ def show_homepage():
           }}
         }}
       }});
+      
+      // 翻译星期表头（thead 中的 th 或 div）
+      const weekHeaders = popover.querySelectorAll('thead th, thead div, [role="columnheader"]');
+      weekHeaders.forEach(header => {{
+        let text = (header.textContent || '').trim();
+        if(weekdayMap[text]){{
+          header.textContent = weekdayMap[text];
+        }}
+      }});
+      
+      // 也查找表格头部行中的单元格
+      const table = popover.querySelector('table');
+      if(table){{
+        const headerRow = table.querySelector('thead tr') || table.querySelector('tr');
+        if(headerRow){{
+          const cells = headerRow.querySelectorAll('th, td, div');
+          cells.forEach(cell => {{
+            let text = (cell.textContent || '').trim();
+            if(weekdayMap[text]){{
+              cell.textContent = weekdayMap[text];
+            }}
+          }});
+        }}
+      }}
     }});
     
     // 也检查独立的下拉菜单（可能在 popover 外部）
