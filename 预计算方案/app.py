@@ -1144,6 +1144,37 @@ def load_result(group_id: str, date: str) -> dict:
         return {}
 
 @st.cache_data(ttl=300, show_spinner=False)
+def load_version_info(group_id: str, version_key: str) -> dict:
+    """快速加载版本的基本信息（名称和周期）用于显示"""
+    group = GROUPS.get(group_id)
+    if not group:
+        return {"version": version_key, "period": ""}
+
+    local_path = LOCAL_RESULTS_DIR / group["dir"] / "version" / f"{version_key}.json"
+    if local_path.exists():
+        try:
+            with open(local_path, "r", encoding="utf-8") as f:
+                data = json.load(f)
+                return {
+                    "version": data.get("version", version_key),
+                    "period": data.get("period", "")
+                }
+        except:
+            pass
+
+    try:
+        url = f"{GITHUB_RAW_BASE}/{group['dir']}/version/{version_key}.json"
+        data = fetch_json(url)
+        if data:
+            return {
+                "version": data.get("version", version_key),
+                "period": data.get("period", "")
+            }
+    except:
+        pass
+    
+    return {"version": version_key, "period": ""}
+
 def load_version_result(group_id: str, version_key: str) -> dict:
     """加载版本分析数据"""
     group = GROUPS.get(group_id)
@@ -2476,6 +2507,20 @@ def main():
             if available_versions:
                 st.success(f"✅ 共有 {len(available_versions)} 个版本")
                 
+                # 加载每个版本的详细信息
+                version_display_map = {}
+                for v_key in available_versions:
+                    v_info = load_version_info(display_group_key, v_key)
+                    version_name = v_info.get("version", v_key)
+                    period = v_info.get("period", "")
+                    # 格式化显示：beta15_旋转木马测试（2025-12-03~2025-12-17）
+                    if period:
+                        # 移除空格，使用中文括号和波浪号
+                        period_formatted = period.replace(" ", "").replace("~", "~")
+                        version_display_map[v_key] = f"{version_name}（{period_formatted}）"
+                    else:
+                        version_display_map[v_key] = version_name
+                
                 # 初始化 confirmed_version（首次进入或从主页进入）
                 if "confirmed_version" not in st.session_state:
                     if "selected_version_homepage" in st.session_state:
@@ -2499,6 +2544,7 @@ def main():
                 selected_version = st.selectbox(
                     "选择版本",
                     options=available_versions,
+                    format_func=lambda x: version_display_map.get(x, x),
                     index=default_version_index,
                     help="选择要查看的测试版本"
                 )
