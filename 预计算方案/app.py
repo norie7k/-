@@ -2138,7 +2138,7 @@ def show_homepage():
                                 on_change=on_homepage_date_change,
                             )
 
-                        # JavaScript禁用不可用日期 - 使用 components.html
+                        # JavaScript禁用不可用日期 + 月份中文化 - 使用 components.html
                         available_dates_js = json.dumps(available_dates)
                         
                         components.html(f"""
@@ -2147,9 +2147,50 @@ def show_homepage():
   const availableDates = {available_dates_js};
   console.log('主页可用日期列表:', availableDates);
   
+  // 月份英文到中文的映射
+  const monthMap = {{
+    'January': '一月', 'February': '二月', 'March': '三月', 'April': '四月',
+    'May': '五月', 'June': '六月', 'July': '七月', 'August': '八月',
+    'September': '九月', 'October': '十月', 'November': '十一月', 'December': '十二月'
+  }};
+  
+  // 将月份名称改为中文
+  function translateMonthToChinese(){{
+    const parentDoc = window.parent.document;
+    const popover = parentDoc.querySelector('div[data-baseweb="popover"]');
+    if(!popover) return;
+    
+    // 查找月份按钮
+    const buttons = popover.querySelectorAll('button[role="combobox"]');
+    buttons.forEach(btn => {{
+      let text = btn.textContent || '';
+      for(const [en, cn] of Object.entries(monthMap)){{
+        if(text.includes(en)){{
+          btn.textContent = text.replace(en, cn);
+          break;
+        }}
+      }}
+    }});
+    
+    // 查找下拉菜单中的月份选项
+    const listboxes = popover.querySelectorAll('[role="listbox"] [role="option"]');
+    listboxes.forEach(option => {{
+      let text = option.textContent || '';
+      for(const [en, cn] of Object.entries(monthMap)){{
+        if(text.includes(en)){{
+          option.textContent = text.replace(en, cn);
+          break;
+        }}
+      }}
+    }});
+  }}
+  
   function disableUnavailableDates(){{
     const parentDoc = window.parent.document;
     const popover = parentDoc.querySelector('div[data-baseweb="popover"]');
+    
+    // 先翻译月份
+    translateMonthToChinese();
     if(!popover) return;
     const table = popover.querySelector('table');
     if(!table) return;
