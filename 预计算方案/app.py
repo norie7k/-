@@ -2096,10 +2096,6 @@ def show_homepage():
                                 st.session_state.homepage_date_cache = selected_date_str_check
                                 st.session_state.homepage_need_date_correction = False
 
-                        date_help_text = "选择需要查看的日期"
-                        if available_dates:
-                            date_help_text = f"已有数据日期：{'、'.join(available_dates)}"
-
                         if st.session_state.get("homepage_need_date_correction", False):
                             corrected_date = datetime.strptime(
                                 st.session_state.homepage_valid_date_selected, "%Y-%m-%d"
@@ -2109,7 +2105,7 @@ def show_homepage():
                                 value=corrected_date,
                                 min_value=extended_min_date,
                                 max_value=extended_max_date,
-                                help=date_help_text,
+                                help="选择需要查看的日期",
                                 key="homepage_date_input",
                                 on_change=on_homepage_date_change,
                             )
@@ -2137,7 +2133,7 @@ def show_homepage():
                                 value=initial_date,
                                 min_value=extended_min_date,
                                 max_value=extended_max_date,
-                                help=date_help_text,
+                                help="选择需要查看的日期",
                                 key="homepage_date_input",
                                 on_change=on_homepage_date_change,
                             )
