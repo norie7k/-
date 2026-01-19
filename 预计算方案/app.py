@@ -2144,9 +2144,11 @@ def show_homepage():
 <script>
 (function(){{
   const availableDates = {available_dates_js};
+  console.log('主页可用日期列表:', availableDates);
   
   function disableUnavailableDates(){{
-    const popover = document.querySelector('div[data-baseweb="popover"]');
+    const parentDoc = window.parent.document;
+    const popover = parentDoc.querySelector('div[data-baseweb="popover"]');
     if(!popover) return;
     const table = popover.querySelector('table');
     if(!table) return;
@@ -2169,7 +2171,9 @@ def show_homepage():
     }});
     
     if(currentYear === null || currentMonth === null){{
-      const dateInput = document.querySelector('input[aria-label="监测日期"]');
+      const dateInput = document.querySelector('input[type="date"]') || 
+                        document.querySelector('input[aria-label*="日期"]') ||
+                        document.querySelector('input[aria-label*="Date"]');
       if(dateInput && dateInput.value){{
         const inputDate = new Date(dateInput.value);
         if(currentYear === null) currentYear = inputDate.getFullYear();
@@ -2223,13 +2227,14 @@ def show_homepage():
     }});
   }}
   
+  const parentDoc = window.parent.document;
   const observer = new MutationObserver(function(){{
-    const hasPopover = document.querySelector('div[data-baseweb="popover"]');
+    const hasPopover = parentDoc.querySelector('div[data-baseweb="popover"]');
     if(hasPopover) disableUnavailableDates();
   }});
-  observer.observe(document.body, {{ childList:true, subtree:true }});
+  observer.observe(parentDoc.body, {{ childList:true, subtree:true }});
   
-  document.addEventListener('click', function(e){{
+  parentDoc.addEventListener('click', function(e){{
     const t = e.target;
     if(t.closest('[data-baseweb="popover"]') ||
        t.closest('input[type="date"]') ||
@@ -2243,7 +2248,8 @@ def show_homepage():
   setTimeout(disableUnavailableDates, 80);
   setTimeout(disableUnavailableDates, 300);
   setInterval(function(){{
-    const popover = document.querySelector('div[data-baseweb="popover"]');
+    const parentDoc = window.parent.document;
+    const popover = parentDoc.querySelector('div[data-baseweb="popover"]');
     if(popover && popover.style.display !== 'none') disableUnavailableDates();
   }}, 500);
 }})();
