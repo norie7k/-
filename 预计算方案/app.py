@@ -1688,18 +1688,8 @@ def render_version_result(result: dict, group_key: str | None = None):
     st.markdown(
         f"""<div style="text-align: center; padding: 0 0 1.5rem 0; margin-top: -4rem;">
 <h1 style="margin: 0; color: #e9d5ff; font-size: 1.8rem; font-weight: 700; white-space: nowrap;">
-📊 {platform_display} {group_display}{version} ({period})分析报告
+📊 {platform_display} {group_display}{version} ({period})_热门讨论TOP{len(topics)}
 </h1>
-</div>""",
-        unsafe_allow_html=True,
-    )
-
-    # ========= 热点话题列表 =========
-    st.markdown(
-        f"""<div style="text-align: center; margin-bottom: 1.5rem;">
-<h2 style="color: #f0abfc; font-size: 1.5rem; font-weight: 700;">
-🔥 热点话题排行（共 {len(topics)} 个）
-</h2>
 </div>""",
         unsafe_allow_html=True,
     )
