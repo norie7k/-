@@ -2798,16 +2798,88 @@ def main():
                         on_change=on_date_change
                     )
 
-                # JS 禁用不可用日期
+                # JS 禁用不可用日期 + 日历中文化（侧边栏）
                 available_dates_js = json.dumps(available_dates)
-                disable_dates_js = f"""
+                
+                components.html(f"""
 <script>
 (function(){{
   const availableDates = {available_dates_js};
+  
+  // 月份和星期的中文映射
+  const monthMap = {{
+    'January': '一月', 'February': '二月', 'March': '三月', 'April': '四月',
+    'May': '五月', 'June': '六月', 'July': '七月', 'August': '八月',
+    'September': '九月', 'October': '十月', 'November': '十一月', 'December': '十二月'
+  }};
+  const weekdayMap = {{
+    'Mo': '一', 'Tu': '二', 'We': '三', 'Th': '四', 'Fr': '五', 'Sa': '六', 'Su': '日',
+    'Mon': '一', 'Tue': '二', 'Wed': '三', 'Thu': '四', 'Fri': '五', 'Sat': '六', 'Sun': '日'
+  }};
+  
+  // 翻译日历为中文
+  function translateCalendar(){{
+    const parentDoc = window.parent.document;
+    const popovers = parentDoc.querySelectorAll('div[data-baseweb="popover"]');
+    
+    popovers.forEach(popover => {{
+      // 翻译月份
+      const buttons = popover.querySelectorAll('button');
+      buttons.forEach(btn => {{
+        let text = btn.textContent || '';
+        for(const [en, cn] of Object.entries(monthMap)){{
+          if(text.includes(en) && !text.includes(cn)){{
+            btn.textContent = text.replace(en, cn);
+            break;
+          }}
+        }}
+      }});
+      
+      // 翻译下拉菜单中的月份
+      const listItems = popover.querySelectorAll('ul li, [role="option"]');
+      listItems.forEach(item => {{
+        let text = item.textContent || '';
+        for(const [en, cn] of Object.entries(monthMap)){{
+          if(text.includes(en) && !text.includes(cn)){{
+            item.textContent = text.replace(en, cn);
+            break;
+          }}
+        }}
+      }});
+      
+      // 翻译星期表头
+      const dayDivs = popover.querySelectorAll('div');
+      dayDivs.forEach(div => {{
+        let text = (div.textContent || '').trim();
+        if(text.length <= 3 && weekdayMap[text]){{
+          div.textContent = weekdayMap[text];
+        }}
+      }});
+      
+      // thead 中的星期
+      const thead = popover.querySelector('thead');
+      if(thead){{
+        const cells = thead.querySelectorAll('*');
+        cells.forEach(cell => {{
+          if(cell.children.length === 0){{
+            let text = (cell.textContent || '').trim();
+            if(weekdayMap[text]){{
+              cell.textContent = weekdayMap[text];
+            }}
+          }}
+        }});
+      }}
+    }});
+  }}
 
   function disableUnavailableDates(){{
-    const popover = document.querySelector('div[data-baseweb="popover"]');
+    const parentDoc = window.parent.document;
+    const popover = parentDoc.querySelector('div[data-baseweb="popover"]');
     if(!popover) return;
+    
+    // 先翻译日历
+    translateCalendar();
+    
     const table = popover.querySelector('table');
     if(!table) return;
 
@@ -2829,7 +2901,7 @@ def main():
     }});
 
     if(currentYear === null || currentMonth === null) {{
-      const dateInput = document.querySelector('input[type="date"]');
+      const dateInput = parentDoc.querySelector('input[type="date"]');
       if(dateInput && dateInput.value) {{
         const inputDate = new Date(dateInput.value);
         if(currentYear === null) currentYear = inputDate.getFullYear();
@@ -2848,7 +2920,6 @@ def main():
     const dateButtons = tbody.querySelectorAll('button');
     dateButtons.forEach(button => {{
       let dayText = button.textContent.trim();
-      dayText = dayText.replace(/🚫/g,'').replace(/\\s+/g,'').trim();
       if(button.dataset.originalText) dayText = button.dataset.originalText;
       const day = parseInt(dayText);
       if(isNaN(day) || day<1 || day>31) return;
@@ -2859,27 +2930,21 @@ def main():
         if(!button.dataset.originalText) button.dataset.originalText = dayText;
         button.disabled = true;
         button.setAttribute('aria-disabled','true');
-        button.style.opacity = '0.4';
+        button.style.color = '#666666';
+        button.style.backgroundColor = '#2a2a2a';
+        button.style.cursor = 'not-allowed';
         button.style.pointerEvents = 'none';
         button.classList.add('date-disabled');
-
-        const existingIcon = button.querySelector('.date-disabled-icon');
-        if(existingIcon) existingIcon.remove();
-        const icon = document.createElement('span');
-        icon.className = 'date-disabled-icon';
-        icon.textContent = '🚫';
-        icon.style.cssText = 'font-size:12px;margin-left:3px;vertical-align:middle;display:inline-block;';
-        button.innerHTML = button.dataset.originalText + ' ' + icon.outerHTML;
+        button.textContent = dayText;
       }} else {{
         button.disabled = false;
         button.removeAttribute('aria-disabled');
-        button.style.opacity = '1';
+        button.style.color = '';
+        button.style.backgroundColor = '';
+        button.style.cursor = '';
         button.style.pointerEvents = 'auto';
         button.classList.remove('date-disabled');
-
-        const icon = button.querySelector('.date-disabled-icon');
-        if(icon) icon.remove();
-        if(button.dataset.originalText) {{
+        if(button.dataset.originalText){{
           button.textContent = button.dataset.originalText;
           delete button.dataset.originalText;
         }}
@@ -2887,33 +2952,34 @@ def main():
     }});
   }}
 
+  const parentDoc = window.parent.document;
   const observer = new MutationObserver(function(){{
-    const hasPopover = document.querySelector('div[data-baseweb="popover"]');
-    if(hasPopover) disableUnavailableDates();
-  }});
-  observer.observe(document.body, {{ childList:true, subtree:true }});
-
-  document.addEventListener('click', function(e){{
-    const t = e.target;
-    if(t.closest('[data-baseweb="popover"]') ||
-       t.closest('input[type="date"]') ||
-       t.closest('button[aria-label*="date"]') ||
-       t.closest('button[role="combobox"]')) {{
-      setTimeout(disableUnavailableDates, 60);
-      setTimeout(disableUnavailableDates, 250);
+    const hasPopover = parentDoc.querySelector('div[data-baseweb="popover"]');
+    if(hasPopover){{
+      translateCalendar();
+      disableUnavailableDates();
     }}
-  }}, true);
+  }});
+  observer.observe(parentDoc.body, {{ childList:true, subtree:true }});
 
-  setTimeout(disableUnavailableDates, 80);
-  setTimeout(disableUnavailableDates, 300);
+  parentDoc.addEventListener('click', function(e){{
+    setTimeout(translateCalendar, 50);
+    setTimeout(translateCalendar, 150);
+    setTimeout(disableUnavailableDates, 60);
+    setTimeout(disableUnavailableDates, 250);
+  }});
+
   setInterval(function(){{
-    const popover = document.querySelector('div[data-baseweb="popover"]');
-    if(popover && popover.style.display !== 'none') disableUnavailableDates();
-  }}, 500);
+    const parentDoc = window.parent.document;
+    const popover = parentDoc.querySelector('div[data-baseweb="popover"]');
+    if(popover && popover.style.display !== 'none'){{
+      translateCalendar();
+      disableUnavailableDates();
+    }}
+  }}, 100);
 }})();
 </script>
-"""
-                st.markdown(disable_dates_js, unsafe_allow_html=True)
+""", height=0)
 
                 # 更新选择的日期缓存（仅用于显示用户选择了什么日期）
                 picker_date = selected_date_obj.strftime("%Y-%m-%d")
