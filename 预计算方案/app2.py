@@ -648,13 +648,13 @@ section[data-testid="stMain"] div[data-testid="stExpander"] div[role="region"]{
 .example-quote{
   background: rgba(99,102,241,.10);
   border: 1px solid rgba(99,102,241,.16);
-  padding: 6px 10px;
-  margin: 4px 0;
+  padding: 5px 10px;
+  margin: 3px 0;
   border-radius: 8px;
-  color: #dbeafe;
+  color: #c7d2fe;
   font-style: italic;
-  font-size: 1.05rem;
-  line-height: 1.6;
+  font-size: 0.88rem;
+  line-height: 1.5;
 }
 
 /* ===== 新增：观点卡片样式（V2格式）===== */
@@ -662,17 +662,18 @@ section[data-testid="stMain"] div[data-testid="stExpander"] div[role="region"]{
   background: rgba(34,211,238,.08);
   border: 1px solid rgba(34,211,238,.18);
   border-radius: 10px;
-  padding: 10px 12px;
-  margin: 8px 0;
+  padding: 12px 14px;
+  margin: 10px 0;
 }
 .opinion-card-header{
-  font-size: 0.92rem;
-  font-weight: 700;
+  font-size: 1.15rem;
+  font-weight: 800;
   color: #22d3ee;
-  margin-bottom: 8px;
+  margin-bottom: 10px;
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
+  line-height: 1.4;
 }
 .opinion-card-content{
   margin-left: 4px;
