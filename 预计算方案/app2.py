@@ -622,6 +622,30 @@ section[data-testid="stMain"] div[data-testid="stExpander"] div[role="region"]{
   background: rgba(15,23,42,.4);
   padding: 10px 12px;
 }
+
+/* ===== 讨论点直接展示样式（不折叠）===== */
+.dp-card-wrapper{
+  background: linear-gradient(145deg, rgba(236,72,153,.08), rgba(139,92,246,.05));
+  border: 1px solid rgba(236,72,153,.20);
+  border-radius: 12px;
+  margin: 10px 0;
+  overflow: hidden;
+}
+.dp-card-header-fixed{
+  background: linear-gradient(145deg, rgba(236,72,153,.15), rgba(139,92,246,.10));
+  border-bottom: 1px solid rgba(236,72,153,.18);
+  padding: 10px 14px;
+}
+.dp-card-header-fixed .dp-title{
+  font-weight: 800;
+  font-size: 1.02rem;
+  color: #fff;
+}
+.dp-content-direct{
+  background: rgba(15,23,42,.35);
+  padding: 12px 14px;
+}
+
 .dp-section-title{
   font-size: 0.82rem;
   font-weight: 700;
@@ -1360,35 +1384,18 @@ def build_discussion_point_html(dp: dict, dp_i: int, group_key: str, date: str, 
     if not dp_inner_html:
         dp_inner_html = '<p style="color: var(--muted); font-size: 0.85rem; margin: 0;">暂无详细内容</p>'
     
-    # 生成可展开的讨论点卡片
+    # 生成讨论点卡片（直接展示，不折叠）
     dp_id = f"dp-{group_key or 'g'}-{date}-{cluster_idx}-{dp_i}"
     dp_title_escaped = html.escape(dp_title) if dp_title else f"讨论点 {dp_i}"
     
-    return f'''<details class="dp-expander" id="{dp_id}">
-<summary class="dp-expander-summary">
-<div class="dp-card">
-<div class="dp-header">
+    return f'''<div class="dp-card-wrapper" id="{dp_id}">
+<div class="dp-card-header-fixed">
 <span class="dp-title">📌 {dp_i}. {dp_title_escaped}</span>
-<span class="dp-toggle-btn"><span class="expand-text">展开 ▼</span><span class="collapse-text">收起 ▲</span></span>
 </div>
-</div>
-</summary>
-<div class="dp-details-wrapper">
-<div class="dp-card-sticky">
-<div class="dp-card">
-<div class="dp-header">
-<span class="dp-title">📌 {dp_i}. {dp_title_escaped}</span>
-<span class="dp-toggle-btn"><span class="collapse-text">收起 ▲</span></span>
-</div>
-</div>
-</div>
-<div class="dp-scrollable">
-<div class="dp-content">
+<div class="dp-content-direct">
 {dp_inner_html}
 </div>
-</div>
-</div>
-</details>'''
+</div>'''
 
 
 # ==================== 渲染 ====================
