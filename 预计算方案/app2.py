@@ -118,8 +118,14 @@ section[data-testid="stSidebar"]{
 /* 禁用侧边栏收缩按钮 */
 button[data-testid="collapsedControl"],
 button[data-testid="stSidebarNavCollapseIcon"],
-div[data-testid="collapsedControl"] {
+div[data-testid="collapsedControl"],
+button[data-testid="baseButton-headerNoPadding"],
+div[data-testid="stSidebarCollapseButton"],
+section[data-testid="stSidebar"] > div > div > div > button:first-child {
   display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
 }
 /* 确保侧边栏始终展开 */
 section[data-testid="stSidebar"][aria-expanded="false"] {
@@ -280,22 +286,20 @@ section[data-testid="stSidebar"] .stAlert {
 
 /* 侧边栏返回主页按钮 */
 section[data-testid="stSidebar"] button#st-key-sidebar_back_home {
-  background: rgba(15, 23, 42, 0.9) !important;
-  border: 2px solid rgba(96, 165, 250, 0.5) !important;
-  color: #93c5fd !important;
-  padding: 0.35rem 0.5rem !important;
-  font-size: 1.1rem !important;
-  font-weight: 700 !important;
-  border-radius: 8px !important;
-  transition: all 0.25s ease !important;
+  background: transparent !important;
+  border: none !important;
+  padding: 0.3rem 0.4rem !important;
+  font-size: 1.2rem !important;
+  border-radius: 6px !important;
+  transition: all 0.2s ease !important;
   min-width: auto !important;
-  margin-top: 0.2rem !important;
+  margin-top: 0.1rem !important;
+  opacity: 0.7 !important;
 }
 section[data-testid="stSidebar"] button#st-key-sidebar_back_home:hover {
-  background: rgba(59, 130, 246, 0.25) !important;
-  border-color: rgba(96, 165, 250, 0.8) !important;
-  color: #bfdbfe !important;
-  box-shadow: 0 2px 10px rgba(59, 130, 246, 0.3) !important;
+  background: rgba(139, 92, 246, 0.15) !important;
+  opacity: 1 !important;
+  transform: scale(1.1) !important;
 }
 
 
@@ -2996,7 +3000,7 @@ def main():
             </div>
             """, unsafe_allow_html=True)
         with col_back:
-            if st.button("«", key="sidebar_back_home", help="返回主页"):
+            if st.button("🏠", key="sidebar_back_home", help="返回主页"):
                 st.session_state.show_results = False
                 st.session_state.query_type = "daily"
                 st.rerun()
