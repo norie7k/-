@@ -2223,14 +2223,13 @@ def render_version_result(result: dict, group_key: str | None = None):
 
 def render_custom_calendar(available_dates: list, current_date: str, key_prefix: str = "cal"):
     """
-    渲染自定义日历选择器
+    渲染紧凑型自定义日历选择器
     available_dates: 有数据的日期列表 (格式: YYYY-MM-DD)
     current_date: 当前选中的日期
     key_prefix: 按钮key前缀
     返回: 用户选择的日期字符串，如果没有选择则返回None
     """
     import calendar
-    from datetime import date as date_type
     
     if not available_dates:
         st.warning("暂无可用日期")
@@ -2240,7 +2239,7 @@ def render_custom_calendar(available_dates: list, current_date: str, key_prefix:
     date_set = set(available_dates)
     date_objects = [datetime.strptime(d, "%Y-%m-%d").date() for d in available_dates]
     
-    # 确定显示的月份（基于当前选中日期或最新数据日期）
+    # 确定显示的月份
     if current_date:
         try:
             display_date = datetime.strptime(current_date, "%Y-%m-%d").date()
@@ -2249,86 +2248,220 @@ def render_custom_calendar(available_dates: list, current_date: str, key_prefix:
     else:
         display_date = max(date_objects)
     
-    display_year = display_date.year
-    display_month = display_date.month
-    
-    # 月份导航
-    st.markdown("#### 📅 选择日期")
-    
-    month_col1, month_col2, month_col3 = st.columns([1, 2, 1])
+    # 检查session_state中是否有保存的显示月份
+    if f"{key_prefix}_display_year" in st.session_state:
+        display_year = st.session_state[f"{key_prefix}_display_year"]
+        display_month = st.session_state[f"{key_prefix}_display_month"]
+    else:
+        display_year = display_date.year
+        display_month = display_date.month
     
     selected_new_date = None
     
-    with month_col1:
-        # 上个月
+    # 生成日历数据
+    cal = calendar.Calendar(firstweekday=0)
+    month_days = cal.monthdayscalendar(display_year, display_month)
+    
+    # 构建日历HTML
+    weekdays = ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"]
+    
+    # 当前选中日期显示
+    display_current = current_date.replace("-", "/") if current_date else "请选择日期"
+    
+    calendar_html = f'''
+    <style>
+    .compact-calendar {{
+        background: rgba(15, 23, 42, 0.95);
+        border: 1px solid rgba(148, 163, 184, 0.2);
+        border-radius: 12px;
+        padding: 12px;
+        max-width: 280px;
+        font-family: system-ui, -apple-system, sans-serif;
+    }}
+    .cal-header {{
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 12px;
+        padding-bottom: 8px;
+        border-bottom: 1px solid rgba(148, 163, 184, 0.15);
+    }}
+    .cal-current {{
+        font-size: 0.95rem;
+        color: #e2e8f0;
+        font-weight: 500;
+    }}
+    .cal-nav {{
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 8px;
+    }}
+    .cal-nav-btn {{
+        background: transparent;
+        border: none;
+        color: #94a3b8;
+        cursor: pointer;
+        padding: 4px 8px;
+        font-size: 1rem;
+    }}
+    .cal-nav-btn:hover {{
+        color: #e2e8f0;
+    }}
+    .cal-month-year {{
+        display: flex;
+        gap: 8px;
+        align-items: center;
+    }}
+    .cal-month, .cal-year {{
+        color: #e2e8f0;
+        font-size: 0.9rem;
+        font-weight: 500;
+    }}
+    .cal-weekdays {{
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        gap: 2px;
+        margin-bottom: 4px;
+    }}
+    .cal-weekday {{
+        text-align: center;
+        font-size: 0.75rem;
+        color: #64748b;
+        padding: 4px 0;
+        font-weight: 500;
+    }}
+    .cal-days {{
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        gap: 2px;
+    }}
+    .cal-day {{
+        text-align: center;
+        padding: 6px 4px;
+        font-size: 0.85rem;
+        border-radius: 50%;
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: auto;
+    }}
+    .cal-day-empty {{
+        visibility: hidden;
+    }}
+    .cal-day-disabled {{
+        color: #334155;
+        cursor: not-allowed;
+    }}
+    .cal-day-available {{
+        color: #e2e8f0;
+        cursor: pointer;
+        transition: all 0.15s;
+    }}
+    .cal-day-available:hover {{
+        background: rgba(139, 92, 246, 0.3);
+    }}
+    .cal-day-selected {{
+        background: #8b5cf6 !important;
+        color: white !important;
+        font-weight: 600;
+    }}
+    </style>
+    <div class="compact-calendar">
+        <div class="cal-header">
+            <span class="cal-current">{display_current}</span>
+        </div>
+        <div class="cal-weekdays">
+            {"".join([f'<div class="cal-weekday">{d}</div>' for d in weekdays])}
+        </div>
+        <div class="cal-days">
+    '''
+    
+    for week in month_days:
+        for day in week:
+            if day == 0:
+                calendar_html += '<div class="cal-day cal-day-empty"></div>'
+            else:
+                date_str = f"{display_year}-{display_month:02d}-{day:02d}"
+                has_data = date_str in date_set
+                is_selected = date_str == current_date
+                
+                if is_selected:
+                    calendar_html += f'<div class="cal-day cal-day-selected">{day}</div>'
+                elif has_data:
+                    calendar_html += f'<div class="cal-day cal-day-available">{day}</div>'
+                else:
+                    calendar_html += f'<div class="cal-day cal-day-disabled">{day}</div>'
+    
+    calendar_html += '''
+        </div>
+    </div>
+    '''
+    
+    # 显示日历HTML
+    st.markdown(calendar_html, unsafe_allow_html=True)
+    
+    # 月份导航按钮
+    nav_col1, nav_col2, nav_col3 = st.columns([1, 2, 1])
+    
+    with nav_col1:
         prev_month = display_month - 1
         prev_year = display_year
         if prev_month < 1:
             prev_month = 12
             prev_year -= 1
-        if st.button("◀ 上月", key=f"{key_prefix}_prev_month", use_container_width=True):
+        if st.button("◀", key=f"{key_prefix}_prev_month"):
             st.session_state[f"{key_prefix}_display_year"] = prev_year
             st.session_state[f"{key_prefix}_display_month"] = prev_month
             st.rerun()
     
-    with month_col2:
-        # 检查session_state中是否有保存的显示月份
-        if f"{key_prefix}_display_year" in st.session_state:
-            display_year = st.session_state[f"{key_prefix}_display_year"]
-            display_month = st.session_state[f"{key_prefix}_display_month"]
-        
-        st.markdown(f"<div style='text-align: center; font-size: 1.3rem; font-weight: 700; color: #e9d5ff; padding: 0.3rem;'>{display_year}年{display_month}月</div>", unsafe_allow_html=True)
+    with nav_col2:
+        months = ["January", "February", "March", "April", "May", "June", 
+                  "July", "August", "September", "October", "November", "December"]
+        st.markdown(f"<div style='text-align:center; color:#e2e8f0; font-size:0.9rem;'>{months[display_month-1]} {display_year}</div>", unsafe_allow_html=True)
     
-    with month_col3:
-        # 下个月
+    with nav_col3:
         next_month = display_month + 1
         next_year = display_year
         if next_month > 12:
             next_month = 1
             next_year += 1
-        if st.button("下月 ▶", key=f"{key_prefix}_next_month", use_container_width=True):
+        if st.button("▶", key=f"{key_prefix}_next_month"):
             st.session_state[f"{key_prefix}_display_year"] = next_year
             st.session_state[f"{key_prefix}_display_month"] = next_month
             st.rerun()
     
-    # 星期标题
-    weekdays = ["一", "二", "三", "四", "五", "六", "日"]
-    weekday_html = "".join([f'<div style="text-align: center; font-weight: 700; color: #94a3b8; padding: 0.3rem;">{d}</div>' for d in weekdays])
-    st.markdown(f'<div style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; margin: 0.5rem 0;">{weekday_html}</div>', unsafe_allow_html=True)
+    # 日期选择按钮（隐藏式，用selectbox实现）
+    valid_dates_in_month = [d for d in available_dates 
+                           if d.startswith(f"{display_year}-{display_month:02d}")]
     
-    # 生成日历
-    cal = calendar.Calendar(firstweekday=0)  # 周一开始
-    month_days = cal.monthdayscalendar(display_year, display_month)
-    
-    # 日历网格
-    for week_idx, week in enumerate(month_days):
-        cols = st.columns(7)
-        for day_idx, day in enumerate(week):
-            with cols[day_idx]:
-                if day == 0:
-                    st.markdown("<div style='height: 2.2rem;'></div>", unsafe_allow_html=True)
-                else:
-                    date_str = f"{display_year}-{display_month:02d}-{day:02d}"
-                    has_data = date_str in date_set
-                    is_selected = date_str == current_date
-                    
-                    if has_data:
-                        # 有数据的日期 - 可点击按钮
-                        btn_type = "primary" if is_selected else "secondary"
-                        if st.button(
-                            str(day), 
-                            key=f"{key_prefix}_day_{date_str}", 
-                            use_container_width=True,
-                            type=btn_type
-                        ):
-                            selected_new_date = date_str
-                    else:
-                        # 无数据的日期 - 灰色显示
-                        st.markdown(
-                            f'<div style="text-align: center; padding: 0.35rem; color: #475569; '
-                            f'background: rgba(100,100,100,0.15); border-radius: 6px; font-size: 0.9rem;">{day}</div>',
-                            unsafe_allow_html=True
-                        )
+    if valid_dates_in_month:
+        # 格式化显示
+        date_display_map = {}
+        for d in sorted(valid_dates_in_month):
+            day_num = int(d.split("-")[2])
+            date_display_map[d] = f"{day_num}日 ({d})"
+        
+        # 确定默认选中
+        default_idx = 0
+        if current_date in valid_dates_in_month:
+            default_idx = sorted(valid_dates_in_month).index(current_date)
+        
+        selected = st.selectbox(
+            "选择日期",
+            options=sorted(valid_dates_in_month),
+            index=default_idx,
+            format_func=lambda x: date_display_map.get(x, x),
+            key=f"{key_prefix}_date_select",
+            label_visibility="collapsed"
+        )
+        
+        if selected != current_date:
+            selected_new_date = selected
+    else:
+        st.caption("本月无可用数据")
     
     return selected_new_date
 
