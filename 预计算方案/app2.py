@@ -69,10 +69,18 @@ STYLE_CSS = """
 /* 主内容区基础文字 */
 section[data-testid="stMain"]{ 
   color: var(--text);
-  padding-top: 1rem !important;
+  padding-top: 0 !important;
 }
 section[data-testid="stMain"] p,
 section[data-testid="stMain"] li{ color: var(--text); }
+
+/* 减少顶部空白 */
+.block-container{
+  padding-top: 1rem !important;
+}
+div[data-testid="stAppViewBlockContainer"]{
+  padding-top: 1rem !important;
+}
 
 /* 隐藏顶部 header */
 header[data-testid="stHeader"]{
