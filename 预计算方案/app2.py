@@ -115,6 +115,18 @@ section[data-testid="stSidebar"]{
   min-width: 280px !important;
   max-width: 320px !important;
 }
+/* 禁用侧边栏收缩按钮 */
+button[data-testid="collapsedControl"],
+button[data-testid="stSidebarNavCollapseIcon"],
+div[data-testid="collapsedControl"] {
+  display: none !important;
+}
+/* 确保侧边栏始终展开 */
+section[data-testid="stSidebar"][aria-expanded="false"] {
+  display: block !important;
+  transform: none !important;
+  width: 280px !important;
+}
 section[data-testid="stSidebar"] > div {
   width: 100% !important;
   padding: 1rem 1.2rem !important;
@@ -159,6 +171,31 @@ section[data-testid="stSidebar"] button[kind="secondary"] {
 section[data-testid="stSidebar"] button[kind="secondary"]:hover {
     background: rgba(30, 41, 59, 1) !important;
     border-color: rgba(168, 85, 247, 0.5) !important;
+}
+
+/* 前一天/后一天快捷按钮 */
+section[data-testid="stSidebar"] button#st-key-quick_prev_day,
+section[data-testid="stSidebar"] button#st-key-quick_next_day,
+section[data-testid="stSidebar"] button#st-key-quick_prev_disabled,
+section[data-testid="stSidebar"] button#st-key-quick_next_disabled {
+    background: rgba(30, 41, 59, 0.6) !important;
+    border: 1px solid rgba(148, 163, 184, 0.25) !important;
+    color: #94a3b8 !important;
+    font-size: 0.8rem !important;
+    padding: 0.35rem 0.5rem !important;
+    min-height: auto !important;
+    height: auto !important;
+}
+section[data-testid="stSidebar"] button#st-key-quick_prev_day:hover,
+section[data-testid="stSidebar"] button#st-key-quick_next_day:hover {
+    background: rgba(139, 92, 246, 0.15) !important;
+    border-color: rgba(168, 85, 247, 0.4) !important;
+    color: #c7d2fe !important;
+}
+section[data-testid="stSidebar"] button#st-key-quick_prev_disabled,
+section[data-testid="stSidebar"] button#st-key-quick_next_disabled {
+    opacity: 0.4 !important;
+    cursor: not-allowed !important;
 }
 
 /* sidebar 输入框/下拉框 */
@@ -3216,6 +3253,49 @@ def main():
             st.cache_data.clear()
             _set_nonce()
             st.rerun()
+        
+        # 前一天/后一天快捷按钮（仅每日查询模式）
+        if current_query_type == "daily" and available_dates:
+            current_date_str = st.session_state.get("confirmed_date", "") or st.session_state.get("selected_date_cache", "")
+            if current_date_str:
+                sorted_dates = sorted(available_dates)
+                try:
+                    current_idx = sorted_dates.index(current_date_str)
+                except ValueError:
+                    current_idx = -1
+                
+                prev_date = sorted_dates[current_idx - 1] if current_idx > 0 else None
+                next_date = sorted_dates[current_idx + 1] if current_idx >= 0 and current_idx < len(sorted_dates) - 1 else None
+                
+                st.markdown("<div style='margin: 0.6rem 0 0.3rem 0;'></div>", unsafe_allow_html=True)
+                
+                col_prev, col_next = st.columns(2)
+                
+                with col_prev:
+                    if prev_date:
+                        prev_display = datetime.strptime(prev_date, "%Y-%m-%d").strftime("%m/%d")
+                        if st.button(f"← {prev_display}", key="quick_prev_day", use_container_width=True):
+                            st.session_state.confirmed_date = prev_date
+                            st.session_state.selected_date_cache = prev_date
+                            st.session_state.confirmed_group = st.session_state.get("selected_group_cache", "")
+                            st.cache_data.clear()
+                            _set_nonce()
+                            st.rerun()
+                    else:
+                        st.button("← --", key="quick_prev_disabled", use_container_width=True, disabled=True)
+                
+                with col_next:
+                    if next_date:
+                        next_display = datetime.strptime(next_date, "%Y-%m-%d").strftime("%m/%d")
+                        if st.button(f"{next_display} →", key="quick_next_day", use_container_width=True):
+                            st.session_state.confirmed_date = next_date
+                            st.session_state.selected_date_cache = next_date
+                            st.session_state.confirmed_group = st.session_state.get("selected_group_cache", "")
+                            st.cache_data.clear()
+                            _set_nonce()
+                            st.rerun()
+                    else:
+                        st.button("-- →", key="quick_next_disabled", use_container_width=True, disabled=True)
         
         st.markdown("---")
         st.markdown("""
