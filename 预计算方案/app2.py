@@ -817,7 +817,7 @@ section[data-testid="stMain"] div[data-testid="stExpander"] div[role="region"]{
 }
 .dp-card:hover{
   background: #f1f3f5;
-  border-color: #dee2e6;
+  border-color: #C8A2E8;
   border-left-color: #C8A2E8;
 }
 .dp-header{
@@ -827,29 +827,30 @@ section[data-testid="stMain"] div[data-testid="stExpander"] div[role="region"]{
   gap: 10px;
 }
 .dp-title{
-  font-weight: 800;
-  font-size: 1.2rem;
-  color: #334155;
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: #7c3aed;
   flex: 1;
 }
 .dp-toggle-btn{
   font-size: 0.75rem;
-  font-weight: 500;
-  color: #6c757d;
-  background: transparent;
-  padding: 4px 8px;
+  font-weight: 600;
+  color: #7c3aed;
+  background: rgba(200,162,232,.1);
+  padding: 4px 10px;
   border-radius: 4px;
-  border: none;
+  border: 1px solid rgba(200,162,232,.3);
   transition: all 0.2s ease;
   white-space: nowrap;
 }
 .dp-card:hover .dp-toggle-btn{
-  color: #495057;
+  background: rgba(200,162,232,.2);
+  border-color: rgba(200,162,232,.5);
 }
 .dp-toggle-btn .expand-text{ display: inline; }
 .dp-toggle-btn .collapse-text{ display: none; }
 .dp-expander[open] .dp-toggle-btn{
-  color: #495057;
+  background: rgba(200,162,232,.2);
 }
 .dp-expander[open] .dp-toggle-btn .expand-text{ display: none; }
 .dp-expander[open] .dp-toggle-btn .collapse-text{ display: inline; }
@@ -926,7 +927,7 @@ section[data-testid="stMain"] div[data-testid="stExpander"] div[role="region"]{
 .dp-card-header-fixed .dp-title{
   font-weight: 700;
   font-size: 1.05rem;
-  color: #1a1a2e;
+  color: #7c3aed;
 }
 .dp-content-direct{
   background: #ffffff;
@@ -934,10 +935,10 @@ section[data-testid="stMain"] div[data-testid="stExpander"] div[role="region"]{
 }
 
 .dp-section-title{
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: #6c757d;
-  margin: 10px 0 6px 0;
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #6b21a8;
+  margin: 12px 0 8px 0;
   display: flex;
   align-items: center;
   gap: 6px;
@@ -949,21 +950,23 @@ section[data-testid="stMain"] div[data-testid="stExpander"] div[role="region"]{
 .opinion-item{
   background: #f8f9fa;
   border: none;
-  border-left: 2px solid #adb5bd;
-  padding: 8px 12px;
-  margin: 6px 0;
-  border-radius: 0 4px 4px 0;
-  color: var(--text);
+  border-left: 3px solid #A9B9F0;
+  padding: 10px 14px;
+  margin: 8px 0;
+  border-radius: 0 6px 6px 0;
+  color: #374151;
   font-size: 0.95rem;
   line-height: 1.6;
+  font-weight: 500;
 }
 .example-quote{
-  background: #f8f9fa;
+  background: #faf5ff;
   border: none;
-  padding: 8px 12px;
-  margin: 6px 0;
-  border-radius: 4px;
-  color: #495057;
+  border-left: 2px solid #C8A2E8;
+  padding: 10px 14px;
+  margin: 8px 0;
+  border-radius: 0 6px 6px 0;
+  color: #4b5563;
   font-style: italic;
   font-size: 0.9rem;
   line-height: 1.5;
@@ -972,17 +975,18 @@ section[data-testid="stMain"] div[data-testid="stExpander"] div[role="region"]{
 /* ===== 新增：观点卡片样式（V2格式）===== */
 .opinion-card{
   background: #ffffff;
-  border: 1px solid #e9ecef;
-  border-left: 3px solid #6c757d;
-  border-radius: 0 6px 6px 0;
-  padding: 12px 14px;
-  margin: 10px 0;
+  border: 1px solid #e5e7eb;
+  border-left: 3px solid #9AC9F5;
+  border-radius: 0 8px 8px 0;
+  padding: 14px 16px;
+  margin: 12px 0;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
 }
 .opinion-card-header{
   font-size: 1rem;
-  font-weight: 600;
-  color: #495057;
-  margin-bottom: 8px;
+  font-weight: 700;
+  color: #1e40af;
+  margin-bottom: 10px;
   display: flex;
   align-items: center;
   gap: 6px;
@@ -1001,14 +1005,18 @@ section[data-testid="stMain"] div[data-testid="stExpander"] div[role="region"]{
   list-style: none;
   cursor: pointer;
   user-select: none;
-  background: #f8f9fa;
-  border: 1px solid #e9ecef;
-  border-radius: 4px;
-  padding: 8px 12px;
+  background: rgba(200,162,232,.1);
+  border: 1px solid rgba(200,162,232,.3);
+  border-radius: 6px;
+  padding: 10px 14px;
   font-size: 0.85rem;
-  font-weight: 500;
-  color: #6c757d;
+  font-weight: 600;
+  color: #7c3aed;
   transition: all 0.2s ease;
+}
+.raw-msg-summary:hover{
+  background: rgba(200,162,232,.2);
+  border-color: rgba(200,162,232,.5);
 }
 .raw-msg-summary::-webkit-details-marker{
   display: none;
