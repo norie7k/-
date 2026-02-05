@@ -3277,7 +3277,7 @@ def main():
                 with col_prev:
                     if prev_date:
                         prev_tooltip = datetime.strptime(prev_date, "%Y-%m-%d").strftime("%Y年%m月%d日")
-                        if st.button("前一天", key="quick_prev_day", use_container_width=True, help=prev_tooltip):
+                        if st.button("←前一天", key="quick_prev_day", use_container_width=True, help=prev_tooltip):
                             st.session_state.confirmed_date = prev_date
                             st.session_state.selected_date_cache = prev_date
                             st.session_state.confirmed_group = st.session_state.get("selected_group_cache", "")
@@ -3285,12 +3285,12 @@ def main():
                             _set_nonce()
                             st.rerun()
                     else:
-                        st.button("前一天", key="quick_prev_disabled", use_container_width=True, disabled=True, help=f"{calc_prev_date}（无数据）")
+                        st.button("←前一天", key="quick_prev_disabled", use_container_width=True, disabled=True, help=f"{calc_prev_date}（无数据）")
                 
                 with col_next:
                     if next_date:
                         next_tooltip = datetime.strptime(next_date, "%Y-%m-%d").strftime("%Y年%m月%d日")
-                        if st.button("后一天", key="quick_next_day", use_container_width=True, help=next_tooltip):
+                        if st.button("后一天→", key="quick_next_day", use_container_width=True, help=next_tooltip):
                             st.session_state.confirmed_date = next_date
                             st.session_state.selected_date_cache = next_date
                             st.session_state.confirmed_group = st.session_state.get("selected_group_cache", "")
@@ -3298,7 +3298,7 @@ def main():
                             _set_nonce()
                             st.rerun()
                     else:
-                        st.button("后一天", key="quick_next_disabled", use_container_width=True, disabled=True, help=f"{calc_next_date}（无数据）")
+                        st.button("后一天→", key="quick_next_disabled", use_container_width=True, disabled=True, help=f"{calc_next_date}（无数据）")
         
         st.markdown("---")
         st.markdown("""
