@@ -187,20 +187,33 @@ section[data-testid="stSidebar"] button#st-key-quick_next_disabled {
     background: rgba(30, 41, 59, 0.6) !important;
     border: 1px solid rgba(148, 163, 184, 0.25) !important;
     color: #94a3b8 !important;
-    font-size: 0.48rem !important;
-    padding: 0.22rem 0.26rem !important;
+    font-size: 0.42rem !important;
+    padding: 0.2rem 0.25rem !important;
     min-height: auto !important;
     height: auto !important;
     white-space: nowrap !important;
     overflow: hidden !important;
+    line-height: 1 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
 }
 section[data-testid="stSidebar"] button#st-key-quick_prev_day p,
 section[data-testid="stSidebar"] button#st-key-quick_next_day p,
 section[data-testid="stSidebar"] button#st-key-quick_prev_disabled p,
 section[data-testid="stSidebar"] button#st-key-quick_next_disabled p {
-    font-size: 0.48rem !important;
+    font-size: 0.42rem !important;
     margin: 0 !important;
     white-space: nowrap !important;
+    line-height: 1 !important;
+}
+section[data-testid="stSidebar"] button#st-key-quick_prev_day span,
+section[data-testid="stSidebar"] button#st-key-quick_next_day span,
+section[data-testid="stSidebar"] button#st-key-quick_prev_disabled span,
+section[data-testid="stSidebar"] button#st-key-quick_next_disabled span {
+    font-size: 0.42rem !important;
+    white-space: nowrap !important;
+    line-height: 1 !important;
 }
 section[data-testid="stSidebar"] button#st-key-quick_prev_day:hover,
 section[data-testid="stSidebar"] button#st-key-quick_next_day:hover {
@@ -3259,12 +3272,12 @@ def main():
                 
                 st.markdown("<div style='margin: 0.6rem 0 0.3rem 0;'></div>", unsafe_allow_html=True)
                 
-                col_prev, col_next = st.columns(2)
+                col_prev, col_next = st.columns(2, gap="small")
                 
                 with col_prev:
                     if prev_date:
                         prev_tooltip = datetime.strptime(prev_date, "%Y-%m-%d").strftime("%Y年%m月%d日")
-                        if st.button("← 前一天", key="quick_prev_day", use_container_width=True, help=prev_tooltip):
+                        if st.button("前一天", key="quick_prev_day", use_container_width=True, help=prev_tooltip):
                             st.session_state.confirmed_date = prev_date
                             st.session_state.selected_date_cache = prev_date
                             st.session_state.confirmed_group = st.session_state.get("selected_group_cache", "")
@@ -3272,12 +3285,12 @@ def main():
                             _set_nonce()
                             st.rerun()
                     else:
-                        st.button("← 前一天", key="quick_prev_disabled", use_container_width=True, disabled=True, help=f"{calc_prev_date}（无数据）")
+                        st.button("前一天", key="quick_prev_disabled", use_container_width=True, disabled=True, help=f"{calc_prev_date}（无数据）")
                 
                 with col_next:
                     if next_date:
                         next_tooltip = datetime.strptime(next_date, "%Y-%m-%d").strftime("%Y年%m月%d日")
-                        if st.button("后一天 →", key="quick_next_day", use_container_width=True, help=next_tooltip):
+                        if st.button("后一天", key="quick_next_day", use_container_width=True, help=next_tooltip):
                             st.session_state.confirmed_date = next_date
                             st.session_state.selected_date_cache = next_date
                             st.session_state.confirmed_group = st.session_state.get("selected_group_cache", "")
@@ -3285,7 +3298,7 @@ def main():
                             _set_nonce()
                             st.rerun()
                     else:
-                        st.button("后一天 →", key="quick_next_disabled", use_container_width=True, disabled=True, help=f"{calc_next_date}（无数据）")
+                        st.button("后一天", key="quick_next_disabled", use_container_width=True, disabled=True, help=f"{calc_next_date}（无数据）")
         
         st.markdown("---")
         st.markdown("""
