@@ -716,7 +716,7 @@ section[data-testid="stMain"] div[data-testid="stExpander"] div[role="region"]{
   margin: 10px 0;
 }
 .opinion-card-header{
-  font-size: 1.05rem;
+  font-size: 1.12rem;
   font-weight: 700;
   color: #22d3ee;
   margin-bottom: 10px;
