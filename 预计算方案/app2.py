@@ -973,15 +973,15 @@ section[data-testid="stMain"] div[data-testid="stExpander"] div[role="region"]{
   font-weight: 600;
 }
 .example-quote{
-  background: #f9fafb;
+  background: rgba(150,230,193,0.1);
   border: none;
-  border-left: 2px solid #d1d5db;
-  padding: 8px 12px;
-  margin: 6px 0;
-  border-radius: 0 4px 4px 0;
-  color: #6b7280;
+  border-left: 2px solid #96E6C1;
+  padding: 10px 14px;
+  margin: 8px 0;
+  border-radius: 0 6px 6px 0;
+  color: #374151;
   font-style: italic;
-  font-size: 0.85rem;
+  font-size: 0.88rem;
   line-height: 1.5;
 }
 
@@ -1011,62 +1011,59 @@ section[data-testid="stMain"] div[data-testid="stExpander"] div[role="region"]{
 /* 原文发言展开器 */
 .raw-msg-expander{
   margin-top: 10px;
-  border-radius: 4px;
+  border-radius: 6px;
 }
 .raw-msg-summary{
   list-style: none;
   cursor: pointer;
   user-select: none;
-  background: #f8f9fa;
-  border: 1px solid #e5e7eb;
-  border-radius: 4px;
-  padding: 6px 10px;
-  font-size: 0.8rem;
+  background: rgba(117,200,227,0.1);
+  border: 1px solid rgba(117,200,227,0.3);
+  border-radius: 6px;
+  padding: 8px 12px;
+  font-size: 0.82rem;
   font-weight: 500;
-  color: #6b7280;
+  color: #0891b2;
   transition: all 0.15s ease;
 }
 .raw-msg-summary:hover{
-  background: #f1f5f9;
-  color: #4b5563;
+  background: rgba(117,200,227,0.18);
+  color: #0e7490;
 }
 .raw-msg-summary::-webkit-details-marker{
   display: none;
-}
-.raw-msg-summary:hover{
-  background: #f1f3f5;
-  color: #495057;
 }
 .raw-msg-expander[open] .raw-msg-summary{
   border-bottom-left-radius: 0;
   border-bottom-right-radius: 0;
 }
 .raw-msg-content{
-  background: #f8f9fa;
-  border: 1px solid #e9ecef;
+  background: rgba(117,200,227,0.06);
+  border: 1px solid rgba(117,200,227,0.25);
   border-top: none;
-  border-bottom-left-radius: 4px;
-  border-bottom-right-radius: 4px;
-  padding: 10px 12px;
+  border-bottom-left-radius: 6px;
+  border-bottom-right-radius: 6px;
+  padding: 12px 14px;
   max-height: 300px;
   overflow-y: auto;
 }
 .raw-msg-item{
   background: #ffffff;
-  border: 1px solid #e9ecef;
-  border-radius: 4px;
-  padding: 8px 12px;
-  margin: 6px 0;
+  border: 1px solid rgba(117,200,227,0.2);
+  border-left: 3px solid #75C8E3;
+  border-radius: 0 6px 6px 0;
+  padding: 10px 14px;
+  margin: 8px 0;
   font-size: 0.9rem;
   line-height: 1.5;
 }
 .raw-msg-item .msg-meta{
-  color: #adb5bd;
+  color: #0891b2;
   font-size: 0.8rem;
   margin-bottom: 4px;
 }
 .raw-msg-item .msg-content{
-  color: var(--text);
+  color: #1f2937;
 }
 
 /* Metric */
