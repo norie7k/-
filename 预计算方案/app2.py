@@ -2377,14 +2377,12 @@ def show_homepage():
             col_group, col_date = st.columns([1, 1])
             
             with col_group:
-                st.markdown("##### 🌐 监控社群")
                 group_options = {k: GROUPS[k]["name"] for k in GROUPS.keys()}
                 selected_group_daily = st.selectbox(
-                    "监控社群",
+                    "🌐 监控社群",
                     options=list(group_options.keys()),
                     format_func=lambda x: group_options[x],
                     key="homepage_group_daily",
-                    label_visibility="collapsed"
                 )
                 
                 # 加载可用日期
@@ -2393,29 +2391,20 @@ def show_homepage():
                     available_dates = index.get("available_dates", [])
             
             with col_date:
-                st.markdown("##### 📅 监测日期")
-                
                 if available_dates:
-                    # 初始化当前选中日期
-                    if "homepage_date_cache" not in st.session_state:
-                        sorted_dates = sorted(available_dates, reverse=True)
-                        st.session_state.homepage_date_cache = sorted_dates[0] if sorted_dates else None
+                    # 转换为date对象列表
+                    date_objects = [datetime.strptime(d, "%Y-%m-%d").date() for d in available_dates]
+                    max_date = max(date_objects)
+                    min_date = min(date_objects)
                     
-                    current_selected = st.session_state.homepage_date_cache
-                    
-                    # 使用自定义日历选择器
-                    new_selected = render_custom_calendar(
-                        available_dates=available_dates,
-                        current_date=current_selected,
-                        key_prefix="homepage_cal"
+                    selected_date_obj = st.date_input(
+                        "📅 监测日期",
+                        value=max_date,
+                        min_value=min_date,
+                        max_value=max_date,
+                        key="homepage_date_daily",
                     )
-                    
-                    # 如果用户选择了新日期
-                    if new_selected:
-                        st.session_state.homepage_date_cache = new_selected
-                        st.rerun()
-                    
-                    selected_date = st.session_state.homepage_date_cache
+                    selected_date = selected_date_obj.strftime("%Y-%m-%d") if selected_date_obj else None
                 else:
                     st.warning("该社群暂无数据")
                     selected_date = None
