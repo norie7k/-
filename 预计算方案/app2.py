@@ -808,17 +808,19 @@ section[data-testid="stMain"] div[data-testid="stExpander"] div[role="region"]{
   display: none;
 }
 .dp-card{
-  background: #f8f9fa;
-  border: 1px solid #e9ecef;
-  border-left: 3px solid #C8A2E8;
-  border-radius: 0 8px 8px 0;
-  padding: 10px 14px;
+  background: linear-gradient(135deg, #f5f0ff 0%, #eff6ff 100%);
+  border: 1px solid #ddd6fe;
+  border-left: 4px solid #8b5cf6;
+  border-radius: 0 10px 10px 0;
+  padding: 12px 16px;
   transition: all 0.2s ease;
+  box-shadow: 0 2px 6px rgba(139,92,246,0.08);
 }
 .dp-card:hover{
-  background: #f1f3f5;
-  border-color: #C8A2E8;
-  border-left-color: #C8A2E8;
+  background: linear-gradient(135deg, #ede9fe 0%, #e0f2fe 100%);
+  border-color: #c4b5fd;
+  border-left-color: #7c3aed;
+  box-shadow: 0 4px 12px rgba(139,92,246,0.15);
 }
 .dp-header{
   display: flex;
@@ -833,24 +835,23 @@ section[data-testid="stMain"] div[data-testid="stExpander"] div[role="region"]{
   flex: 1;
 }
 .dp-toggle-btn{
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: #7c3aed;
-  background: rgba(200,162,232,.1);
-  padding: 4px 10px;
+  font-size: 0.72rem;
+  font-weight: 500;
+  color: #6b7280;
+  background: transparent;
+  padding: 3px 8px;
   border-radius: 4px;
-  border: 1px solid rgba(200,162,232,.3);
-  transition: all 0.2s ease;
+  border: none;
+  transition: all 0.15s ease;
   white-space: nowrap;
 }
 .dp-card:hover .dp-toggle-btn{
-  background: rgba(200,162,232,.2);
-  border-color: rgba(200,162,232,.5);
+  color: #4b5563;
 }
 .dp-toggle-btn .expand-text{ display: inline; }
 .dp-toggle-btn .collapse-text{ display: none; }
 .dp-expander[open] .dp-toggle-btn{
-  background: rgba(200,162,232,.2);
+  color: #4b5563;
 }
 .dp-expander[open] .dp-toggle-btn .expand-text{ display: none; }
 .dp-expander[open] .dp-toggle-btn .collapse-text{ display: inline; }
@@ -874,16 +875,18 @@ section[data-testid="stMain"] div[data-testid="stExpander"] div[role="region"]{
   padding-bottom: 4px;
 }
 .dp-card-sticky .dp-card{
-  background: #f8f9fa;
-  border: 1px solid #e9ecef;
-  border-left: 3px solid #C8A2E8;
-  border-radius: 0 8px 8px 0;
+  background: linear-gradient(135deg, #f5f0ff 0%, #eff6ff 100%);
+  border: 1px solid #ddd6fe;
+  border-left: 4px solid #8b5cf6;
+  border-radius: 0 10px 10px 0;
   margin: 0;
   cursor: pointer;
   transition: all 0.2s ease;
+  box-shadow: 0 2px 6px rgba(139,92,246,0.08);
 }
 .dp-card-sticky .dp-card:hover{
-  background: #f1f3f5;
+  background: linear-gradient(135deg, #ede9fe 0%, #e0f2fe 100%);
+  box-shadow: 0 4px 12px rgba(139,92,246,0.15);
 }
 /* 讨论点内容区域（自适应高度，无需滚动） */
 .dp-scrollable{
@@ -948,44 +951,45 @@ section[data-testid="stMain"] div[data-testid="stExpander"] div[role="region"]{
 }
 
 .opinion-item{
-  background: #f8f9fa;
+  background: linear-gradient(135deg, #fef3c7 0%, #fef9c3 100%);
   border: none;
-  border-left: 3px solid #A9B9F0;
-  padding: 10px 14px;
-  margin: 8px 0;
-  border-radius: 0 6px 6px 0;
-  color: #374151;
+  border-left: 4px solid #f59e0b;
+  padding: 12px 16px;
+  margin: 10px 0;
+  border-radius: 0 8px 8px 0;
+  color: #1f2937;
   font-size: 0.95rem;
   line-height: 1.6;
-  font-weight: 500;
+  font-weight: 600;
+  box-shadow: 0 2px 6px rgba(245,158,11,0.1);
 }
 .example-quote{
-  background: #faf5ff;
+  background: #f9fafb;
   border: none;
-  border-left: 2px solid #C8A2E8;
-  padding: 10px 14px;
-  margin: 8px 0;
-  border-radius: 0 6px 6px 0;
-  color: #4b5563;
+  border-left: 2px solid #d1d5db;
+  padding: 8px 12px;
+  margin: 6px 0;
+  border-radius: 0 4px 4px 0;
+  color: #6b7280;
   font-style: italic;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   line-height: 1.5;
 }
 
 /* ===== 新增：观点卡片样式（V2格式）===== */
 .opinion-card{
-  background: #ffffff;
-  border: 1px solid #e5e7eb;
-  border-left: 3px solid #9AC9F5;
-  border-radius: 0 8px 8px 0;
-  padding: 14px 16px;
-  margin: 12px 0;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+  background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+  border: 1px solid #fde68a;
+  border-left: 4px solid #f59e0b;
+  border-radius: 0 10px 10px 0;
+  padding: 14px 18px;
+  margin: 14px 0;
+  box-shadow: 0 3px 8px rgba(245,158,11,0.12);
 }
 .opinion-card-header{
-  font-size: 1rem;
+  font-size: 1.05rem;
   font-weight: 700;
-  color: #1e40af;
+  color: #b45309;
   margin-bottom: 10px;
   display: flex;
   align-items: center;
@@ -1005,18 +1009,18 @@ section[data-testid="stMain"] div[data-testid="stExpander"] div[role="region"]{
   list-style: none;
   cursor: pointer;
   user-select: none;
-  background: rgba(200,162,232,.1);
-  border: 1px solid rgba(200,162,232,.3);
-  border-radius: 6px;
-  padding: 10px 14px;
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: #7c3aed;
-  transition: all 0.2s ease;
+  background: #f8f9fa;
+  border: 1px solid #e5e7eb;
+  border-radius: 4px;
+  padding: 6px 10px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: #6b7280;
+  transition: all 0.15s ease;
 }
 .raw-msg-summary:hover{
-  background: rgba(200,162,232,.2);
-  border-color: rgba(200,162,232,.5);
+  background: #f1f5f9;
+  color: #4b5563;
 }
 .raw-msg-summary::-webkit-details-marker{
   display: none;
