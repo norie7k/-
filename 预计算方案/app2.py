@@ -283,10 +283,10 @@ section[data-testid="stSidebar"] input{
 section[data-testid="stSidebar"] button#st-key-sidebar_back_home {
   background: rgba(30, 41, 59, 0.75) !important;
   border: 1px solid rgba(148, 163, 184, 0.35) !important;
-  color: #e2e8f0 !important;
-  font-size: 0.78rem !important;
-  padding: 0.3rem 0.5rem !important;
-  border-radius: 8px !important;
+  color: #cbd5f5 !important;
+  font-size: 0.8rem !important;
+  padding: 0.25rem 0.5rem !important;
+  border-radius: 6px !important;
   min-width: auto !important;
   white-space: nowrap !important;
 }
@@ -3011,7 +3011,7 @@ def main():
             </div>
             """, unsafe_allow_html=True)
         with col_back:
-            if st.button("返回主页", key="sidebar_back_home", help="返回主页"):
+            if st.button("〈 返回", key="sidebar_back_home", help="返回主页"):
                 st.session_state.show_results = False
                 st.session_state.query_type = "daily"
                 st.rerun()
