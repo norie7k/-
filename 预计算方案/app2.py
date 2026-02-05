@@ -138,9 +138,9 @@ section[data-testid="stSidebar"] .stCaption{ color: var(--muted) !important; }
 section[data-testid="stSidebar"] button[kind="primary"] {
     background: linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%) !important;
     border: none !important;
-    font-size: 1rem !important;
+    font-size: 0.9rem !important;
     font-weight: 600 !important;
-    padding: 0.6rem 1rem !important;
+    padding: 0.55rem 0.9rem !important;
     margin: 0.3rem 0 !important;
 }
 section[data-testid="stSidebar"] button[kind="primary"]:hover {
@@ -166,9 +166,10 @@ section[data-testid="stSidebar"] [data-baseweb="select"] > div{
   background: rgba(30,41,59,.92) !important;
   border: 1px solid rgba(148,163,184,.25) !important;
   border-radius: 10px !important;
-  font-size: 0.95rem !important;
-  padding: 0.6rem 0.8rem !important;
-  min-height: 2.8rem !important;
+  font-size: 0.9rem !important;
+  padding: 0.7rem 0.9rem !important;
+  min-height: 3rem !important;
+  height: auto !important;
 }
 section[data-testid="stSidebar"] [data-baseweb="select"]:hover > div{
   border-color: rgba(168, 85, 247, 0.4) !important;
@@ -178,9 +179,10 @@ section[data-testid="stSidebar"] [data-baseweb="select"] span{
   word-wrap: break-word !important;
   overflow: visible !important;
   text-overflow: clip !important;
-  line-height: 1.4 !important;
-  display: block !important;
+  line-height: 1.5 !important;
+  display: inline-block !important;
   max-width: 100% !important;
+  vertical-align: middle !important;
 }
 section[data-testid="stSidebar"] [data-baseweb="select"] [data-baseweb="popover"] {
   max-width: none !important;
@@ -189,6 +191,14 @@ section[data-testid="stSidebar"] [data-baseweb="select"] [data-baseweb="popover"
 section[data-testid="stSidebar"] [data-baseweb="select"] > div > div {
   overflow: visible !important;
   white-space: normal !important;
+  height: auto !important;
+  min-height: 1.5rem !important;
+}
+/* 选择器内部的文本容器 */
+section[data-testid="stSidebar"] [data-baseweb="select"] [role="button"] {
+  height: auto !important;
+  min-height: 1.8rem !important;
+  padding-right: 2rem !important;
 }
 section[data-testid="stSidebar"] [data-baseweb="input"]{
   background: rgba(30,41,59,.92) !important;
@@ -227,9 +237,9 @@ section[data-testid="stSidebar"] button[key^="next_day"] {
   background: rgba(30, 41, 59, 0.8) !important;
   border: 1px solid rgba(148, 163, 184, 0.3) !important;
   color: #94a3b8 !important;
-  font-size: 0.9rem !important;
+  font-size: 0.85rem !important;
   font-weight: 500 !important;
-  padding: 0.5rem 0.8rem !important;
+  padding: 0.5rem 0.7rem !important;
 }
 section[data-testid="stSidebar"] button[key^="prev_day"]:not(:disabled):hover,
 section[data-testid="stSidebar"] button[key^="next_day"]:not(:disabled):hover {
