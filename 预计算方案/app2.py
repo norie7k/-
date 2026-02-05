@@ -275,7 +275,7 @@ div[data-baseweb="popover"] button.date-disabled .date-disabled-icon {
 }
 .cluster-header-inner .cluster-title{
   font-weight: 950 !important;
-  font-size: 1.45rem !important;
+  font-size: 1.3rem !important;
   color: #f1f5f9 !important;
   line-height: 1.25 !important;
 }
@@ -287,7 +287,7 @@ div[data-baseweb="popover"] button.date-disabled .date-disabled-icon {
 }
 .cluster-title{
   font-weight: 950;
-  font-size: 1.45rem;
+  font-size: 1.3rem;
   color: #f1f5f9;
   line-height: 1.25;
 }
