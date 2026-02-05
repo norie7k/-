@@ -69,7 +69,7 @@ STYLE_CSS = """
 /* 主内容区基础文字 */
 section[data-testid="stMain"]{ 
   color: var(--text);
-  padding-top: 0 !important;
+  padding-top: 1rem !important;
 }
 section[data-testid="stMain"] p,
 section[data-testid="stMain"] li{ color: var(--text); }
@@ -112,6 +112,12 @@ section[data-testid="stMain"] li{ color: var(--text); }
 section[data-testid="stSidebar"]{
   background: linear-gradient(180deg, #10182f, #0b1020) !important;
   border-right: 1px solid rgba(148,163,184,.14);
+  min-width: 280px !important;
+  max-width: 320px !important;
+}
+section[data-testid="stSidebar"] > div {
+  width: 100% !important;
+  padding: 1rem 1.2rem !important;
 }
 section[data-testid="stSidebar"] h1,
 section[data-testid="stSidebar"] h2,
@@ -161,10 +167,28 @@ section[data-testid="stSidebar"] [data-baseweb="select"] > div{
   border: 1px solid rgba(148,163,184,.25) !important;
   border-radius: 10px !important;
   font-size: 0.95rem !important;
-  padding: 0.3rem 0.5rem !important;
+  padding: 0.6rem 0.8rem !important;
+  min-height: 2.8rem !important;
 }
 section[data-testid="stSidebar"] [data-baseweb="select"]:hover > div{
   border-color: rgba(168, 85, 247, 0.4) !important;
+}
+section[data-testid="stSidebar"] [data-baseweb="select"] span{
+  white-space: normal !important;
+  word-wrap: break-word !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
+  line-height: 1.4 !important;
+  display: block !important;
+  max-width: 100% !important;
+}
+section[data-testid="stSidebar"] [data-baseweb="select"] [data-baseweb="popover"] {
+  max-width: none !important;
+}
+/* 确保选择器的值区域能完整显示 */
+section[data-testid="stSidebar"] [data-baseweb="select"] > div > div {
+  overflow: visible !important;
+  white-space: normal !important;
 }
 section[data-testid="stSidebar"] [data-baseweb="input"]{
   background: rgba(30,41,59,.92) !important;
@@ -202,8 +226,16 @@ div[data-baseweb="menu"]{
   background: rgba(15,23,42,.98) !important;
   border: 1px solid rgba(148,163,184,.20) !important;
   border-radius: 12px !important;
+  max-width: 350px !important;
+  min-width: 280px !important;
 }
-div[data-baseweb="option"]{ color: var(--text) !important; }
+div[data-baseweb="option"]{ 
+  color: var(--text) !important;
+  white-space: normal !important;
+  word-wrap: break-word !important;
+  padding: 0.7rem 1rem !important;
+  line-height: 1.4 !important;
+}
 div[data-baseweb="option"]:hover{ background: rgba(99,102,241,.18) !important; }
 
 /* 日期 popover */
@@ -3116,7 +3148,40 @@ def main():
         </div>
         """, unsafe_allow_html=True)
 
-    # 主内容区
+    # 主内容区 - 顶部返回按钮
+    st.markdown("""
+    <style>
+    .back-button-container {
+        margin-bottom: 1.5rem;
+    }
+    .back-button-container button {
+        background: rgba(30, 41, 59, 0.7) !important;
+        border: 1px solid rgba(148, 163, 184, 0.3) !important;
+        color: #e2e8f0 !important;
+        padding: 0.6rem 1.2rem !important;
+        font-size: 0.95rem !important;
+        font-weight: 500 !important;
+        border-radius: 8px !important;
+        transition: all 0.2s ease !important;
+    }
+    .back-button-container button:hover {
+        background: rgba(30, 41, 59, 0.95) !important;
+        border-color: rgba(168, 85, 247, 0.5) !important;
+        transform: translateX(-3px) !important;
+        box-shadow: 0 2px 12px rgba(139, 92, 246, 0.2) !important;
+    }
+    </style>
+    """, unsafe_allow_html=True)
+    
+    st.markdown('<div class="back-button-container">', unsafe_allow_html=True)
+    col_back, col_spacer = st.columns([0.12, 0.88])
+    with col_back:
+        if st.button("← 返回", key="back_to_home_top", help="返回主页"):
+            st.session_state.show_results = False
+            st.session_state.query_type = "daily"
+            st.rerun()
+    st.markdown('</div>', unsafe_allow_html=True)
+    
     query_type = st.session_state.get("query_type", "daily")
     
     if query_type == "version":
