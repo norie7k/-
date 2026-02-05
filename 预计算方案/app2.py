@@ -284,8 +284,8 @@ section[data-testid="stSidebar"] button#st-key-sidebar_back_home {
   background: rgba(30, 41, 59, 0.75) !important;
   border: 1px solid rgba(148, 163, 184, 0.35) !important;
   color: #cbd5f5 !important;
-  font-size: 0.8rem !important;
-  padding: 0.22rem 0.45rem !important;
+  font-size: 0.68rem !important;
+  padding: 0.18rem 0.35rem !important;
   border-radius: 6px !important;
   min-width: auto !important;
   white-space: nowrap !important;
@@ -3007,7 +3007,7 @@ def main():
     # 侧边栏
     with st.sidebar:
         # 顶部：标题 + 返回主页（右上角）
-        col_title, col_back = st.columns([0.72, 0.28], gap="small")
+        col_title, col_back = st.columns([0.78, 0.22], gap="small")
         with col_title:
             st.markdown("""
             <div style="padding: 0.5rem 0 1rem 0;">
