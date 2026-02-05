@@ -1585,10 +1585,6 @@ def render_result(result: dict, group_key: str | None = None):
 </div>
 </div>
 <div class="scrollable-content">
-<div class="expander-toggle-inside">
-<span class="toggle-icon">▲</span>
-<span class="toggle-text">收起详情</span>
-</div>
 <div class="custom-expander-inner">
 {discussion_content_html}
 </div>
@@ -1986,10 +1982,6 @@ def render_version_result(result: dict, group_key: str | None = None):
 </div>
 </div>
 <div class="scrollable-content">
-<div class="expander-toggle-inside">
-<span class="toggle-icon">▲</span>
-<span class="toggle-text">收起详情</span>
-</div>
 <div class="custom-expander-inner">
 {discussion_content_html}
 </div>
