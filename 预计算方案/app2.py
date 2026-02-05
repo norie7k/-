@@ -973,9 +973,9 @@ section[data-testid="stMain"] div[data-testid="stExpander"] div[role="region"]{
   font-weight: 600;
 }
 .example-quote{
-  background: rgba(154,217,232,0.12);
+  background: rgba(169,185,240,0.1);
   border: none;
-  border-left: 2px solid #9AD9E8;
+  border-left: 2px solid #A9B9F0;
   padding: 10px 14px;
   margin: 8px 0;
   border-radius: 0 6px 6px 0;
@@ -1017,18 +1017,18 @@ section[data-testid="stMain"] div[data-testid="stExpander"] div[role="region"]{
   list-style: none;
   cursor: pointer;
   user-select: none;
-  background: rgba(117,200,227,0.1);
-  border: 1px solid rgba(117,200,227,0.3);
+  background: rgba(169,185,240,0.1);
+  border: 1px solid rgba(169,185,240,0.3);
   border-radius: 6px;
   padding: 8px 12px;
   font-size: 0.82rem;
   font-weight: 500;
-  color: #0891b2;
+  color: #4f46e5;
   transition: all 0.15s ease;
 }
 .raw-msg-summary:hover{
-  background: rgba(117,200,227,0.18);
-  color: #0e7490;
+  background: rgba(169,185,240,0.2);
+  color: #4338ca;
 }
 .raw-msg-summary::-webkit-details-marker{
   display: none;
@@ -1038,8 +1038,8 @@ section[data-testid="stMain"] div[data-testid="stExpander"] div[role="region"]{
   border-bottom-right-radius: 0;
 }
 .raw-msg-content{
-  background: rgba(117,200,227,0.06);
-  border: 1px solid rgba(117,200,227,0.25);
+  background: rgba(169,185,240,0.06);
+  border: 1px solid rgba(169,185,240,0.25);
   border-top: none;
   border-bottom-left-radius: 6px;
   border-bottom-right-radius: 6px;
@@ -1049,8 +1049,8 @@ section[data-testid="stMain"] div[data-testid="stExpander"] div[role="region"]{
 }
 .raw-msg-item{
   background: #ffffff;
-  border: 1px solid rgba(117,200,227,0.2);
-  border-left: 3px solid #75C8E3;
+  border: 1px solid rgba(169,185,240,0.25);
+  border-left: 3px solid #A9B9F0;
   border-radius: 0 6px 6px 0;
   padding: 10px 14px;
   margin: 8px 0;
@@ -1058,7 +1058,7 @@ section[data-testid="stMain"] div[data-testid="stExpander"] div[role="region"]{
   line-height: 1.5;
 }
 .raw-msg-item .msg-meta{
-  color: #0891b2;
+  color: #4f46e5;
   font-size: 0.8rem;
   margin-bottom: 4px;
 }
