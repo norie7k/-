@@ -292,6 +292,7 @@ section[data-testid="stSidebar"] button#st-key-sidebar_back_home {
   white-space: nowrap !important;
   display: inline-flex !important;
   align-items: center !important;
+  flex-direction: row !important;
   gap: 0.2rem !important;
   line-height: 1 !important;
 }
@@ -301,6 +302,7 @@ section[data-testid="stSidebar"] button#st-key-sidebar_back_home p {
   line-height: 1 !important;
   margin: 0 !important;
   white-space: nowrap !important;
+  display: inline !important;
 }
 section[data-testid="stSidebar"] button#st-key-sidebar_back_home:hover {
   background: rgba(139, 92, 246, 0.2) !important;
