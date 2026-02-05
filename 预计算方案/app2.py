@@ -197,7 +197,7 @@ div[data-baseweb="popover"] button.date-disabled .date-disabled-icon {
 .stButton button[kind="secondary"] p,
 button[data-testid="baseButton-secondary"] span,
 button[data-testid="baseButton-secondary"] p{
-  font-size: 1.1rem !important;
+  font-size: 1.3rem !important;
   font-weight: 700 !important;
 }
 
@@ -1809,7 +1809,7 @@ def render_result(result: dict, group_key: str | None = None, available_dates: l
                 st.markdown(
                     f"""<div style="text-align: center; padding: 0.5rem 1rem; background: rgba(168,85,247,0.25); 
                     border-radius: 8px; border: 2px solid rgba(168,85,247,0.5);">
-                    <span style="font-size: 1.15rem; font-weight: 700; color: #e9d5ff;">📅 {current_display}</span>
+                    <span style="font-size: 1.3rem; font-weight: 700; color: #e9d5ff;">📅 {current_display}</span>
                     </div>""",
                     unsafe_allow_html=True
                 )
