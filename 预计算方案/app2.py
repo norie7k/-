@@ -237,12 +237,18 @@ section[data-testid="stSidebar"] button[key^="next_day"] {
   background: rgba(30, 41, 59, 0.8) !important;
   border: 1px solid rgba(148, 163, 184, 0.3) !important;
   color: #94a3b8 !important;
-  font-size: 0.7rem !important;
+  font-size: 0.62rem !important;
   font-weight: 500 !important;
-  padding: 0.4rem 0.4rem !important;
+  padding: 0.4rem 0.3rem !important;
   white-space: nowrap !important;
   overflow: hidden !important;
   text-overflow: clip !important;
+  line-height: 1.2 !important;
+}
+section[data-testid="stSidebar"] button[key^="prev_day"] span,
+section[data-testid="stSidebar"] button[key^="next_day"] span {
+  white-space: nowrap !important;
+  font-size: 0.62rem !important;
 }
 section[data-testid="stSidebar"] button[key^="prev_day"]:not(:disabled):hover,
 section[data-testid="stSidebar"] button[key^="next_day"]:not(:disabled):hover {
