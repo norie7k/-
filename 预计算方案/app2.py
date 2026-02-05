@@ -41,16 +41,16 @@ STYLE_CSS = """
   --accent-primary:#C8A2E8;
   --accent-secondary:#9AD9E8;
 
-  --bg-dark:#f8fafc;
-  --bg0:#ffffff;
-  --bg1:#f1f5f9;
-  --bg2:#e2e8f0;
+  --bg-dark:#eef0f4;
+  --bg0:#f0f2f5;
+  --bg1:#e8ebf0;
+  --bg2:#dde1e8;
 
-  --card:#ffffff;
-  --card2:#f8fafc;
-  --card-bg:rgba(255, 255, 255, 0.9);
-  --line:rgba(100,116,139,.15);
-  --glass-border:rgba(200, 162, 232, 0.2);
+  --card:#f5f6f8;
+  --card2:#eef0f4;
+  --card-bg:rgba(245, 246, 248, 0.95);
+  --line:rgba(100,116,139,.18);
+  --glass-border:rgba(200, 162, 232, 0.25);
 
   --text:#334155;
   --muted:#64748b;
@@ -118,8 +118,8 @@ header[data-testid="stHeader"]{
 
 /* ===== 侧边栏：稳定选择器 ===== */
 section[data-testid="stSidebar"]{
-  background: linear-gradient(180deg, #ffffff, #f8fafc) !important;
-  border-right: 1px solid rgba(200,162,232,.2);
+  background: linear-gradient(180deg, #f0f2f5, #e8ebf0) !important;
+  border-right: 1px solid rgba(200,162,232,.25);
   min-width: 280px !important;
   max-width: 320px !important;
 }
@@ -176,7 +176,7 @@ section[data-testid="stSidebar"] button[kind="primary"]:hover {
     box-shadow: 0 4px 12px rgba(200, 162, 232, 0.4) !important;
 }
 section[data-testid="stSidebar"] button[kind="secondary"] {
-    background: rgba(255, 255, 255, 0.9) !important;
+    background: rgba(240, 242, 245, 0.95) !important;
     border: 1px solid rgba(200, 162, 232, 0.4) !important;
     color: #334155 !important;
     font-size: 0.95rem !important;
@@ -217,7 +217,7 @@ section[data-testid="stSidebar"] button#st-key-quick_prev_day,
 section[data-testid="stSidebar"] button#st-key-quick_next_day,
 section[data-testid="stSidebar"] button#st-key-quick_prev_disabled,
 section[data-testid="stSidebar"] button#st-key-quick_next_disabled {
-    background: rgba(255, 255, 255, 0.9) !important;
+    background: rgba(240, 242, 245, 0.95) !important;
     border: 1px solid rgba(200, 162, 232, 0.35) !important;
     color: #6b21a8 !important;
     font-size: 0.42rem !important;
@@ -262,7 +262,7 @@ section[data-testid="stSidebar"] button#st-key-quick_next_disabled {
 
 /* sidebar 输入框/下拉框 */
 section[data-testid="stSidebar"] [data-baseweb="select"] > div{
-  background: rgba(255,255,255,.95) !important;
+  background: rgba(240,242,245,.98) !important;
   border: 1px solid rgba(200,162,232,.3) !important;
   border-radius: 10px !important;
   font-size: 0.9rem !important;
@@ -300,7 +300,7 @@ section[data-testid="stSidebar"] [data-baseweb="select"] [role="button"] {
   padding-right: 2rem !important;
 }
 section[data-testid="stSidebar"] [data-baseweb="input"]{
-  background: rgba(255,255,255,.95) !important;
+  background: rgba(240,242,245,.98) !important;
   border: 1px solid rgba(200,162,232,.3) !important;
   border-radius: 10px !important;
   font-size: 0.95rem !important;
@@ -333,7 +333,7 @@ section[data-testid="stSidebar"] .stAlert {
 
 /* 下拉菜单弹层（options） */
 div[data-baseweb="menu"]{
-  background: rgba(255,255,255,.98) !important;
+  background: rgba(240,242,245,.98) !important;
   border: 1px solid rgba(200,162,232,.25) !important;
   border-radius: 12px !important;
   max-width: 350px !important;
@@ -351,7 +351,7 @@ div[data-baseweb="option"]:hover{ background: rgba(200,162,232,.15) !important; 
 
 /* 日期 popover */
 div[data-baseweb="popover"]{
-  background: rgba(255,255,255,.98) !important;
+  background: rgba(240,242,245,.98) !important;
   border: 1px solid rgba(200,162,232,.25) !important;
   border-radius: 12px !important;
   z-index: 9999 !important;
@@ -433,7 +433,7 @@ button[data-testid="baseButton-secondary"]:hover{
 
 /* ===== 统计概览卡 ===== */
 .stats-overview{
-  background: linear-gradient(145deg, rgba(255,255,255,.95), rgba(248,250,252,.95));
+  background: linear-gradient(145deg, rgba(245,246,248,.98), rgba(238,240,244,.98));
   border-radius: 18px;
   padding: 0.8rem 1rem 0.8rem 1rem;
   margin: 1.1rem 0 1.1rem 0;
@@ -476,7 +476,7 @@ button[data-testid="baseButton-secondary"]:hover{
   position: relative;
 }
 .cluster-card{
-  background: linear-gradient(145deg, rgba(255,255,255,.95), rgba(248,250,252,.95));
+  background: linear-gradient(145deg, rgba(245,246,248,.98), rgba(238,240,244,.98));
   border: 1px solid rgba(200,162,232,.2);
   border-radius: 14px;
   padding: 10px 14px 8px 14px;
@@ -507,7 +507,7 @@ button[data-testid="baseButton-secondary"]:hover{
   justify-content:space-between !important;
   gap: 10px !important;
   padding: 12px 14px !important;
-  background: linear-gradient(145deg, rgba(255,255,255,.98), rgba(248,250,252,.98)) !important;
+  background: linear-gradient(145deg, rgba(245,246,248,.98), rgba(238,240,244,.98)) !important;
   backdrop-filter: blur(10px) !important;
   border-bottom: 1px solid rgba(200,162,232,.2) !important;
   box-shadow: 0 4px 12px rgba(200,162,232,.1) !important;
@@ -591,7 +591,7 @@ button[data-testid="baseButton-secondary"]:hover{
 /* Summary中的卡片：未展开时显示，展开后隐藏 */
 .custom-expander:not([open]) .custom-expander-summary .cluster-card{
   display: block;
-  background: linear-gradient(145deg, rgba(255,255,255,.95), rgba(248,250,252,.95));
+  background: linear-gradient(145deg, rgba(245,246,248,.98), rgba(238,240,244,.98));
   border: 1px solid rgba(200,162,232,.2);
   border-radius: 14px;
   padding: 10px 14px 8px 14px;
@@ -611,12 +611,12 @@ button[data-testid="baseButton-secondary"]:hover{
   position: sticky !important;
   top: 0 !important;
   z-index: 100 !important;
-  background: linear-gradient(180deg, rgba(255,255,255,1) 0%, rgba(255,255,255,0.98) 85%, rgba(255,255,255,0.7) 100%) !important;
+  background: linear-gradient(180deg, rgba(240,242,245,1) 0%, rgba(240,242,245,0.98) 85%, rgba(240,242,245,0.7) 100%) !important;
   padding-bottom: 6px;
   margin-bottom: 0;
 }
 .cluster-card-sticky .cluster-card{
-  background: linear-gradient(145deg, rgba(255,255,255,.95), rgba(248,250,252,.95));
+  background: linear-gradient(145deg, rgba(245,246,248,.98), rgba(238,240,244,.98));
   border: 1px solid rgba(200,162,232,.2);
   border-radius: 14px;
   padding: 10px 14px 8px 14px;
@@ -646,7 +646,7 @@ button[data-testid="baseButton-secondary"]:hover{
 }
 /* 内部收起按钮 */
 .expander-toggle-inside{
-  background: rgba(255,255,255,.9);
+  background: rgba(240,242,245,.95);
   border: 1px solid rgba(200,162,232,.25);
   border-radius: 10px;
   padding: 5px 12px;
@@ -712,7 +712,7 @@ button[data-testid="baseButton-secondary"]:hover{
   display: none;
 }
 .expander-toggle{
-  background: rgba(255,255,255,.9);
+  background: rgba(240,242,245,.95);
   border: 1px solid rgba(200,162,232,.25);
   border-radius: 14px;
   padding: 6px 14px;
@@ -746,7 +746,7 @@ button[data-testid="baseButton-secondary"]:hover{
 
 /* ===== Expander（原生 Streamlit，保留兼容）===== */
 section[data-testid="stMain"] div[data-testid="stExpander"] details > summary{
-  background: rgba(255,255,255,.9) !important;
+  background: rgba(240,242,245,.95) !important;
   border: 1px solid rgba(200,162,232,.25) !important;
   border-radius: 14px !important;
   padding: 10px 14px !important;
@@ -847,7 +847,7 @@ section[data-testid="stMain"] div[data-testid="stExpander"] div[role="region"]{
   position: sticky;
   top: 0;
   z-index: 50;
-  background: linear-gradient(180deg, rgba(255,255,255,1) 0%, rgba(255,255,255,0.98) 90%, rgba(255,255,255,0.8) 100%);
+  background: linear-gradient(180deg, rgba(240,242,245,1) 0%, rgba(240,242,245,0.98) 90%, rgba(240,242,245,0.8) 100%);
   padding-bottom: 4px;
 }
 .dp-card-sticky .dp-card{
@@ -1008,7 +1008,7 @@ section[data-testid="stMain"] div[data-testid="stExpander"] div[role="region"]{
   overflow-y: auto;
 }
 .raw-msg-item{
-  background: rgba(255,255,255,.8);
+  background: rgba(240,242,245,.9);
   border: 1px solid rgba(200,162,232,.2);
   border-radius: 6px;
   padding: 6px 10px;
@@ -1362,7 +1362,7 @@ button[aria-selected="true"]{
   bottom: calc(100% + 12px);
   left: 50%;
   transform: translateX(-50%) translateY(5px);
-  background: linear-gradient(145deg, rgba(255, 255, 255, 0.98), rgba(248, 250, 252, 0.98));
+  background: linear-gradient(145deg, rgba(245, 246, 248, 0.98), rgba(238, 240, 244, 0.98));
   border: 1px solid rgba(200, 162, 232, 0.35);
   border-radius: 12px;
   padding: 12px 16px;
@@ -1466,7 +1466,7 @@ section[data-testid="stMain"] [data-testid="stDateInput"]{
 
 /* 查询区域容器样式 - 通过标记ID定位 */
 [data-testid="stVerticalBlock"]:has(> [data-testid="element-container"] > .query-card-header){
-  background: rgba(255, 255, 255, 0.9) !important;
+  background: rgba(240, 242, 245, 0.95) !important;
   border: 2px solid var(--accent-primary) !important;
   border-radius: 20px !important;
   padding: 20px 24px !important;
@@ -2957,7 +2957,7 @@ def show_homepage():
             if (!container) container = header.closest('[data-testid="stVerticalBlock"]');
             if (container && !container.dataset.cardStyled) {
                 container.dataset.cardStyled = 'true';
-                container.style.background = 'rgba(255, 255, 255, 0.9)';
+                container.style.background = 'rgba(240, 242, 245, 0.95)';
                 container.style.border = '2px solid #C8A2E8';
                 container.style.borderRadius = '20px';
                 container.style.padding = '20px 24px';
