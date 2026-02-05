@@ -275,7 +275,7 @@ div[data-baseweb="popover"] button.date-disabled .date-disabled-icon {
 }
 .cluster-header-inner .cluster-title{
   font-weight: 950 !important;
-  font-size: 1.15rem !important;
+  font-size: 1.45rem !important;
   color: #f1f5f9 !important;
   line-height: 1.25 !important;
 }
@@ -287,7 +287,7 @@ div[data-baseweb="popover"] button.date-disabled .date-disabled-icon {
 }
 .cluster-title{
   font-weight: 950;
-  font-size: 1.15rem;
+  font-size: 1.45rem;
   color: #f1f5f9;
   line-height: 1.25;
 }
@@ -565,7 +565,7 @@ section[data-testid="stMain"] div[data-testid="stExpander"] div[role="region"]{
 }
 .dp-title{
   font-weight: 800;
-  font-size: 1.35rem;
+  font-size: 1.2rem;
   color: #fff;
   flex: 1;
 }
@@ -664,7 +664,7 @@ section[data-testid="stMain"] div[data-testid="stExpander"] div[role="region"]{
 }
 .dp-card-header-fixed .dp-title{
   font-weight: 800;
-  font-size: 1.35rem;
+  font-size: 1.2rem;
   color: #fff;
 }
 .dp-content-direct{
