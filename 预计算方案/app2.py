@@ -3206,47 +3206,39 @@ def main():
         </div>
         """, unsafe_allow_html=True)
 
-    # 主内容区 - 顶部返回图标
+    # 主内容区 - 顶部返回按钮
     st.markdown("""
     <style>
-    .back-home-icon {
-        position: absolute;
-        top: 0.8rem;
-        left: 0;
-        z-index: 100;
+    .back-button-container {
+        margin-bottom: 1.5rem;
     }
-    .back-home-icon button {
-        background: rgba(30, 41, 59, 0.8) !important;
-        border: 1px solid rgba(148, 163, 184, 0.25) !important;
-        color: #94a3b8 !important;
-        padding: 0.45rem 0.6rem !important;
-        font-size: 1.3rem !important;
-        line-height: 1 !important;
-        border-radius: 6px !important;
+    .back-button-container button {
+        background: rgba(30, 41, 59, 0.7) !important;
+        border: 1px solid rgba(148, 163, 184, 0.3) !important;
+        color: #e2e8f0 !important;
+        padding: 0.6rem 1.2rem !important;
+        font-size: 0.95rem !important;
+        font-weight: 500 !important;
+        border-radius: 8px !important;
         transition: all 0.2s ease !important;
-        min-width: auto !important;
-        width: auto !important;
-        height: auto !important;
-        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15) !important;
     }
-    .back-home-icon button:hover {
-        background: rgba(139, 92, 246, 0.25) !important;
+    .back-button-container button:hover {
+        background: rgba(30, 41, 59, 0.95) !important;
         border-color: rgba(168, 85, 247, 0.5) !important;
-        color: #c7d2fe !important;
         transform: translateX(-3px) !important;
-        box-shadow: 0 3px 10px rgba(139, 92, 246, 0.25) !important;
+        box-shadow: 0 2px 12px rgba(139, 92, 246, 0.2) !important;
     }
     </style>
     """, unsafe_allow_html=True)
     
-    col_icon, col_space = st.columns([0.08, 0.92])
-    with col_icon:
-        st.markdown('<div class="back-home-icon">', unsafe_allow_html=True)
-        if st.button("◀", key="back_to_home_icon", help="返回主页"):
+    st.markdown('<div class="back-button-container">', unsafe_allow_html=True)
+    col_back, col_spacer = st.columns([0.12, 0.88])
+    with col_back:
+        if st.button("← 返回", key="back_to_home_top", help="返回主页"):
             st.session_state.show_results = False
             st.session_state.query_type = "daily"
             st.rerun()
-        st.markdown('</div>', unsafe_allow_html=True)
+    st.markdown('</div>', unsafe_allow_html=True)
     
     query_type = st.session_state.get("query_type", "daily")
     
