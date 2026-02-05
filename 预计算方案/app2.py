@@ -2676,6 +2676,36 @@ def show_homepage():
 </div>
 """, unsafe_allow_html=True)
 
+    # ===== JavaScript：给查询区域容器添加背景 =====
+    components.html("""
+<script>
+(function() {
+    function applyCardBackground() {
+        const parentDoc = window.parent.document;
+        const header = parentDoc.querySelector('.query-card-header');
+        if (header) {
+            let container = header.closest('[data-testid="column"]');
+            if (!container) container = header.closest('[data-testid="stVerticalBlock"]');
+            if (container && !container.dataset.cardStyled) {
+                container.dataset.cardStyled = 'true';
+                container.style.background = 'rgba(15, 23, 42, 0.85)';
+                container.style.border = '2px solid #a855f7';
+                container.style.borderRadius = '20px';
+                container.style.padding = '20px 24px';
+                container.style.marginBottom = '20px';
+                container.style.boxShadow = '0 15px 40px rgba(168, 85, 247, 0.2)';
+            }
+        }
+    }
+    setTimeout(applyCardBackground, 200);
+    setTimeout(applyCardBackground, 500);
+    setTimeout(applyCardBackground, 1000);
+    const observer = new MutationObserver(applyCardBackground);
+    observer.observe(window.parent.document.body, { childList: true, subtree: true });
+})();
+</script>
+""", height=0)
+
     # ===== 系统说明文字 =====
     st.markdown("""
 <div style="text-align: center; margin: 8px auto 8px; padding: 0 20px;">
