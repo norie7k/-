@@ -191,6 +191,11 @@ div[data-baseweb="popover"] button.date-disabled .date-disabled-icon {
   transform: translateY(-1px);
   box-shadow: 0 12px 28px rgba(99,102,241,.38);
 }
+/* 日期导航按钮字体增大 */
+.stButton > button p{
+  font-size: 1.25rem !important;
+  font-weight: 700 !important;
+}
 
 /* ===== 统计概览卡 ===== */
 .stats-overview{
@@ -1784,18 +1789,6 @@ def render_result(result: dict, group_key: str | None = None, available_dates: l
             st.markdown("---")
             st.markdown("### 📅 日期导航")
             
-            # 日期导航按钮样式
-            st.markdown("""
-            <style>
-            div[data-testid="column"]:has(button[key^="nav_"]) button,
-            div[data-testid="stHorizontalBlock"] button[kind="secondary"] {
-                font-size: 1.3rem !important;
-                font-weight: 700 !important;
-                padding: 0.6rem 1rem !important;
-            }
-            </style>
-            """, unsafe_allow_html=True)
-            
             nav_col1, nav_col2, nav_col3 = st.columns([1, 1, 1])
             
             with nav_col1:
@@ -1809,9 +1802,9 @@ def render_result(result: dict, group_key: str | None = None, available_dates: l
             
             with nav_col2:
                 st.markdown(
-                    f"""<div style="text-align: center; padding: 0.6rem; background: rgba(168,85,247,0.2); 
+                    f"""<div style="text-align: center; padding: 0.5rem; background: rgba(168,85,247,0.2); 
                     border-radius: 8px; border: 1px solid rgba(168,85,247,0.4);">
-                    <span style="font-size: 1.4rem; font-weight: 800; color: #e9d5ff;">当前: {current_display}</span>
+                    <span style="font-size: 1.1rem; font-weight: 700; color: #e9d5ff;">当前: {current_display}</span>
                     </div>""",
                     unsafe_allow_html=True
                 )
