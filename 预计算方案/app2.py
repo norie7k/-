@@ -3118,7 +3118,7 @@ def show_homepage():
     </div>
     <div class="intro-card">
         <span class="icon">🔥</span>
-        <h3>热度排名</h3>
+        <h3>热度分析</h3>
         <p>根据参与人数和发言数计算话题热度，呈现Top5热门话题</p>
     </div>
     <div class="intro-card">
