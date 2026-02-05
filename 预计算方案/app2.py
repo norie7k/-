@@ -808,19 +808,17 @@ section[data-testid="stMain"] div[data-testid="stExpander"] div[role="region"]{
   display: none;
 }
 .dp-card{
-  background: linear-gradient(135deg, #f5f0ff 0%, #eff6ff 100%);
-  border: 1px solid #ddd6fe;
-  border-left: 4px solid #8b5cf6;
+  background: linear-gradient(135deg, rgba(133,182,242,0.1) 0%, rgba(117,200,227,0.1) 100%);
+  border: 1px solid rgba(133,182,242,0.3);
+  border-left: 4px solid #85B6F2;
   border-radius: 0 10px 10px 0;
   padding: 12px 16px;
   transition: all 0.2s ease;
-  box-shadow: 0 2px 6px rgba(139,92,246,0.08);
 }
 .dp-card:hover{
-  background: linear-gradient(135deg, #ede9fe 0%, #e0f2fe 100%);
-  border-color: #c4b5fd;
-  border-left-color: #7c3aed;
-  box-shadow: 0 4px 12px rgba(139,92,246,0.15);
+  background: linear-gradient(135deg, rgba(133,182,242,0.18) 0%, rgba(117,200,227,0.18) 100%);
+  border-color: rgba(133,182,242,0.5);
+  border-left-color: #5a9de8;
 }
 .dp-header{
   display: flex;
@@ -830,8 +828,8 @@ section[data-testid="stMain"] div[data-testid="stExpander"] div[role="region"]{
 }
 .dp-title{
   font-weight: 700;
-  font-size: 1.1rem;
-  color: #7c3aed;
+  font-size: 1.05rem;
+  color: #2563eb;
   flex: 1;
 }
 .dp-toggle-btn{
@@ -875,18 +873,16 @@ section[data-testid="stMain"] div[data-testid="stExpander"] div[role="region"]{
   padding-bottom: 4px;
 }
 .dp-card-sticky .dp-card{
-  background: linear-gradient(135deg, #f5f0ff 0%, #eff6ff 100%);
-  border: 1px solid #ddd6fe;
-  border-left: 4px solid #8b5cf6;
+  background: linear-gradient(135deg, rgba(133,182,242,0.1) 0%, rgba(117,200,227,0.1) 100%);
+  border: 1px solid rgba(133,182,242,0.3);
+  border-left: 4px solid #85B6F2;
   border-radius: 0 10px 10px 0;
   margin: 0;
   cursor: pointer;
   transition: all 0.2s ease;
-  box-shadow: 0 2px 6px rgba(139,92,246,0.08);
 }
 .dp-card-sticky .dp-card:hover{
-  background: linear-gradient(135deg, #ede9fe 0%, #e0f2fe 100%);
-  box-shadow: 0 4px 12px rgba(139,92,246,0.15);
+  background: linear-gradient(135deg, rgba(133,182,242,0.18) 0%, rgba(117,200,227,0.18) 100%);
 }
 /* 讨论点内容区域（自适应高度，无需滚动） */
 .dp-scrollable{
@@ -916,28 +912,38 @@ section[data-testid="stMain"] div[data-testid="stExpander"] div[role="region"]{
 /* ===== 讨论点直接展示样式（不折叠）===== */
 .dp-card-wrapper{
   background: #ffffff;
-  border: 1px solid #ddd6fe;
-  border-left: 4px solid #8b5cf6;
+  border: 1px solid rgba(133,182,242,0.3);
+  border-left: 4px solid #85B6F2;
   border-radius: 0 10px 10px 0;
   margin: 14px 0;
   overflow: hidden;
-  box-shadow: 0 2px 8px rgba(139,92,246,0.1);
 }
 .dp-card-header-fixed{
-  background: linear-gradient(135deg, #f5f0ff 0%, #eff6ff 100%);
-  border-bottom: 1px solid #ddd6fe;
+  background: linear-gradient(135deg, rgba(133,182,242,0.1) 0%, rgba(117,200,227,0.1) 100%);
+  border-bottom: 1px solid rgba(133,182,242,0.3);
   padding: 12px 16px;
 }
 .dp-card-header-fixed .dp-title{
   font-weight: 700;
-  font-size: 1.08rem;
-  color: #7c3aed;
+  font-size: 1.05rem;
+  color: #2563eb;
 }
 .dp-content-direct{
   background: #ffffff;
   padding: 12px 14px;
 }
 
+/* 讨论点主标题 */
+.dp-main-title{
+  background: linear-gradient(135deg, rgba(181,146,232,0.15) 0%, rgba(133,182,242,0.15) 100%);
+  border-left: 4px solid #B592E8;
+  border-radius: 0 8px 8px 0;
+  padding: 12px 16px;
+  margin-bottom: 14px;
+  color: #7c3aed;
+  font-size: 1.05rem;
+  font-weight: 700;
+}
 .dp-section-title{
   font-size: 0.82rem;
   font-weight: 600;
@@ -955,9 +961,9 @@ section[data-testid="stMain"] div[data-testid="stExpander"] div[role="region"]{
 }
 
 .opinion-item{
-  background: linear-gradient(135deg, #fef3c7 0%, #fef9c3 100%);
+  background: linear-gradient(135deg, rgba(124,218,201,0.12) 0%, rgba(150,230,193,0.12) 100%);
   border: none;
-  border-left: 4px solid #f59e0b;
+  border-left: 4px solid #7CDAC9;
   padding: 12px 16px;
   margin: 10px 0;
   border-radius: 0 8px 8px 0;
@@ -965,7 +971,6 @@ section[data-testid="stMain"] div[data-testid="stExpander"] div[role="region"]{
   font-size: 0.95rem;
   line-height: 1.6;
   font-weight: 600;
-  box-shadow: 0 2px 6px rgba(245,158,11,0.1);
 }
 .example-quote{
   background: #f9fafb;
@@ -982,18 +987,17 @@ section[data-testid="stMain"] div[data-testid="stExpander"] div[role="region"]{
 
 /* ===== 新增：观点卡片样式（V2格式）===== */
 .opinion-card{
-  background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
-  border: 1px solid #fde68a;
-  border-left: 4px solid #f59e0b;
+  background: linear-gradient(135deg, rgba(124,218,201,0.1) 0%, rgba(150,230,193,0.1) 100%);
+  border: 1px solid rgba(124,218,201,0.3);
+  border-left: 4px solid #7CDAC9;
   border-radius: 0 10px 10px 0;
   padding: 14px 18px;
   margin: 14px 0;
-  box-shadow: 0 3px 8px rgba(245,158,11,0.12);
 }
 .opinion-card-header{
-  font-size: 1.05rem;
+  font-size: 1rem;
   font-weight: 700;
-  color: #b45309;
+  color: #0d9488;
   margin-bottom: 10px;
   display: flex;
   align-items: center;
@@ -1888,7 +1892,7 @@ def render_result(result: dict, group_key: str | None = None, available_dates: l
         discussion_list = cluster.get("讨论点列表", []) or []
         
         if discussion_list:
-            discussion_content_html += f'<div style="background: linear-gradient(135deg, #ede9fe 0%, #e0e7ff 100%); border-left: 4px solid #8b5cf6; border-radius: 0 8px 8px 0; padding: 12px 16px; margin-bottom: 14px; color: #7c3aed; font-size: 1.08rem; font-weight: 700; box-shadow: 0 2px 6px rgba(139,92,246,0.12);">💬 讨论点（共 {len(discussion_list)} 条）</div>'
+            discussion_content_html += f'<div class="dp-main-title">💬 讨论点（共 {len(discussion_list)} 条）</div>'
             
             for dp_i, dp in enumerate(discussion_list, 1):
                 discussion_content_html += build_discussion_point_html(dp, dp_i, group_key, date, idx)
@@ -2275,7 +2279,7 @@ def render_version_result(result: dict, group_key: str | None = None):
         # 构建讨论点内容
         discussion_content_html = ""
         if discussion_points:
-            discussion_content_html += f'<div style="background: linear-gradient(135deg, #ede9fe 0%, #e0e7ff 100%); border-left: 4px solid #8b5cf6; border-radius: 0 8px 8px 0; padding: 12px 16px; margin-bottom: 14px; color: #7c3aed; font-size: 1.08rem; font-weight: 700; box-shadow: 0 2px 6px rgba(139,92,246,0.12);">📋 核心讨论点（共 {len(discussion_points)} 条）</div>'
+            discussion_content_html += f'<div class="dp-main-title">📋 核心讨论点（共 {len(discussion_points)} 条）</div>'
             
             for dp_i, dp in enumerate(discussion_points, 1):
                 dp_title = dp.get("point", "")
