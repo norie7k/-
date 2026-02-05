@@ -284,24 +284,6 @@ section[data-testid="stSidebar"] .stAlert {
   margin: 0.5rem 0 !important;
 }
 
-/* 侧边栏返回主页按钮 */
-section[data-testid="stSidebar"] button#st-key-sidebar_back_home {
-  background: transparent !important;
-  border: none !important;
-  padding: 0.3rem 0.4rem !important;
-  font-size: 1.2rem !important;
-  border-radius: 6px !important;
-  transition: all 0.2s ease !important;
-  min-width: auto !important;
-  margin-top: 0.1rem !important;
-  opacity: 0.7 !important;
-}
-section[data-testid="stSidebar"] button#st-key-sidebar_back_home:hover {
-  background: rgba(139, 92, 246, 0.15) !important;
-  opacity: 1 !important;
-  transform: scale(1.1) !important;
-}
-
 
 /* 下拉菜单弹层（options） */
 div[data-baseweb="menu"]{
@@ -2991,21 +2973,11 @@ def main():
     
     # 侧边栏
     with st.sidebar:
-        # 顶部：返回主页按钮 + 标题
-        col_title, col_back = st.columns([0.85, 0.15])
-        with col_title:
-            st.markdown("""
-            <div style="padding: 0.5rem 0 0.5rem 0;">
-                <h2 style="margin: 0; font-size: 1.3rem; color: #e2e8f0;">🔍 查询条件</h2>
-            </div>
-            """, unsafe_allow_html=True)
-        with col_back:
-            if st.button("返回", key="sidebar_back_home", help="返回主页"):
-                st.session_state.show_results = False
-                st.session_state.query_type = "daily"
-                st.rerun()
-        
-        st.markdown("<div style='margin-bottom: 0.5rem;'></div>", unsafe_allow_html=True)
+        st.markdown("""
+        <div style="text-align: center; padding: 0.5rem 0 1rem 0;">
+            <h2 style="margin: 0; font-size: 1.3rem; color: #e2e8f0;">🔍 查询条件</h2>
+        </div>
+        """, unsafe_allow_html=True)
 
         group_options = {k: GROUPS[k]["name"] for k in GROUPS.keys()}
         
