@@ -279,41 +279,6 @@ section[data-testid="stSidebar"] input{
   color: var(--text) !important;
 }
 
-/* 侧边栏返回主页按钮 */
-section[data-testid="stSidebar"] button#st-key-sidebar_back_home {
-  background: rgba(30, 41, 59, 0.75) !important;
-  border: 1px solid rgba(148, 163, 184, 0.35) !important;
-  color: #cbd5f5 !important;
-  font-size: 0.6rem !important;
-  padding: 0.16rem 0.32rem !important;
-  border-radius: 6px !important;
-  min-width: auto !important;
-  width: auto !important;
-  white-space: nowrap !important;
-  display: inline-flex !important;
-  align-items: center !important;
-  flex-direction: row !important;
-  line-height: 1 !important;
-}
-section[data-testid="stSidebar"] button#st-key-sidebar_back_home span,
-section[data-testid="stSidebar"] button#st-key-sidebar_back_home p {
-  font-size: 0.6rem !important;
-  line-height: 1 !important;
-  margin: 0 !important;
-  white-space: nowrap !important;
-  display: inline !important;
-}
-section[data-testid="stSidebar"] button#st-key-sidebar_back_home > div {
-  display: inline-flex !important;
-  flex-direction: row !important;
-  white-space: nowrap !important;
-  align-items: center !important;
-}
-section[data-testid="stSidebar"] button#st-key-sidebar_back_home:hover {
-  background: rgba(139, 92, 246, 0.2) !important;
-  border-color: rgba(168, 85, 247, 0.45) !important;
-}
-
 /* sidebar 分隔线 */
 section[data-testid="stSidebar"] hr {
   border: none !important;
@@ -3021,19 +2986,11 @@ def main():
     
     # 侧边栏
     with st.sidebar:
-        # 顶部：标题 + 返回主页（右上角）
-        col_title, col_back = st.columns([0.78, 0.22], gap="small")
-        with col_title:
-            st.markdown("""
-            <div style="padding: 0.5rem 0 1rem 0;">
-                <h2 style="margin: 0; font-size: 1.3rem; color: #e2e8f0;">🔍 查询条件</h2>
-            </div>
-            """, unsafe_allow_html=True)
-        with col_back:
-            if st.button("‹返回", key="sidebar_back_home", help="返回主页", use_container_width=False):
-                st.session_state.show_results = False
-                st.session_state.query_type = "daily"
-                st.rerun()
+        st.markdown("""
+        <div style="text-align: center; padding: 0.5rem 0 1rem 0;">
+            <h2 style="margin: 0; font-size: 1.3rem; color: #e2e8f0;">🔍 查询条件</h2>
+        </div>
+        """, unsafe_allow_html=True)
 
         group_options = {k: GROUPS[k]["name"] for k in GROUPS.keys()}
         
