@@ -234,23 +234,23 @@ section[data-testid="stSidebar"] .stAlert {
 /* 返回主页按钮 */
 div[data-testid="column"]:first-child button[kind="secondary"] {
   background: rgba(15, 23, 42, 0.95) !important;
-  border: 2px solid rgba(96, 165, 250, 0.5) !important;
+  border: 2px solid rgba(96, 165, 250, 0.6) !important;
   color: #93c5fd !important;
-  padding: 0.6rem 0.9rem !important;
-  font-size: 1.6rem !important;
+  padding: 0.5rem 0.8rem !important;
+  font-size: 1.5rem !important;
   font-weight: 700 !important;
-  border-radius: 10px !important;
+  border-radius: 8px !important;
   transition: all 0.25s ease !important;
   min-width: auto !important;
-  margin-top: -2.8rem !important;
-  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.15) !important;
+  margin-top: -3.8rem !important;
+  box-shadow: 0 2px 10px rgba(59, 130, 246, 0.25) !important;
 }
 div[data-testid="column"]:first-child button[kind="secondary"]:hover {
-  background: rgba(59, 130, 246, 0.2) !important;
-  border-color: rgba(96, 165, 250, 0.8) !important;
+  background: rgba(59, 130, 246, 0.25) !important;
+  border-color: rgba(96, 165, 250, 0.9) !important;
   color: #bfdbfe !important;
   transform: translateX(-3px) !important;
-  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3) !important;
+  box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4) !important;
 }
 
 
