@@ -3273,7 +3273,18 @@ def main():
                 selected_version = None
         
         elif available_dates:
-            st.markdown("##### 📅 监测日期")
+            st.markdown('''
+<div style="display: flex; align-items: center; margin-bottom: 6px;">
+  <span style="font-size: 1rem; font-weight: 700; color: #1f2937;">📅 监测日期</span>
+  <span class="version-tooltip" style="margin-left: 4px;">ℹ️
+    <span class="tooltip-text">
+      <b>📌 版本日期参考</b><br>
+      • beta15_旋转木马: 12-03 ~ 12-17<br>
+      • beta17_暖冬测试: 12-31 ~ 01-20
+    </span>
+  </span>
+</div>
+''', unsafe_allow_html=True)
 
             date_objects = []
             for date_str in available_dates:
