@@ -1793,8 +1793,8 @@ def render_result(result: dict, group_key: str | None = None, available_dates: l
             st.markdown("---")
             st.markdown("### 📅 日期导航")
             
-            # 居中紧凑布局
-            _, nav_col1, nav_col2, nav_col3, _ = st.columns([0.5, 1, 1, 1, 0.5])
+            # 三列均匀分布，占满屏幕宽度
+            nav_col1, nav_col2, nav_col3 = st.columns([1, 1, 1])
             
             with nav_col1:
                 if has_prev:
