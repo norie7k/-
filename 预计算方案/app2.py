@@ -74,11 +74,11 @@ section[data-testid="stMain"]{
 section[data-testid="stMain"] p,
 section[data-testid="stMain"] li{ color: var(--text); }
 
-/* 主页专用：隐藏顶部 header（通过 class 标记控制）*/
-.homepage-mode header[data-testid="stHeader"]{
+/* 隐藏顶部 header */
+header[data-testid="stHeader"]{
   display: none !important;
 }
-.homepage-mode .stApp > header{
+.stApp > header{
   display: none !important;
 }
 .homepage-mode .block-container{
@@ -278,23 +278,6 @@ section[data-testid="stSidebar"] [data-baseweb="input"]:hover{
 }
 section[data-testid="stSidebar"] input{
   color: var(--text) !important;
-}
-
-/* 主内容区返回主页按钮 */
-button#st-key-back_home_main {
-  background: rgba(255, 255, 255, 0.9) !important;
-  border: 1px solid rgba(200, 162, 232, 0.5) !important;
-  color: #6b21a8 !important;
-  font-size: 1.5rem !important;
-  padding: 0.4rem 0.7rem !important;
-  border-radius: 8px !important;
-  margin-top: -3.5rem !important;
-  transition: all 0.2s ease !important;
-}
-button#st-key-back_home_main:hover {
-  background: rgba(200, 162, 232, 0.2) !important;
-  border-color: rgba(200, 162, 232, 0.7) !important;
-  transform: translateX(-2px) !important;
 }
 
 /* sidebar 分隔线 */
@@ -1737,24 +1720,15 @@ def render_result(result: dict, group_key: str | None = None, available_dates: l
     except:
         formatted_date = date
     
-    # 报告标题（带返回按钮）
-    col_back, col_title = st.columns([0.06, 0.94])
-    
-    with col_back:
-        if st.button("‹", key="back_home_main", help="返回主页"):
-            st.session_state.show_results = False
-            st.session_state.query_type = "daily"
-            st.rerun()
-    
-    with col_title:
-        st.markdown(
-            f"""<div style="text-align: center; padding: 0 0 1rem 0; margin-top: -4rem; margin-left: -2rem;">
+    # 报告标题
+    st.markdown(
+        f"""<div style="text-align: center; padding: 0 0 1rem 0;">
 <h1 style="margin: 0; color: #6b21a8; font-size: 2rem; font-weight: 700;">
 📊 {platform_display} {group_display} {formatted_date} 分析报告 <span style="color: #C8A2E8;">_热门讨论TOP5</span>
 </h1>
 </div>""",
-            unsafe_allow_html=True,
-        )
+        unsafe_allow_html=True,
+    )
 
     # ========= 热门话题列表（摘要卡 + 展开详情）=========
     sorted_clusters = sorted(clusters, key=lambda x: float(x.get("热度评分", 0) or 0), reverse=True)
