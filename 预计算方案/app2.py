@@ -232,23 +232,25 @@ section[data-testid="stSidebar"] .stAlert {
 }
 
 /* 返回主页按钮 */
-button[key="back_home_from_result"] {
-  background: rgba(30, 41, 59, 0.8) !important;
-  border: 1px solid rgba(148, 163, 184, 0.3) !important;
-  color: #94a3b8 !important;
-  padding: 0.5rem 0.7rem !important;
-  font-size: 1.1rem !important;
-  border-radius: 8px !important;
-  transition: all 0.2s ease !important;
+div[data-testid="column"]:first-child button[kind="secondary"] {
+  background: rgba(15, 23, 42, 0.95) !important;
+  border: 2px solid rgba(96, 165, 250, 0.5) !important;
+  color: #93c5fd !important;
+  padding: 0.6rem 0.9rem !important;
+  font-size: 1.6rem !important;
+  font-weight: 700 !important;
+  border-radius: 10px !important;
+  transition: all 0.25s ease !important;
   min-width: auto !important;
-  margin-top: -2.5rem !important;
+  margin-top: -2.8rem !important;
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.15) !important;
 }
-button[key="back_home_from_result"]:hover {
-  background: rgba(139, 92, 246, 0.25) !important;
-  border-color: rgba(168, 85, 247, 0.5) !important;
-  color: #c7d2fe !important;
-  transform: translateX(-2px) !important;
-  box-shadow: 0 2px 8px rgba(139, 92, 246, 0.2) !important;
+div[data-testid="column"]:first-child button[kind="secondary"]:hover {
+  background: rgba(59, 130, 246, 0.2) !important;
+  border-color: rgba(96, 165, 250, 0.8) !important;
+  color: #bfdbfe !important;
+  transform: translateX(-3px) !important;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3) !important;
 }
 
 
@@ -1672,17 +1674,17 @@ def render_result(result: dict, group_key: str | None = None, available_dates: l
         formatted_date = date
     
     # 报告标题（带返回按钮）
-    col_back, col_title = st.columns([0.06, 0.94])
+    col_back, col_title = st.columns([0.05, 0.95])
     
     with col_back:
-        if st.button("◀", key="back_home_from_result", help="返回主页"):
+        if st.button("«", key="back_home_from_result", help="返回主页"):
             st.session_state.show_results = False
             st.session_state.query_type = "daily"
             st.rerun()
     
     with col_title:
         st.markdown(
-            f"""<div style="text-align: center; padding: 0 0 1rem 0; margin-top: -4rem; margin-left: -3rem;">
+            f"""<div style="text-align: center; padding: 0 0 1rem 0; margin-top: -4rem; margin-left: -2rem;">
 <h1 style="margin: 0; color: #e9d5ff; font-size: 2rem; font-weight: 700;">
 📊 {platform_display} {group_display} {formatted_date} 分析报告 <span style="color: #fbbf24;">_热门讨论TOP5</span>
 </h1>
