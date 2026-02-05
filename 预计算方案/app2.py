@@ -2219,6 +2219,120 @@ def render_version_result(result: dict, group_key: str | None = None):
 </script>
 """, height=0)
 
+# ==================== 自定义日历选择器 ====================
+
+def render_custom_calendar(available_dates: list, current_date: str, key_prefix: str = "cal"):
+    """
+    渲染自定义日历选择器
+    available_dates: 有数据的日期列表 (格式: YYYY-MM-DD)
+    current_date: 当前选中的日期
+    key_prefix: 按钮key前缀
+    返回: 用户选择的日期字符串，如果没有选择则返回None
+    """
+    import calendar
+    from datetime import date as date_type
+    
+    if not available_dates:
+        st.warning("暂无可用日期")
+        return None
+    
+    # 解析日期
+    date_set = set(available_dates)
+    date_objects = [datetime.strptime(d, "%Y-%m-%d").date() for d in available_dates]
+    
+    # 确定显示的月份（基于当前选中日期或最新数据日期）
+    if current_date:
+        try:
+            display_date = datetime.strptime(current_date, "%Y-%m-%d").date()
+        except:
+            display_date = max(date_objects)
+    else:
+        display_date = max(date_objects)
+    
+    display_year = display_date.year
+    display_month = display_date.month
+    
+    # 月份导航
+    st.markdown("#### 📅 选择日期")
+    
+    month_col1, month_col2, month_col3 = st.columns([1, 2, 1])
+    
+    selected_new_date = None
+    
+    with month_col1:
+        # 上个月
+        prev_month = display_month - 1
+        prev_year = display_year
+        if prev_month < 1:
+            prev_month = 12
+            prev_year -= 1
+        if st.button("◀ 上月", key=f"{key_prefix}_prev_month", use_container_width=True):
+            st.session_state[f"{key_prefix}_display_year"] = prev_year
+            st.session_state[f"{key_prefix}_display_month"] = prev_month
+            st.rerun()
+    
+    with month_col2:
+        # 检查session_state中是否有保存的显示月份
+        if f"{key_prefix}_display_year" in st.session_state:
+            display_year = st.session_state[f"{key_prefix}_display_year"]
+            display_month = st.session_state[f"{key_prefix}_display_month"]
+        
+        st.markdown(f"<div style='text-align: center; font-size: 1.3rem; font-weight: 700; color: #e9d5ff; padding: 0.3rem;'>{display_year}年{display_month}月</div>", unsafe_allow_html=True)
+    
+    with month_col3:
+        # 下个月
+        next_month = display_month + 1
+        next_year = display_year
+        if next_month > 12:
+            next_month = 1
+            next_year += 1
+        if st.button("下月 ▶", key=f"{key_prefix}_next_month", use_container_width=True):
+            st.session_state[f"{key_prefix}_display_year"] = next_year
+            st.session_state[f"{key_prefix}_display_month"] = next_month
+            st.rerun()
+    
+    # 星期标题
+    weekdays = ["一", "二", "三", "四", "五", "六", "日"]
+    weekday_html = "".join([f'<div style="text-align: center; font-weight: 700; color: #94a3b8; padding: 0.3rem;">{d}</div>' for d in weekdays])
+    st.markdown(f'<div style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; margin: 0.5rem 0;">{weekday_html}</div>', unsafe_allow_html=True)
+    
+    # 生成日历
+    cal = calendar.Calendar(firstweekday=0)  # 周一开始
+    month_days = cal.monthdayscalendar(display_year, display_month)
+    
+    # 日历网格
+    for week_idx, week in enumerate(month_days):
+        cols = st.columns(7)
+        for day_idx, day in enumerate(week):
+            with cols[day_idx]:
+                if day == 0:
+                    st.markdown("<div style='height: 2.2rem;'></div>", unsafe_allow_html=True)
+                else:
+                    date_str = f"{display_year}-{display_month:02d}-{day:02d}"
+                    has_data = date_str in date_set
+                    is_selected = date_str == current_date
+                    
+                    if has_data:
+                        # 有数据的日期 - 可点击按钮
+                        btn_type = "primary" if is_selected else "secondary"
+                        if st.button(
+                            str(day), 
+                            key=f"{key_prefix}_day_{date_str}", 
+                            use_container_width=True,
+                            type=btn_type
+                        ):
+                            selected_new_date = date_str
+                    else:
+                        # 无数据的日期 - 灰色显示
+                        st.markdown(
+                            f'<div style="text-align: center; padding: 0.35rem; color: #475569; '
+                            f'background: rgba(100,100,100,0.15); border-radius: 6px; font-size: 0.9rem;">{day}</div>',
+                            unsafe_allow_html=True
+                        )
+    
+    return selected_new_date
+
+
 # ==================== 主页欢迎界面 ====================
 
 def show_homepage():
@@ -2262,8 +2376,9 @@ def show_homepage():
         
         # === 日常查询标签 ===
         with tab1:
-            col_group, col_date, col_button = st.columns([1, 1, 0.8])
-
+            # 社群选择
+            col_group, col_button = st.columns([3, 1])
+            
             with col_group:
                 group_options = {k: GROUPS[k]["name"] for k in GROUPS.keys()}
                 selected_group_daily = st.selectbox(
@@ -2273,145 +2388,60 @@ def show_homepage():
                     key="homepage_group_daily",
                 )
 
-                with st.spinner("加载可用日期..."):
-                    index = load_index(selected_group_daily)
-                    available_dates = index.get("available_dates", [])
-
-            with col_date:
-                if available_dates:
-                    date_objects = []
-                    for date_str in available_dates:
-                        try:
-                            date_objects.append(datetime.strptime(date_str, "%Y-%m-%d").date())
-                        except:
-                            pass
-
-                    if date_objects:
-                        from datetime import date as date_type
-
-                        sorted_date_objects = sorted(date_objects, reverse=True)
-                        default_date = sorted_date_objects[0]
-
-                        min_date = min(date_objects)
-                        max_date = max(date_objects)
-
-                        min_year = min_date.year
-                        max_year = max_date.year
-                        extended_min_date = date_type(min_year, 1, 1)
-                        extended_max_date = date_type(max_year, 12, 31)
-
-                        if "homepage_date_cache" not in st.session_state:
-                            st.session_state.homepage_date_cache = default_date.strftime("%Y-%m-%d")
-
-                        try:
-                            cached_date_obj = datetime.strptime(
-                                st.session_state.homepage_date_cache, "%Y-%m-%d"
-                            ).date()
-                            initial_date = cached_date_obj if cached_date_obj in date_objects else default_date
-                        except:
-                            initial_date = default_date
-
-                        def on_homepage_date_change():
-                            selected_date_obj_check = st.session_state.get("homepage_date_input", initial_date)
-                            if isinstance(selected_date_obj_check, str):
-                                try:
-                                    selected_date_obj_check = datetime.strptime(
-                                        selected_date_obj_check, "%Y-%m-%d"
-                                    ).date()
-                                except:
-                                    selected_date_obj_check = initial_date
-
-                            selected_date_str_check = selected_date_obj_check.strftime("%Y-%m-%d")
-
-                            if selected_date_str_check not in available_dates:
-                                selected_date_obj_dt = datetime.combine(
-                                    selected_date_obj_check, datetime.min.time()
-                                )
-                                closest_date = min(
-                                    date_objects,
-                                    key=lambda x: abs(
-                                        (datetime.combine(x, datetime.min.time()) - selected_date_obj_dt).days
-                                    ),
-                                )
-                                closest_date_str = closest_date.strftime("%Y-%m-%d")
-                                st.session_state.homepage_date_cache = closest_date_str
-                                st.session_state.homepage_need_date_correction = True
-                                st.session_state.homepage_invalid_date_selected = selected_date_str_check
-                                st.session_state.homepage_valid_date_selected = closest_date_str
-                                st.rerun()
-                            else:
-                                st.session_state.homepage_date_cache = selected_date_str_check
-                                st.session_state.homepage_need_date_correction = False
-
-                        if st.session_state.get("homepage_need_date_correction", False):
-                            corrected_date = datetime.strptime(
-                                st.session_state.homepage_valid_date_selected, "%Y-%m-%d"
-                            ).date()
-                            selected_date_obj = st.date_input(
-                                "📅 监测日期",
-                                value=corrected_date,
-                                min_value=extended_min_date,
-                                max_value=extended_max_date,
-                                help="选择需要查看的日期",
-                                key="homepage_date_input",
-                                on_change=on_homepage_date_change,
-                            )
-
-                            invalid_date = st.session_state.get("homepage_invalid_date_selected", "")
-                            valid_date = st.session_state.get("homepage_valid_date_selected", "")
-                            if invalid_date:
-                                formatted_invalid_date = datetime.strptime(invalid_date, "%Y-%m-%d").strftime(
-                                    "%Y年%m月%d日"
-                                )
-                                formatted_valid_date = datetime.strptime(valid_date, "%Y-%m-%d").strftime(
-                                    "%Y年%m月%d日"
-                                )
-                                st.markdown(
-                                    f'<div style="padding: 0.6rem; background-color: rgba(255, 193, 7, 0.10); '
-                                    f'border-left: 3px solid #ffc107; border-radius: 8px; margin: 0.5rem 0;">'
-                                    f'<p style="margin: 0; font-size: 0.85rem; font-weight: 600; color: #ffd166;">'
-                                    f'⚠️ {formatted_invalid_date}暂无数据，已选择：{formatted_valid_date}</p></div>',
-                                    unsafe_allow_html=True,
-                                )
-                            st.session_state.homepage_need_date_correction = False
-                        else:
-                            selected_date_obj = st.date_input(
-                                "📅 监测日期",
-                                value=initial_date,
-                                min_value=extended_min_date,
-                                max_value=extended_max_date,
-                                help="选择需要查看的日期",
-                                key="homepage_date_input",
-                                on_change=on_homepage_date_change,
-                            )
-
-                        selected_date = selected_date_obj.strftime("%Y-%m-%d")
-                        if selected_date in available_dates:
-                            st.session_state.homepage_date_cache = selected_date
-                    else:
-                        selected_date = None
-                else:
-                    st.warning("该社群暂无数据")
-                    selected_date = None
-
             with col_button:
                 st.markdown("<div style='height: 1.75rem;'></div>", unsafe_allow_html=True)
-                if st.button(
-                    "✨ 查看分析",
-                    use_container_width=True,
-                    type="primary",
-                    disabled=not selected_date,
-                    key="btn_daily",
-                ):
-                    st.session_state.show_results = True
-                    st.session_state.query_type = "daily"
-                    st.session_state.selected_group_homepage = selected_group_daily
-                    st.session_state.selected_date_homepage = selected_date
-                    st.session_state.confirmed_group = selected_group_daily
-                    st.session_state.selected_group_cache = selected_group_daily
-                    st.session_state.confirmed_date = selected_date
-                    st.session_state.selected_date_cache = selected_date
+                query_btn_disabled = True  # 先禁用，等日期选择后启用
+            
+            # 加载可用日期
+            with st.spinner("加载可用日期..."):
+                index = load_index(selected_group_daily)
+                available_dates = index.get("available_dates", [])
+            
+            # 日期选择 - 使用自定义日历
+            if available_dates:
+                # 初始化当前选中日期
+                if "homepage_date_cache" not in st.session_state:
+                    sorted_dates = sorted(available_dates, reverse=True)
+                    st.session_state.homepage_date_cache = sorted_dates[0] if sorted_dates else None
+                
+                current_selected = st.session_state.homepage_date_cache
+                
+                # 使用自定义日历选择器
+                new_selected = render_custom_calendar(
+                    available_dates=available_dates,
+                    current_date=current_selected,
+                    key_prefix="homepage_cal"
+                )
+                
+                # 如果用户选择了新日期
+                if new_selected:
+                    st.session_state.homepage_date_cache = new_selected
                     st.rerun()
+                
+                selected_date = st.session_state.homepage_date_cache
+                query_btn_disabled = not selected_date
+            else:
+                st.warning("该社群暂无数据")
+                selected_date = None
+            
+            # 查询按钮
+            st.markdown("<div style='height: 0.5rem;'></div>", unsafe_allow_html=True)
+            if st.button(
+                "✨ 查看分析",
+                use_container_width=True,
+                type="primary",
+                disabled=query_btn_disabled,
+                key="btn_daily",
+            ):
+                st.session_state.show_results = True
+                st.session_state.query_type = "daily"
+                st.session_state.selected_group_homepage = selected_group_daily
+                st.session_state.selected_date_homepage = selected_date
+                st.session_state.confirmed_group = selected_group_daily
+                st.session_state.selected_group_cache = selected_group_daily
+                st.session_state.confirmed_date = selected_date
+                st.session_state.selected_date_cache = selected_date
+                st.rerun()
 
 
         # === 版本查询标签 ===
