@@ -2665,12 +2665,15 @@ def show_homepage():
             col_group, col_date, col_button = st.columns([1, 1, 0.8])
 
             with col_group:
+                # 自定义标签
+                st.markdown('<div style="font-size: 1.4rem; font-weight: 800; color: #6b21a8; margin-bottom: 8px;">🌐 监控社群</div>', unsafe_allow_html=True)
                 group_options = {k: GROUPS[k]["name"] for k in GROUPS.keys()}
                 selected_group_daily = st.selectbox(
-                    "🌐 监控社群",
+                    "",
                     options=list(group_options.keys()),
                     format_func=lambda x: group_options[x],
                     key="homepage_group_daily",
+                    label_visibility="collapsed"
                 )
 
                 # 加载日期列表
@@ -2753,8 +2756,8 @@ def show_homepage():
   <span class="version-tooltip">ℹ️
     <span class="tooltip-text">
       <b>📌 版本日期参考</b><br>
-      • beta15_旋转木马: 12-03 ~ 12-17<br>
-      • beta17_暖冬测试: 12-31 ~ 01-20
+      • beta15_旋转木马:2025-12-03 ~ 2025-12-17<br>
+      • beta17_暖冬测试: 2025-12-31 ~ 2026-01-20<br
     </span>
   </span>
 </div>
@@ -2800,6 +2803,7 @@ def show_homepage():
                                 help="选择需要查看的日期",
                                 key="homepage_date_input",
                                 on_change=on_homepage_date_change,
+                                label_visibility="collapsed"
                             )
 
                         # JavaScript禁用不可用日期 + 月份中文化
