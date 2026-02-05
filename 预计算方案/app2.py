@@ -945,9 +945,9 @@ section[data-testid="stMain"] div[data-testid="stExpander"] div[role="region"]{
   font-weight: 700;
 }
 .dp-section-title{
-  font-size: 0.82rem;
+  font-size: 0.84rem;
   font-weight: 600;
-  color: #6b7280;
+  color: #6366f1;
   background: transparent;
   border: none;
   padding: 0;
@@ -2703,6 +2703,15 @@ def show_homepage():
                             else:
                                 st.session_state.homepage_date_cache = selected_date_str_check
                                 st.session_state.homepage_need_date_correction = False
+
+                        # 版本日期提示
+                        st.markdown('''
+<div style="background: rgba(181,146,232,0.1); border-left: 3px solid #B592E8; border-radius: 0 6px 6px 0; padding: 8px 12px; margin-bottom: 10px; font-size: 0.78rem; color: #6b21a8;">
+📌 <b>版本日期参考</b><br>
+• beta15_旋转木马: 2025-12-03 ~ 2025-12-17<br>
+• beta17_暖冬测试: 2025-12-31 ~ 2026-01-20
+</div>
+''', unsafe_allow_html=True)
 
                         if st.session_state.get("homepage_need_date_correction", False):
                             corrected_date = datetime.strptime(
