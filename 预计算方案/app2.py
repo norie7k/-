@@ -564,8 +564,8 @@ section[data-testid="stMain"] div[data-testid="stExpander"] div[role="region"]{
   gap: 10px;
 }
 .dp-title{
-  font-weight: 700;
-  font-size: 0.95rem;
+  font-weight: 800;
+  font-size: 1.25rem;
   color: #fff;
   flex: 1;
 }
@@ -664,7 +664,7 @@ section[data-testid="stMain"] div[data-testid="stExpander"] div[role="region"]{
 }
 .dp-card-header-fixed .dp-title{
   font-weight: 800;
-  font-size: 1.02rem;
+  font-size: 1.25rem;
   color: #fff;
 }
 .dp-content-direct{
