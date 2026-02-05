@@ -116,25 +116,85 @@ section[data-testid="stSidebar"]{
 section[data-testid="stSidebar"] h1,
 section[data-testid="stSidebar"] h2,
 section[data-testid="stSidebar"] h3{ color: #c7d2fe !important; }
+section[data-testid="stSidebar"] h5{ 
+    color: #94a3b8 !important; 
+    font-size: 0.95rem !important;
+    font-weight: 600 !important;
+    margin: 1rem 0 0.5rem 0 !important;
+}
 section[data-testid="stSidebar"] p,
 section[data-testid="stSidebar"] label,
 section[data-testid="stSidebar"] div,
 section[data-testid="stSidebar"] span{ color: var(--text); }
 section[data-testid="stSidebar"] .stCaption{ color: var(--muted) !important; }
 
+/* sidebar 按钮样式 */
+section[data-testid="stSidebar"] button[kind="primary"] {
+    background: linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%) !important;
+    border: none !important;
+    font-size: 1rem !important;
+    font-weight: 600 !important;
+    padding: 0.6rem 1rem !important;
+    margin: 0.3rem 0 !important;
+}
+section[data-testid="stSidebar"] button[kind="primary"]:hover {
+    background: linear-gradient(135deg, #7c3aed 0%, #9333ea 100%) !important;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3) !important;
+}
+section[data-testid="stSidebar"] button[kind="secondary"] {
+    background: rgba(30, 41, 59, 0.8) !important;
+    border: 1px solid rgba(148, 163, 184, 0.3) !important;
+    color: #e2e8f0 !important;
+    font-size: 0.95rem !important;
+    font-weight: 500 !important;
+    margin: 0.3rem 0 !important;
+}
+section[data-testid="stSidebar"] button[kind="secondary"]:hover {
+    background: rgba(30, 41, 59, 1) !important;
+    border-color: rgba(168, 85, 247, 0.5) !important;
+}
+
 /* sidebar 输入框/下拉框 */
 section[data-testid="stSidebar"] [data-baseweb="select"] > div{
   background: rgba(30,41,59,.92) !important;
-  border: 1px solid rgba(148,163,184,.22) !important;
-  border-radius: 12px !important;
+  border: 1px solid rgba(148,163,184,.25) !important;
+  border-radius: 10px !important;
+  font-size: 0.95rem !important;
+  padding: 0.3rem 0.5rem !important;
+}
+section[data-testid="stSidebar"] [data-baseweb="select"]:hover > div{
+  border-color: rgba(168, 85, 247, 0.4) !important;
 }
 section[data-testid="stSidebar"] [data-baseweb="input"]{
   background: rgba(30,41,59,.92) !important;
-  border: 1px solid rgba(148,163,184,.22) !important;
-  border-radius: 12px !important;
+  border: 1px solid rgba(148,163,184,.25) !important;
+  border-radius: 10px !important;
+  font-size: 0.95rem !important;
+}
+section[data-testid="stSidebar"] [data-baseweb="input"]:hover{
+  border-color: rgba(168, 85, 247, 0.4) !important;
 }
 section[data-testid="stSidebar"] input{
   color: var(--text) !important;
+}
+
+/* sidebar 分隔线 */
+section[data-testid="stSidebar"] hr {
+  border: none !important;
+  height: 1px !important;
+  background: rgba(148, 163, 184, 0.2) !important;
+  margin: 1.2rem 0 !important;
+}
+
+/* sidebar 提示框 */
+section[data-testid="stSidebar"] .stAlert {
+  background: rgba(59, 130, 246, 0.1) !important;
+  border: 1px solid rgba(59, 130, 246, 0.3) !important;
+  border-radius: 8px !important;
+  padding: 0.6rem 0.8rem !important;
+  font-size: 0.9rem !important;
+  margin: 0.5rem 0 !important;
 }
 
 /* 下拉菜单弹层（options） */
@@ -2778,7 +2838,11 @@ def main():
     
     # 侧边栏
     with st.sidebar:
-        st.header("🔍 查询条件")
+        st.markdown("""
+        <div style="text-align: center; padding: 0.5rem 0 1rem 0;">
+            <h2 style="margin: 0; font-size: 1.4rem; color: #e2e8f0;">🔍 查询条件</h2>
+        </div>
+        """, unsafe_allow_html=True)
 
         group_options = {k: GROUPS[k]["name"] for k in GROUPS.keys()}
         
@@ -2796,17 +2860,19 @@ def main():
         if "selected_group_cache" not in st.session_state:
             st.session_state.selected_group_cache = st.session_state.confirmed_group
         
+        st.markdown("##### 🌐 监控社群")
         selected_group_key = st.selectbox(
             "选择社群",
             options=list(group_options.keys()),
             format_func=lambda x: group_options[x],
             index=default_group_index,
+            label_visibility="collapsed"
         )
         
         st.session_state.selected_group_cache = selected_group_key
         display_group_key = selected_group_key
 
-        st.markdown("---")
+        st.markdown("<div style='margin: 1rem 0;'></div>", unsafe_allow_html=True)
 
         current_query_type = st.session_state.get("query_type", "daily")
 
@@ -2820,7 +2886,7 @@ def main():
 
         if current_query_type == "version":
             if available_versions:
-                st.success(f"✅ 共有 {len(available_versions)} 个版本")
+                st.markdown("##### 📦 版本周期")
                 
                 version_display_map = {}
                 for v_key in available_versions:
@@ -2856,7 +2922,8 @@ def main():
                     options=available_versions,
                     format_func=lambda x: version_display_map.get(x, x),
                     index=default_version_index,
-                    help="选择要查看的测试版本"
+                    help="选择要查看的测试版本",
+                    label_visibility="collapsed"
                 )
                 
                 st.session_state.selected_version_cache = selected_version
@@ -2865,7 +2932,7 @@ def main():
                 selected_version = None
         
         elif available_dates:
-            st.success(f"✅ 共有 {len(available_dates)} 天的数据")
+            st.markdown("##### 📅 监测日期")
 
             date_objects = []
             for date_str in available_dates:
@@ -2939,23 +3006,18 @@ def main():
                         value=corrected_date,
                         min_value=extended_min_date,
                         max_value=extended_max_date,
-                        help="只能选择已上传到数据库的日期",
+                        help="选择需要查看的日期",
                         key="selected_date_input",
-                        on_change=on_date_change
+                        on_change=on_date_change,
+                        label_visibility="collapsed"
                     )
 
                     invalid_date = st.session_state.get("invalid_date_selected", "")
                     valid_date = st.session_state.get("valid_date_selected", "")
                     if invalid_date:
-                        formatted_invalid_date = datetime.strptime(invalid_date, "%Y-%m-%d").strftime("%Y年%m月%d日")
-                        formatted_valid_date = datetime.strptime(valid_date, "%Y-%m-%d").strftime("%Y年%m月%d日")
-                        st.markdown(
-                            f'<div style="padding: 1rem; background-color: rgba(255, 193, 7, 0.10); '
-                            f'border-left: 4px solid #ffc107; border-radius: 10px; margin: 1rem 0;">'
-                            f'<p style="margin: 0; font-size: 1.05rem; font-weight: 800; color: #ffd166;">'
-                            f'⚠️ {formatted_invalid_date}暂无数据，推荐选择最近的可用日期：{formatted_valid_date}</p></div>',
-                            unsafe_allow_html=True
-                        )
+                        formatted_invalid_date = datetime.strptime(invalid_date, "%Y-%m-%d").strftime("%m月%d日")
+                        formatted_valid_date = datetime.strptime(valid_date, "%Y-%m-%d").strftime("%m月%d日")
+                        st.warning(f"⚠️ {formatted_invalid_date}暂无数据，已自动选择 {formatted_valid_date}")
                     st.session_state.need_date_correction = False
                 else:
                     selected_date_obj = st.date_input(
@@ -2963,9 +3025,10 @@ def main():
                         value=initial_date,
                         min_value=extended_min_date,
                         max_value=extended_max_date,
-                        help="只能选择已上传到数据库的日期",
+                        help="选择需要查看的日期",
                         key="selected_date_input",
-                        on_change=on_date_change
+                        on_change=on_date_change,
+                        label_visibility="collapsed"
                     )
 
                 picker_date = selected_date_obj.strftime("%Y-%m-%d")
@@ -3004,8 +3067,7 @@ def main():
             st.warning("⚠️ 暂无数据")
             selected_date = None
 
-        st.markdown("---")
-        st.caption("💡 数据每日自动更新到 GitHub")
+        st.markdown("<div style='margin: 1.5rem 0;'></div>", unsafe_allow_html=True)
         
         current_confirmed = st.session_state.get("confirmed_date", "")
         current_selected = st.session_state.get("selected_date_cache", "")
@@ -3020,7 +3082,7 @@ def main():
             hint_parts = []
             if group_changed:
                 new_group_name = GROUPS.get(current_selected_group, {}).get("name", current_selected_group)
-                hint_parts.append(f"社群「{new_group_name}」")
+                hint_parts.append(f"「{new_group_name}」")
             if date_changed:
                 try:
                     selected_formatted = datetime.strptime(current_selected, "%Y-%m-%d").strftime("%m月%d日")
@@ -3028,9 +3090,9 @@ def main():
                 except:
                     pass
             if hint_parts:
-                st.info(f"📅 已选择 {'、'.join(hint_parts)}，点击下方按钮加载数据")
+                st.info(f"✨ 已选择 {' '.join(hint_parts)}")
 
-        if st.button("🔄 刷新数据", use_container_width=True):
+        if st.button("✨ 查看数据", use_container_width=True, type="primary"):
             st.session_state.confirmed_group = st.session_state.get("selected_group_cache", "")
             
             if current_query_type == "version":
@@ -3046,6 +3108,13 @@ def main():
             st.session_state.show_results = False
             st.session_state.query_type = "daily"
             st.rerun()
+        
+        st.markdown("---")
+        st.markdown("""
+        <div style="text-align: center; padding: 0.5rem 0; color: #64748b; font-size: 0.85rem;">
+            💡 数据每日自动更新
+        </div>
+        """, unsafe_allow_html=True)
 
     # 主内容区
     query_type = st.session_state.get("query_type", "daily")
