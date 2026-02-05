@@ -191,11 +191,6 @@ div[data-baseweb="popover"] button.date-disabled .date-disabled-icon {
   transform: translateY(-1px);
   box-shadow: 0 12px 28px rgba(99,102,241,.38);
 }
-/* 日期导航按钮字体增大 */
-.stButton > button p{
-  font-size: 1.25rem !important;
-  font-weight: 700 !important;
-}
 
 /* ===== 统计概览卡 ===== */
 .stats-overview{
