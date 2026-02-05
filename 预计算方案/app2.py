@@ -284,15 +284,23 @@ section[data-testid="stSidebar"] button#st-key-sidebar_back_home {
   background: rgba(30, 41, 59, 0.75) !important;
   border: 1px solid rgba(148, 163, 184, 0.35) !important;
   color: #cbd5f5 !important;
-  font-size: 0.68rem !important;
-  padding: 0.18rem 0.35rem !important;
+  font-size: 0.6rem !important;
+  padding: 0.16rem 0.32rem !important;
   border-radius: 6px !important;
   min-width: auto !important;
+  width: auto !important;
   white-space: nowrap !important;
   display: inline-flex !important;
   align-items: center !important;
   gap: 0.2rem !important;
   line-height: 1 !important;
+}
+section[data-testid="stSidebar"] button#st-key-sidebar_back_home span,
+section[data-testid="stSidebar"] button#st-key-sidebar_back_home p {
+  font-size: 0.6rem !important;
+  line-height: 1 !important;
+  margin: 0 !important;
+  white-space: nowrap !important;
 }
 section[data-testid="stSidebar"] button#st-key-sidebar_back_home:hover {
   background: rgba(139, 92, 246, 0.2) !important;
@@ -3015,7 +3023,7 @@ def main():
             </div>
             """, unsafe_allow_html=True)
         with col_back:
-            if st.button("‹ 返回", key="sidebar_back_home", help="返回主页", use_container_width=False):
+            if st.button("‹返回", key="sidebar_back_home", help="返回主页", use_container_width=False):
                 st.session_state.show_results = False
                 st.session_state.query_type = "daily"
                 st.rerun()
