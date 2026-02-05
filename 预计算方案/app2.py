@@ -824,7 +824,7 @@ a:hover{ text-decoration: underline !important; }
 }
 .title-stack h1{
   margin: 0;
-  font-size: 2.2rem;
+  font-size: 2.8rem;
   font-weight: 800;
   letter-spacing: -0.02em;
   color: white;
@@ -845,8 +845,8 @@ a:hover{ text-decoration: underline !important; }
   margin-top: 10px;
 }
 .badge{
-  font-size: 0.7rem;
-  padding: 4px 10px;
+  font-size: 0.9rem;
+  padding: 6px 14px;
   background: rgba(255, 255, 255, 0.05);
   border-radius: 99px;
   color: var(--text-dim);
@@ -884,10 +884,10 @@ a:hover{ text-decoration: underline !important; }
   background: transparent;
   border: none;
   color: var(--text-dim);
-  padding: 10px 20px;
+  padding: 12px 24px;
   border-radius: 8px;
   cursor: pointer;
-  font-size: 0.9rem;
+  font-size: 1.1rem;
   transition: all 0.3s;
 }
 .query-modes button.active{
@@ -902,7 +902,7 @@ a:hover{ text-decoration: underline !important; }
 }
 .input-group label{
   display: block;
-  font-size: 0.75rem;
+  font-size: 1rem;
   color: var(--text-dim);
   margin-bottom: 8px;
   padding-left: 4px;
@@ -914,7 +914,7 @@ a:hover{ text-decoration: underline !important; }
   color: white;
   padding: 14px 16px;
   border-radius: 12px;
-  font-size: 0.95rem;
+  font-size: 1.1rem;
   outline: none;
   transition: border-color 0.3s;
 }
@@ -962,12 +962,12 @@ a:hover{ text-decoration: underline !important; }
   transition: all 0.3s;
 }
 .intro-card .icon{
-  font-size: 1.8rem;
+  font-size: 2.2rem;
   margin-bottom: 16px;
   display: block;
 }
-.intro-card h3{ margin: 0 0 8px; font-size: 1rem; font-weight: 700; color: white; }
-.intro-card p{ color: var(--text-dim); font-size: 0.85rem; line-height: 1.5; margin: 0; }
+.intro-card h3{ margin: 0 0 10px; font-size: 1.25rem; font-weight: 700; color: white; }
+.intro-card p{ color: var(--text-dim); font-size: 1.05rem; line-height: 1.6; margin: 0; }
 .intro-card:hover{
   background: rgba(255,255,255,0.05);
   transform: translateY(-5px);
