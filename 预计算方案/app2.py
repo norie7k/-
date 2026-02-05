@@ -1385,6 +1385,45 @@ section[data-testid="stMain"] [data-testid="stDateInput"]{
   margin-bottom: 20px !important;
   box-shadow: 0 15px 40px rgba(168, 85, 247, 0.2) !important;
 }
+/* ===== Fix: 侧边栏 前一天/后一天 按钮不换行（强制一行显示） ===== */
+section[data-testid="stSidebar"] button#st-key-prev_day,
+section[data-testid="stSidebar"] button#st-key-next_day,
+section[data-testid="stSidebar"] button#st-key-prev_day_disabled,
+section[data-testid="stSidebar"] button#st-key-next_day_disabled{
+  width: 100% !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+
+  /* 关键：禁止在 / 等符号处断行 */
+  overflow-wrap: normal !important;
+  word-break: keep-all !important;
+
+  font-size: 0.9rem !important;
+  line-height: 1 !important;
+  padding: 8px 10px !important;
+}
+
+/* 按钮内部文字（p/span）也锁死不换行 */
+section[data-testid="stSidebar"] button#st-key-prev_day p,
+section[data-testid="stSidebar"] button#st-key-next_day p,
+section[data-testid="stSidebar"] button#st-key-prev_day_disabled p,
+section[data-testid="stSidebar"] button#st-key-next_day_disabled p,
+section[data-testid="stSidebar"] button#st-key-prev_day span,
+section[data-testid="stSidebar"] button#st-key-next_day span{
+  margin: 0 !important;
+  padding: 0 !important;
+  white-space: nowrap !important;
+  overflow-wrap: normal !important;
+  word-break: keep-all !important;
+  line-height: 1 !important;
+}
+
+/* 让两列更不容易互相挤爆（可选但建议加） */
+section[data-testid="stSidebar"] [data-testid="column"]{
+  min-width: 0 !important;
+}
+
 </style>
 """
 
@@ -3210,7 +3249,8 @@ def main():
                     col1, col2 = st.columns(2)
                     
                     with col1:
-                        prev_label = prev_date_obj.strftime("%Y/%m/%d")
+                        WJ = "\u2060"  # Word Joiner：防止在 / 处换行
+                        prev_label = prev_date_obj.strftime(f"%Y{WJ}/%m{WJ}/%d")
                         if has_prev_data:
                             if st.button(f"◀{prev_label}", use_container_width=True, key="prev_day"):
                                 st.session_state.selected_date_cache = prev_date_str
@@ -3222,7 +3262,7 @@ def main():
                             st.button(f"◀{prev_label}", use_container_width=True, disabled=True, key="prev_day_disabled")
                     
                     with col2:
-                        next_label = next_date_obj.strftime("%Y/%m/%d")
+                        next_label = next_date_obj.strftime(f"%Y{WJ}/%m{WJ}/%d")
                         if has_next_data:
                             if st.button(f"{next_label}▶", use_container_width=True, key="next_day"):
                                 st.session_state.selected_date_cache = next_date_str
