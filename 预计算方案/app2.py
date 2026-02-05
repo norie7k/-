@@ -381,6 +381,32 @@ button[data-testid="baseButton-secondary"] p{
   font-weight: 700 !important;
 }
 
+/* ===== 下载按钮 ===== */
+.stDownloadButton > button,
+button[data-testid="baseButton-secondary"]{
+  background: linear-gradient(90deg, rgba(200,162,232,.15), rgba(169,185,240,.15)) !important;
+  color: #6b21a8 !important;
+  border: 1px solid rgba(200,162,232,.4) !important;
+  border-radius: 12px !important;
+  padding: 0.72rem 1.2rem !important;
+  font-weight: 700 !important;
+  transition: all .22s ease !important;
+  box-shadow: 0 4px 12px rgba(200,162,232,.15) !important;
+}
+.stDownloadButton > button:hover,
+button[data-testid="baseButton-secondary"]:hover{
+  background: linear-gradient(90deg, rgba(200,162,232,.25), rgba(169,185,240,.25)) !important;
+  border-color: rgba(200,162,232,.6) !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 8px 20px rgba(200,162,232,.25) !important;
+}
+.stDownloadButton > button span,
+.stDownloadButton > button p{
+  color: #6b21a8 !important;
+  font-size: 1rem !important;
+  font-weight: 600 !important;
+}
+
 /* ===== 统计概览卡 ===== */
 .stats-overview{
   background: linear-gradient(145deg, rgba(255,255,255,.95), rgba(248,250,252,.95));
