@@ -987,17 +987,17 @@ section[data-testid="stMain"] div[data-testid="stExpander"] div[role="region"]{
 
 /* ===== 新增：观点卡片样式（V2格式）===== */
 .opinion-card{
-  background: linear-gradient(135deg, rgba(124,218,201,0.1) 0%, rgba(150,230,193,0.1) 100%);
-  border: 1px solid rgba(124,218,201,0.3);
-  border-left: 4px solid #7CDAC9;
-  border-radius: 0 10px 10px 0;
+  background: linear-gradient(135deg, rgba(124,218,201,0.15) 0%, rgba(150,230,193,0.15) 100%) !important;
+  border: 1px solid rgba(124,218,201,0.4) !important;
+  border-left: 4px solid #7CDAC9 !important;
+  border-radius: 0 10px 10px 0 !important;
   padding: 14px 18px;
   margin: 14px 0;
 }
 .opinion-card-header{
   font-size: 1rem;
   font-weight: 700;
-  color: #0d9488;
+  color: #0d9488 !important;
   margin-bottom: 10px;
   display: flex;
   align-items: center;
