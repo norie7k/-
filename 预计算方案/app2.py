@@ -1793,55 +1793,35 @@ def render_result(result: dict, group_key: str | None = None, available_dates: l
             st.markdown("---")
             st.markdown("### 📅 日期导航")
             
-            # CSS让三列内的按钮分别左对齐、居中、右对齐
-            st.markdown("""
-            <style>
-            div[data-testid="column"]:nth-child(1) .stButton {
-                display: flex;
-                justify-content: flex-start;
-            }
-            div[data-testid="column"]:nth-child(1) .stButton button {
-                width: auto !important;
-            }
-            div[data-testid="column"]:nth-child(3) .stButton {
-                display: flex;
-                justify-content: flex-end;
-            }
-            div[data-testid="column"]:nth-child(3) .stButton button {
-                width: auto !important;
-            }
-            </style>
-            """, unsafe_allow_html=True)
-            
-            nav_col1, nav_col2, nav_col3 = st.columns(3)
+            # 三等宽列，按钮占满列宽
+            nav_col1, nav_col2, nav_col3 = st.columns([1, 1, 1], gap="large")
             
             with nav_col1:
                 if has_prev:
-                    if st.button(f"◀ {prev_display}", key="nav_prev"):
+                    if st.button(f"◀ {prev_display}", key="nav_prev", use_container_width=True):
                         st.session_state.confirmed_date = prev_date_str
                         st.session_state.selected_date_cache = prev_date_str
                         st.rerun()
                 else:
-                    st.button(f"◀ {prev_display}", key="nav_prev_disabled", disabled=True)
+                    st.button(f"◀ {prev_display}", key="nav_prev_disabled", use_container_width=True, disabled=True)
             
             with nav_col2:
                 st.markdown(
-                    f"""<div style="display: flex; justify-content: center;">
-                    <div style="padding: 0.55rem 1.2rem; background: rgba(168,85,247,0.25); 
+                    f"""<div style="text-align: center; padding: 0.5rem 1rem; background: rgba(168,85,247,0.25); 
                     border-radius: 8px; border: 2px solid rgba(168,85,247,0.5);">
                     <span style="font-size: 1.15rem; font-weight: 700; color: #e9d5ff;">📅 {current_display}</span>
-                    </div></div>""",
+                    </div>""",
                     unsafe_allow_html=True
                 )
             
             with nav_col3:
                 if has_next:
-                    if st.button(f"{next_display} ▶", key="nav_next"):
+                    if st.button(f"{next_display} ▶", key="nav_next", use_container_width=True):
                         st.session_state.confirmed_date = next_date_str
                         st.session_state.selected_date_cache = next_date_str
                         st.rerun()
                 else:
-                    st.button(f"{next_display} ▶", key="nav_next_disabled", disabled=True)
+                    st.button(f"{next_display} ▶", key="nav_next_disabled", use_container_width=True, disabled=True)
     
     # ========= 导出 =========
     st.markdown("### 📥 导出结果")
