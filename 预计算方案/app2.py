@@ -1784,6 +1784,17 @@ def render_result(result: dict, group_key: str | None = None, available_dates: l
             st.markdown("---")
             st.markdown("### 📅 日期导航")
             
+            # 日期导航按钮样式（只影响这个区域）
+            st.markdown("""<style>
+            .date-nav-container .stButton > button {
+                font-size: 1.1rem !important;
+            }
+            .date-nav-container .stButton > button p {
+                font-size: 1.1rem !important;
+                font-weight: 700 !important;
+            }
+            </style><div class="date-nav-container">""", unsafe_allow_html=True)
+            
             nav_col1, nav_col2, nav_col3 = st.columns([1, 1, 1])
             
             with nav_col1:
@@ -1812,6 +1823,8 @@ def render_result(result: dict, group_key: str | None = None, available_dates: l
                         st.rerun()
                 else:
                     st.button(f"{next_display} →", key="nav_next_disabled", use_container_width=True, disabled=True)
+            
+            st.markdown("</div>", unsafe_allow_html=True)
     
     # ========= 导出 =========
     st.markdown("### 📥 导出结果")
