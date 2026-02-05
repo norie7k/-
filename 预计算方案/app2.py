@@ -237,9 +237,9 @@ section[data-testid="stSidebar"] button[key^="next_day"] {
   background: rgba(30, 41, 59, 0.8) !important;
   border: 1px solid rgba(148, 163, 184, 0.3) !important;
   color: #94a3b8 !important;
-  font-size: 0.85rem !important;
+  font-size: 0.75rem !important;
   font-weight: 500 !important;
-  padding: 0.5rem 0.7rem !important;
+  padding: 0.45rem 0.5rem !important;
 }
 section[data-testid="stSidebar"] button[key^="prev_day"]:not(:disabled):hover,
 section[data-testid="stSidebar"] button[key^="next_day"]:not(:disabled):hover {
@@ -3192,7 +3192,7 @@ def main():
                     col1, col2 = st.columns(2)
                     
                     with col1:
-                        prev_label = prev_date_obj.strftime("%m/%d")
+                        prev_label = prev_date_obj.strftime("%y-%m-%d")
                         if has_prev_data:
                             if st.button(f"← {prev_label}", use_container_width=True, key="prev_day"):
                                 st.session_state.selected_date_cache = prev_date_str
@@ -3204,7 +3204,7 @@ def main():
                             st.button(f"← {prev_label}", use_container_width=True, disabled=True, key="prev_day_disabled")
                     
                     with col2:
-                        next_label = next_date_obj.strftime("%m/%d")
+                        next_label = next_date_obj.strftime("%y-%m-%d")
                         if has_next_data:
                             if st.button(f"{next_label} →", use_container_width=True, key="next_day"):
                                 st.session_state.selected_date_cache = next_date_str
