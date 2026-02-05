@@ -2223,19 +2223,13 @@ def render_version_result(result: dict, group_key: str | None = None):
 
 def render_custom_calendar(available_dates: list, current_date: str, key_prefix: str = "cal"):
     """
-    渲染紧凑型自定义日历选择器
-    available_dates: 有数据的日期列表 (格式: YYYY-MM-DD)
-    current_date: 当前选中的日期
-    key_prefix: 按钮key前缀
-    返回: 用户选择的日期字符串，如果没有选择则返回None
+    渲染紧凑型自定义日历选择器（类似原生date_input样式）
     """
     import calendar
     
     if not available_dates:
-        st.warning("暂无可用日期")
         return None
     
-    # 解析日期
     date_set = set(available_dates)
     date_objects = [datetime.strptime(d, "%Y-%m-%d").date() for d in available_dates]
     
@@ -2248,7 +2242,6 @@ def render_custom_calendar(available_dates: list, current_date: str, key_prefix:
     else:
         display_date = max(date_objects)
     
-    # 检查session_state中是否有保存的显示月份
     if f"{key_prefix}_display_year" in st.session_state:
         display_year = st.session_state[f"{key_prefix}_display_year"]
         display_month = st.session_state[f"{key_prefix}_display_month"]
@@ -2257,211 +2250,83 @@ def render_custom_calendar(available_dates: list, current_date: str, key_prefix:
         display_month = display_date.month
     
     selected_new_date = None
-    
-    # 生成日历数据
     cal = calendar.Calendar(firstweekday=0)
     month_days = cal.monthdayscalendar(display_year, display_month)
     
-    # 构建日历HTML
-    weekdays = ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"]
-    
     # 当前选中日期显示
-    display_current = current_date.replace("-", "/") if current_date else "请选择日期"
+    display_current = current_date.replace("-", "/") if current_date else ""
+    months_cn = ["一月", "二月", "三月", "四月", "五月", "六月", 
+                 "七月", "八月", "九月", "十月", "十一月", "十二月"]
     
-    calendar_html = f'''
-    <style>
-    .compact-calendar {{
-        background: rgba(15, 23, 42, 0.95);
-        border: 1px solid rgba(148, 163, 184, 0.2);
-        border-radius: 12px;
-        padding: 12px;
-        max-width: 280px;
-        font-family: system-ui, -apple-system, sans-serif;
-    }}
-    .cal-header {{
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        margin-bottom: 12px;
-        padding-bottom: 8px;
-        border-bottom: 1px solid rgba(148, 163, 184, 0.15);
-    }}
-    .cal-current {{
-        font-size: 0.95rem;
-        color: #e2e8f0;
-        font-weight: 500;
-    }}
-    .cal-nav {{
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        margin-bottom: 8px;
-    }}
-    .cal-nav-btn {{
-        background: transparent;
-        border: none;
-        color: #94a3b8;
-        cursor: pointer;
-        padding: 4px 8px;
-        font-size: 1rem;
-    }}
-    .cal-nav-btn:hover {{
-        color: #e2e8f0;
-    }}
-    .cal-month-year {{
-        display: flex;
-        gap: 8px;
-        align-items: center;
-    }}
-    .cal-month, .cal-year {{
-        color: #e2e8f0;
-        font-size: 0.9rem;
-        font-weight: 500;
-    }}
-    .cal-weekdays {{
-        display: grid;
-        grid-template-columns: repeat(7, 1fr);
-        gap: 2px;
-        margin-bottom: 4px;
-    }}
-    .cal-weekday {{
-        text-align: center;
-        font-size: 0.75rem;
-        color: #64748b;
-        padding: 4px 0;
-        font-weight: 500;
-    }}
-    .cal-days {{
-        display: grid;
-        grid-template-columns: repeat(7, 1fr);
-        gap: 2px;
-    }}
-    .cal-day {{
-        text-align: center;
-        padding: 6px 4px;
-        font-size: 0.85rem;
-        border-radius: 50%;
-        width: 32px;
-        height: 32px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin: auto;
-    }}
-    .cal-day-empty {{
-        visibility: hidden;
-    }}
-    .cal-day-disabled {{
-        color: #334155;
-        cursor: not-allowed;
-    }}
-    .cal-day-available {{
-        color: #e2e8f0;
-        cursor: pointer;
-        transition: all 0.15s;
-    }}
-    .cal-day-available:hover {{
-        background: rgba(139, 92, 246, 0.3);
-    }}
-    .cal-day-selected {{
-        background: #8b5cf6 !important;
-        color: white !important;
-        font-weight: 600;
-    }}
-    </style>
-    <div class="compact-calendar">
-        <div class="cal-header">
-            <span class="cal-current">{display_current}</span>
-        </div>
-        <div class="cal-weekdays">
-            {"".join([f'<div class="cal-weekday">{d}</div>' for d in weekdays])}
-        </div>
-        <div class="cal-days">
-    '''
-    
-    for week in month_days:
-        for day in week:
-            if day == 0:
-                calendar_html += '<div class="cal-day cal-day-empty"></div>'
-            else:
-                date_str = f"{display_year}-{display_month:02d}-{day:02d}"
-                has_data = date_str in date_set
-                is_selected = date_str == current_date
-                
-                if is_selected:
-                    calendar_html += f'<div class="cal-day cal-day-selected">{day}</div>'
-                elif has_data:
-                    calendar_html += f'<div class="cal-day cal-day-available">{day}</div>'
-                else:
-                    calendar_html += f'<div class="cal-day cal-day-disabled">{day}</div>'
-    
-    calendar_html += '''
-        </div>
+    # 顶部：当前日期输入框样式
+    st.markdown(f'''
+    <div style="background: rgba(30,41,59,0.8); border: 1px solid rgba(148,163,184,0.3); 
+         border-radius: 8px; padding: 8px 12px; margin-bottom: 8px; font-size: 0.95rem; color: #e2e8f0;">
+        {display_current}
     </div>
-    '''
+    ''', unsafe_allow_html=True)
     
-    # 显示日历HTML
-    st.markdown(calendar_html, unsafe_allow_html=True)
-    
-    # 月份导航按钮
-    nav_col1, nav_col2, nav_col3 = st.columns([1, 2, 1])
+    # 月份导航
+    nav_col1, nav_col2, nav_col3, nav_col4, nav_col5 = st.columns([0.8, 1.5, 1.5, 0.8, 0.1])
     
     with nav_col1:
-        prev_month = display_month - 1
-        prev_year = display_year
-        if prev_month < 1:
-            prev_month = 12
-            prev_year -= 1
-        if st.button("◀", key=f"{key_prefix}_prev_month"):
+        if st.button("‹", key=f"{key_prefix}_prev", help="上月"):
+            prev_month = display_month - 1
+            prev_year = display_year
+            if prev_month < 1:
+                prev_month = 12
+                prev_year -= 1
             st.session_state[f"{key_prefix}_display_year"] = prev_year
             st.session_state[f"{key_prefix}_display_month"] = prev_month
             st.rerun()
     
     with nav_col2:
-        months = ["January", "February", "March", "April", "May", "June", 
-                  "July", "August", "September", "October", "November", "December"]
-        st.markdown(f"<div style='text-align:center; color:#e2e8f0; font-size:0.9rem;'>{months[display_month-1]} {display_year}</div>", unsafe_allow_html=True)
+        st.markdown(f"<div style='text-align:center; color:#e2e8f0; font-weight:500; padding-top:6px;'>{months_cn[display_month-1]}</div>", unsafe_allow_html=True)
     
     with nav_col3:
-        next_month = display_month + 1
-        next_year = display_year
-        if next_month > 12:
-            next_month = 1
-            next_year += 1
-        if st.button("▶", key=f"{key_prefix}_next_month"):
+        st.markdown(f"<div style='text-align:center; color:#e2e8f0; font-weight:500; padding-top:6px;'>{display_year}</div>", unsafe_allow_html=True)
+    
+    with nav_col4:
+        if st.button("›", key=f"{key_prefix}_next", help="下月"):
+            next_month = display_month + 1
+            next_year = display_year
+            if next_month > 12:
+                next_month = 1
+                next_year += 1
             st.session_state[f"{key_prefix}_display_year"] = next_year
             st.session_state[f"{key_prefix}_display_month"] = next_month
             st.rerun()
     
-    # 日期选择按钮（隐藏式，用selectbox实现）
-    valid_dates_in_month = [d for d in available_dates 
-                           if d.startswith(f"{display_year}-{display_month:02d}")]
+    # 星期标题
+    weekdays = ["一", "二", "三", "四", "五", "六", "日"]
+    week_cols = st.columns(7)
+    for i, wd in enumerate(weekdays):
+        with week_cols[i]:
+            st.markdown(f"<div style='text-align:center; color:#64748b; font-size:0.8rem; font-weight:500;'>{wd}</div>", unsafe_allow_html=True)
     
-    if valid_dates_in_month:
-        # 格式化显示
-        date_display_map = {}
-        for d in sorted(valid_dates_in_month):
-            day_num = int(d.split("-")[2])
-            date_display_map[d] = f"{day_num}日 ({d})"
-        
-        # 确定默认选中
-        default_idx = 0
-        if current_date in valid_dates_in_month:
-            default_idx = sorted(valid_dates_in_month).index(current_date)
-        
-        selected = st.selectbox(
-            "选择日期",
-            options=sorted(valid_dates_in_month),
-            index=default_idx,
-            format_func=lambda x: date_display_map.get(x, x),
-            key=f"{key_prefix}_date_select",
-            label_visibility="collapsed"
-        )
-        
-        if selected != current_date:
-            selected_new_date = selected
-    else:
-        st.caption("本月无可用数据")
+    # 日历网格 - 每行7列
+    for week in month_days:
+        day_cols = st.columns(7)
+        for i, day in enumerate(week):
+            with day_cols[i]:
+                if day == 0:
+                    st.markdown("<div style='height:32px;'></div>", unsafe_allow_html=True)
+                else:
+                    date_str = f"{display_year}-{display_month:02d}-{day:02d}"
+                    has_data = date_str in date_set
+                    is_selected = date_str == current_date
+                    
+                    if has_data:
+                        btn_type = "primary" if is_selected else "secondary"
+                        if st.button(str(day), key=f"{key_prefix}_d_{date_str}", type=btn_type, use_container_width=True):
+                            selected_new_date = date_str
+                    else:
+                        # 无数据 - 灰色不可点击
+                        st.markdown(f'''
+                        <div style="text-align:center; padding:6px 0; color:#334155; font-size:0.85rem;">
+                            {day}
+                        </div>
+                        ''', unsafe_allow_html=True)
     
     return selected_new_date
 
@@ -2509,61 +2374,59 @@ def show_homepage():
         
         # === 日常查询标签 ===
         with tab1:
-            # 社群选择
-            col_group, col_button = st.columns([3, 1])
+            col_group, col_date = st.columns([1, 1])
             
             with col_group:
+                st.markdown("##### 🌐 监控社群")
                 group_options = {k: GROUPS[k]["name"] for k in GROUPS.keys()}
                 selected_group_daily = st.selectbox(
-                    "🌐 监控社群",
+                    "监控社群",
                     options=list(group_options.keys()),
                     format_func=lambda x: group_options[x],
                     key="homepage_group_daily",
-                )
-
-            with col_button:
-                st.markdown("<div style='height: 1.75rem;'></div>", unsafe_allow_html=True)
-                query_btn_disabled = True  # 先禁用，等日期选择后启用
-            
-            # 加载可用日期
-            with st.spinner("加载可用日期..."):
-                index = load_index(selected_group_daily)
-                available_dates = index.get("available_dates", [])
-            
-            # 日期选择 - 使用自定义日历
-            if available_dates:
-                # 初始化当前选中日期
-                if "homepage_date_cache" not in st.session_state:
-                    sorted_dates = sorted(available_dates, reverse=True)
-                    st.session_state.homepage_date_cache = sorted_dates[0] if sorted_dates else None
-                
-                current_selected = st.session_state.homepage_date_cache
-                
-                # 使用自定义日历选择器
-                new_selected = render_custom_calendar(
-                    available_dates=available_dates,
-                    current_date=current_selected,
-                    key_prefix="homepage_cal"
+                    label_visibility="collapsed"
                 )
                 
-                # 如果用户选择了新日期
-                if new_selected:
-                    st.session_state.homepage_date_cache = new_selected
-                    st.rerun()
+                # 加载可用日期
+                with st.spinner("加载可用日期..."):
+                    index = load_index(selected_group_daily)
+                    available_dates = index.get("available_dates", [])
+            
+            with col_date:
+                st.markdown("##### 📅 监测日期")
                 
-                selected_date = st.session_state.homepage_date_cache
-                query_btn_disabled = not selected_date
-            else:
-                st.warning("该社群暂无数据")
-                selected_date = None
+                if available_dates:
+                    # 初始化当前选中日期
+                    if "homepage_date_cache" not in st.session_state:
+                        sorted_dates = sorted(available_dates, reverse=True)
+                        st.session_state.homepage_date_cache = sorted_dates[0] if sorted_dates else None
+                    
+                    current_selected = st.session_state.homepage_date_cache
+                    
+                    # 使用自定义日历选择器
+                    new_selected = render_custom_calendar(
+                        available_dates=available_dates,
+                        current_date=current_selected,
+                        key_prefix="homepage_cal"
+                    )
+                    
+                    # 如果用户选择了新日期
+                    if new_selected:
+                        st.session_state.homepage_date_cache = new_selected
+                        st.rerun()
+                    
+                    selected_date = st.session_state.homepage_date_cache
+                else:
+                    st.warning("该社群暂无数据")
+                    selected_date = None
             
             # 查询按钮
-            st.markdown("<div style='height: 0.5rem;'></div>", unsafe_allow_html=True)
+            st.markdown("<div style='height: 0.8rem;'></div>", unsafe_allow_html=True)
             if st.button(
                 "✨ 查看分析",
                 use_container_width=True,
                 type="primary",
-                disabled=query_btn_disabled,
+                disabled=not selected_date,
                 key="btn_daily",
             ):
                 st.session_state.show_results = True
