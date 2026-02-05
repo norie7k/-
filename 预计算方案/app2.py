@@ -181,8 +181,8 @@ section[data-testid="stSidebar"] button#st-key-quick_next_disabled {
     background: rgba(30, 41, 59, 0.6) !important;
     border: 1px solid rgba(148, 163, 184, 0.25) !important;
     color: #94a3b8 !important;
-    font-size: 0.7rem !important;
-    padding: 0.3rem 0.4rem !important;
+    font-size: 0.55rem !important;
+    padding: 0.25rem 0.3rem !important;
     min-height: auto !important;
     height: auto !important;
     white-space: nowrap !important;
@@ -192,7 +192,7 @@ section[data-testid="stSidebar"] button#st-key-quick_prev_day p,
 section[data-testid="stSidebar"] button#st-key-quick_next_day p,
 section[data-testid="stSidebar"] button#st-key-quick_prev_disabled p,
 section[data-testid="stSidebar"] button#st-key-quick_next_disabled p {
-    font-size: 0.7rem !important;
+    font-size: 0.55rem !important;
     margin: 0 !important;
     white-space: nowrap !important;
 }
@@ -278,26 +278,24 @@ section[data-testid="stSidebar"] .stAlert {
   margin: 0.5rem 0 !important;
 }
 
-/* 返回主页按钮 */
-div[data-testid="column"]:first-child button[kind="secondary"] {
-  background: rgba(15, 23, 42, 0.95) !important;
-  border: 2px solid rgba(96, 165, 250, 0.6) !important;
+/* 侧边栏返回主页按钮 */
+section[data-testid="stSidebar"] button#st-key-sidebar_back_home {
+  background: rgba(15, 23, 42, 0.9) !important;
+  border: 2px solid rgba(96, 165, 250, 0.5) !important;
   color: #93c5fd !important;
-  padding: 0.5rem 0.8rem !important;
-  font-size: 1.5rem !important;
+  padding: 0.35rem 0.5rem !important;
+  font-size: 1.1rem !important;
   font-weight: 700 !important;
   border-radius: 8px !important;
   transition: all 0.25s ease !important;
   min-width: auto !important;
-  margin-top: -3.8rem !important;
-  box-shadow: 0 2px 10px rgba(59, 130, 246, 0.25) !important;
+  margin-top: 0.2rem !important;
 }
-div[data-testid="column"]:first-child button[kind="secondary"]:hover {
+section[data-testid="stSidebar"] button#st-key-sidebar_back_home:hover {
   background: rgba(59, 130, 246, 0.25) !important;
-  border-color: rgba(96, 165, 250, 0.9) !important;
+  border-color: rgba(96, 165, 250, 0.8) !important;
   color: #bfdbfe !important;
-  transform: translateX(-3px) !important;
-  box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4) !important;
+  box-shadow: 0 2px 10px rgba(59, 130, 246, 0.3) !important;
 }
 
 
@@ -1720,24 +1718,15 @@ def render_result(result: dict, group_key: str | None = None, available_dates: l
     except:
         formatted_date = date
     
-    # 报告标题（带返回按钮）
-    col_back, col_title = st.columns([0.05, 0.95])
-    
-    with col_back:
-        if st.button("«", key="back_home_from_result", help="返回主页"):
-            st.session_state.show_results = False
-            st.session_state.query_type = "daily"
-            st.rerun()
-    
-    with col_title:
-        st.markdown(
-            f"""<div style="text-align: center; padding: 0 0 1rem 0; margin-top: -4rem; margin-left: -2rem;">
+    # 报告标题（居中显示）
+    st.markdown(
+        f"""<div style="text-align: center; padding: 0 0 1rem 0; margin-top: -4rem;">
 <h1 style="margin: 0; color: #e9d5ff; font-size: 2rem; font-weight: 700;">
 📊 {platform_display} {group_display} {formatted_date} 分析报告 <span style="color: #fbbf24;">_热门讨论TOP5</span>
 </h1>
 </div>""",
-            unsafe_allow_html=True,
-        )
+        unsafe_allow_html=True,
+    )
 
     # ========= 热门话题列表（摘要卡 + 展开详情）=========
     sorted_clusters = sorted(clusters, key=lambda x: float(x.get("热度评分", 0) or 0), reverse=True)
@@ -2998,11 +2987,21 @@ def main():
     
     # 侧边栏
     with st.sidebar:
-        st.markdown("""
-        <div style="text-align: center; padding: 0.5rem 0 1rem 0;">
-            <h2 style="margin: 0; font-size: 1.4rem; color: #e2e8f0;">🔍 查询条件</h2>
-        </div>
-        """, unsafe_allow_html=True)
+        # 顶部：返回主页按钮 + 标题
+        col_title, col_back = st.columns([0.85, 0.15])
+        with col_title:
+            st.markdown("""
+            <div style="padding: 0.5rem 0 0.5rem 0;">
+                <h2 style="margin: 0; font-size: 1.3rem; color: #e2e8f0;">🔍 查询条件</h2>
+            </div>
+            """, unsafe_allow_html=True)
+        with col_back:
+            if st.button("«", key="sidebar_back_home", help="返回主页"):
+                st.session_state.show_results = False
+                st.session_state.query_type = "daily"
+                st.rerun()
+        
+        st.markdown("<div style='margin-bottom: 0.5rem;'></div>", unsafe_allow_html=True)
 
         group_options = {k: GROUPS[k]["name"] for k in GROUPS.keys()}
         
