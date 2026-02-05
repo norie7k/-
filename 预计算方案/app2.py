@@ -973,9 +973,9 @@ section[data-testid="stMain"] div[data-testid="stExpander"] div[role="region"]{
   font-weight: 600;
 }
 .example-quote{
-  background: rgba(150,230,193,0.1);
+  background: rgba(154,217,232,0.12);
   border: none;
-  border-left: 2px solid #96E6C1;
+  border-left: 2px solid #9AD9E8;
   padding: 10px 14px;
   margin: 8px 0;
   border-radius: 0 6px 6px 0;
@@ -1503,6 +1503,24 @@ section[data-testid="stMain"] [data-testid="stSelectbox"]{
 }
 section[data-testid="stMain"] [data-testid="stDateInput"]{
   max-width: 350px !important;
+}
+
+/* 主页查询区域 - 下拉框文字清晰 */
+section[data-testid="stMain"] [data-baseweb="select"] [data-testid="stMarkdownContainer"],
+section[data-testid="stMain"] [data-baseweb="select"] span,
+section[data-testid="stMain"] [data-baseweb="select"] div[aria-selected="true"],
+section[data-testid="stMain"] [data-baseweb="select"] [role="button"]{
+  color: #1f2937 !important;
+  opacity: 1 !important;
+  font-weight: 500 !important;
+}
+section[data-testid="stMain"] [data-baseweb="select"] > div:first-child{
+  background: #ffffff !important;
+  border: 1px solid #d1d5db !important;
+  border-radius: 8px !important;
+}
+section[data-testid="stMain"] [data-baseweb="select"] > div:first-child:hover{
+  border-color: #B592E8 !important;
 }
 
 /* 查询区域容器样式 - 通过标记ID定位 */
