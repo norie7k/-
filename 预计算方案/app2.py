@@ -1450,7 +1450,7 @@ def build_discussion_point_html(dp: dict, dp_i: int, group_key: str, date: str, 
 
 # ==================== 渲染 ====================
 
-def render_result(result: dict, group_key: str | None = None):
+def render_result(result: dict, group_key: str | None = None, available_dates: list | None = None):
     if not result:
         st.warning("⚠️ 暂无数据")
         return
@@ -1757,6 +1757,61 @@ def render_result(result: dict, group_key: str | None = None):
 """,
         height=0,
     )
+    
+    # ========= 日期导航 =========
+    if available_dates and date:
+        from datetime import timedelta
+        
+        try:
+            current_date_obj = datetime.strptime(date, "%Y-%m-%d").date()
+        except:
+            current_date_obj = None
+        
+        if current_date_obj:
+            prev_date_obj = current_date_obj - timedelta(days=1)
+            next_date_obj = current_date_obj + timedelta(days=1)
+            
+            prev_date_str = prev_date_obj.strftime("%Y-%m-%d")
+            next_date_str = next_date_obj.strftime("%Y-%m-%d")
+            
+            prev_display = prev_date_obj.strftime("%m-%d")
+            next_display = next_date_obj.strftime("%m-%d")
+            current_display = current_date_obj.strftime("%m-%d")
+            
+            has_prev = prev_date_str in available_dates
+            has_next = next_date_str in available_dates
+            
+            st.markdown("---")
+            st.markdown("### 📅 日期导航")
+            
+            nav_col1, nav_col2, nav_col3 = st.columns([1, 1, 1])
+            
+            with nav_col1:
+                if has_prev:
+                    if st.button(f"← {prev_display}", key="nav_prev", use_container_width=True):
+                        st.session_state.confirmed_date = prev_date_str
+                        st.session_state.selected_date_cache = prev_date_str
+                        st.rerun()
+                else:
+                    st.button(f"← {prev_display}", key="nav_prev_disabled", use_container_width=True, disabled=True)
+            
+            with nav_col2:
+                st.markdown(
+                    f"""<div style="text-align: center; padding: 0.5rem; background: rgba(168,85,247,0.2); 
+                    border-radius: 8px; border: 1px solid rgba(168,85,247,0.4);">
+                    <span style="font-size: 1.1rem; font-weight: 700; color: #e9d5ff;">当前: {current_display}</span>
+                    </div>""",
+                    unsafe_allow_html=True
+                )
+            
+            with nav_col3:
+                if has_next:
+                    if st.button(f"{next_display} →", key="nav_next", use_container_width=True):
+                        st.session_state.confirmed_date = next_date_str
+                        st.session_state.selected_date_cache = next_date_str
+                        st.rerun()
+                else:
+                    st.button(f"{next_display} →", key="nav_next_disabled", use_container_width=True, disabled=True)
     
     # ========= 导出 =========
     st.markdown("### 📥 导出结果")
@@ -2766,9 +2821,12 @@ def main():
         if confirmed_date:
             with st.spinner(f"正在加载 {confirmed_date} 的数据..."):
                 result = load_result(confirmed_group_for_load, confirmed_date)
+                # 获取可用日期列表用于日期导航
+                nav_index = load_index(confirmed_group_for_load)
+                nav_available_dates = nav_index.get("available_dates", [])
 
             if result:
-                render_result(result, confirmed_group_for_load)
+                render_result(result, confirmed_group_for_load, nav_available_dates)
             else:
                 st.error(f"❌  {confirmed_date} 的数据待上传")
         else:
