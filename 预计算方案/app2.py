@@ -237,25 +237,27 @@ section[data-testid="stSidebar"] button[key^="next_day"] {
   background: rgba(30, 41, 59, 0.8) !important;
   border: 1px solid rgba(148, 163, 184, 0.3) !important;
   color: #e2e8f0 !important;
-  font-size: 0.8rem !important;
+  font-size: 0.55rem !important;
   font-weight: 400 !important;
-  padding: 0.5rem 0.3rem !important;
+  padding: 0.4rem 0.2rem !important;
   white-space: nowrap !important;
   overflow: hidden !important;
-  line-height: 1.2 !important;
+  line-height: 1 !important;
   min-height: auto !important;
   height: auto !important;
+  letter-spacing: -0.3px !important;
 }
 section[data-testid="stSidebar"] button[key^="prev_day"] p,
 section[data-testid="stSidebar"] button[key^="next_day"] p,
 section[data-testid="stSidebar"] button[key^="prev_day"] span,
 section[data-testid="stSidebar"] button[key^="next_day"] span {
   white-space: nowrap !important;
-  font-size: 0.8rem !important;
+  font-size: 0.55rem !important;
   font-weight: 400 !important;
   margin: 0 !important;
   padding: 0 !important;
-  line-height: 1.2 !important;
+  line-height: 1 !important;
+  letter-spacing: -0.3px !important;
 }
 section[data-testid="stSidebar"] button[key^="prev_day"]:not(:disabled):hover,
 section[data-testid="stSidebar"] button[key^="next_day"]:not(:disabled):hover {
@@ -3205,28 +3207,31 @@ def main():
                     has_prev_data = prev_date_str in available_dates
                     has_next_data = next_date_str in available_dates
                     
-                    # 上下堆叠布局，确保日期完整显示
-                    prev_label = prev_date_obj.strftime("%Y/%m/%d")
-                    if has_prev_data:
-                        if st.button(f"◀ {prev_label}", use_container_width=True, key="prev_day"):
-                            st.session_state.selected_date_cache = prev_date_str
-                            st.session_state.confirmed_date = prev_date_str
-                            st.cache_data.clear()
-                            _set_nonce()
-                            st.rerun()
-                    else:
-                        st.button(f"◀ {prev_label}", use_container_width=True, disabled=True, key="prev_day_disabled")
+                    col1, col2 = st.columns(2)
                     
-                    next_label = next_date_obj.strftime("%Y/%m/%d")
-                    if has_next_data:
-                        if st.button(f"{next_label} ▶", use_container_width=True, key="next_day"):
-                            st.session_state.selected_date_cache = next_date_str
-                            st.session_state.confirmed_date = next_date_str
-                            st.cache_data.clear()
-                            _set_nonce()
-                            st.rerun()
-                    else:
-                        st.button(f"{next_label} ▶", use_container_width=True, disabled=True, key="next_day_disabled")
+                    with col1:
+                        prev_label = prev_date_obj.strftime("%Y/%m/%d")
+                        if has_prev_data:
+                            if st.button(f"◀{prev_label}", use_container_width=True, key="prev_day"):
+                                st.session_state.selected_date_cache = prev_date_str
+                                st.session_state.confirmed_date = prev_date_str
+                                st.cache_data.clear()
+                                _set_nonce()
+                                st.rerun()
+                        else:
+                            st.button(f"◀{prev_label}", use_container_width=True, disabled=True, key="prev_day_disabled")
+                    
+                    with col2:
+                        next_label = next_date_obj.strftime("%Y/%m/%d")
+                        if has_next_data:
+                            if st.button(f"{next_label}▶", use_container_width=True, key="next_day"):
+                                st.session_state.selected_date_cache = next_date_str
+                                st.session_state.confirmed_date = next_date_str
+                                st.cache_data.clear()
+                                _set_nonce()
+                                st.rerun()
+                        else:
+                            st.button(f"{next_label}▶", use_container_width=True, disabled=True, key="next_day_disabled")
                 except:
                     pass
         
