@@ -430,6 +430,32 @@ div[data-baseweb="popover"] button.date-disabled .date-disabled-icon {
 .expander-toggle-inside .toggle-text{
   font-size: 0.85rem;
 }
+/* 底部收起按钮 */
+.expander-toggle-bottom{
+  background: linear-gradient(145deg, rgba(236,72,153,.12), rgba(139,92,246,.08));
+  border: 1px solid rgba(236,72,153,.25);
+  border-radius: 10px;
+  padding: 8px 16px;
+  margin: 12px 10px 6px 10px;
+  text-align: center;
+  color: #ec4899;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+.expander-toggle-bottom:hover{
+  background: linear-gradient(145deg, rgba(236,72,153,.20), rgba(139,92,246,.15));
+  border-color: rgba(236,72,153,.4);
+}
+.expander-toggle-bottom .toggle-icon{
+  display: inline-block;
+  margin-right: 6px;
+  font-size: 0.7rem;
+}
+.expander-toggle-bottom .toggle-text{
+  font-size: 0.9rem;
+}
 .custom-expander{
   border-radius: 14px;
 }
@@ -1566,6 +1592,10 @@ def render_result(result: dict, group_key: str | None = None):
 <div class="custom-expander-inner">
 {discussion_content_html}
 </div>
+<div class="expander-toggle-bottom">
+<span class="toggle-icon">▲</span>
+<span class="toggle-text">点击收起</span>
+</div>
 </div>
 </div>
 </details>
@@ -1626,6 +1656,65 @@ def render_result(result: dict, group_key: str | None = None):
                 if (details) {
                     details.open = false;
                     details.removeAttribute('open');
+                }
+            });
+        });
+        
+        // 话题簇顶部sticky卡片点击收起
+        const clusterStickyCards = parentDoc.querySelectorAll('.cluster-card-sticky');
+        
+        clusterStickyCards.forEach((card) => {
+            if (card.dataset.clusterbound === 'true') {
+                return;
+            }
+            card.dataset.clusterbound = 'true';
+            
+            card.style.cursor = 'pointer';
+            card.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                const details = this.closest('details.custom-expander');
+                if (details) {
+                    details.open = false;
+                    details.removeAttribute('open');
+                    
+                    details.style.display = 'none';
+                    details.offsetHeight;
+                    details.style.display = '';
+                    
+                    setTimeout(() => {
+                        details.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                    }, 50);
+                }
+            });
+        });
+        
+        // 底部收起按钮点击收起
+        const bottomButtons = parentDoc.querySelectorAll('.expander-toggle-bottom');
+        
+        bottomButtons.forEach((button) => {
+            if (button.dataset.bottombound === 'true') {
+                return;
+            }
+            button.dataset.bottombound = 'true';
+            
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                const details = this.closest('details');
+                if (details) {
+                    details.open = false;
+                    details.removeAttribute('open');
+                    
+                    details.style.display = 'none';
+                    details.offsetHeight;
+                    details.style.display = '';
+                    
+                    setTimeout(() => {
+                        details.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                    }, 50);
                 }
             });
         });
@@ -1904,6 +1993,10 @@ def render_version_result(result: dict, group_key: str | None = None):
 <div class="custom-expander-inner">
 {discussion_content_html}
 </div>
+<div class="expander-toggle-bottom">
+<span class="toggle-icon">▲</span>
+<span class="toggle-text">点击收起</span>
+</div>
 </div>
 </div>
 </details>
@@ -1960,6 +2053,65 @@ def render_version_result(result: dict, group_key: str | None = None):
                 e.stopPropagation();
                 
                 const details = this.closest('details.dp-expander');
+                if (details) {
+                    details.open = false;
+                    details.removeAttribute('open');
+                    
+                    details.style.display = 'none';
+                    details.offsetHeight;
+                    details.style.display = '';
+                    
+                    setTimeout(() => {
+                        details.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                    }, 50);
+                }
+            });
+        });
+        
+        // 话题簇顶部sticky卡片点击收起
+        const clusterStickyCards = parentDoc.querySelectorAll('.cluster-card-sticky');
+        
+        clusterStickyCards.forEach((card) => {
+            if (card.dataset.vclusterbound === 'true') {
+                return;
+            }
+            card.dataset.vclusterbound = 'true';
+            
+            card.style.cursor = 'pointer';
+            card.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                const details = this.closest('details.custom-expander');
+                if (details) {
+                    details.open = false;
+                    details.removeAttribute('open');
+                    
+                    details.style.display = 'none';
+                    details.offsetHeight;
+                    details.style.display = '';
+                    
+                    setTimeout(() => {
+                        details.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                    }, 50);
+                }
+            });
+        });
+        
+        // 底部收起按钮点击收起
+        const bottomButtons = parentDoc.querySelectorAll('.expander-toggle-bottom');
+        
+        bottomButtons.forEach((button) => {
+            if (button.dataset.vbottombound === 'true') {
+                return;
+            }
+            button.dataset.vbottombound = 'true';
+            
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                const details = this.closest('details');
                 if (details) {
                     details.open = false;
                     details.removeAttribute('open');
