@@ -1066,6 +1066,48 @@ section[data-testid="stMain"] div[data-testid="stExpander"] div[role="region"]{
   color: #1f2937;
 }
 
+/* Tooltip 样式 */
+.version-tooltip{
+  position: relative;
+  display: inline-block;
+  cursor: help;
+  margin-left: 6px;
+  font-size: 0.9rem;
+  color: #B592E8;
+  vertical-align: middle;
+}
+.version-tooltip .tooltip-text{
+  visibility: hidden;
+  opacity: 0;
+  position: absolute;
+  z-index: 9999;
+  bottom: 130%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%);
+  color: #ffffff;
+  padding: 12px 16px;
+  border-radius: 10px;
+  font-size: 0.78rem;
+  line-height: 1.6;
+  white-space: nowrap;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.25);
+  transition: opacity 0.2s, visibility 0.2s;
+}
+.version-tooltip .tooltip-text::after{
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 8px solid transparent;
+  border-top-color: #312e81;
+}
+.version-tooltip:hover .tooltip-text{
+  visibility: visible;
+  opacity: 1;
+}
+
 /* Metric */
 [data-testid="stMetricValue"]{ color: #6b21a8 !important; font-weight: 900 !important; }
 [data-testid="stMetricLabel"]{ color: var(--muted) !important; }
@@ -2704,12 +2746,17 @@ def show_homepage():
                                 st.session_state.homepage_date_cache = selected_date_str_check
                                 st.session_state.homepage_need_date_correction = False
 
-                        # 版本日期提示
+                        # 自定义标签带tooltip
                         st.markdown('''
-<div style="background: rgba(181,146,232,0.1); border-left: 3px solid #B592E8; border-radius: 0 6px 6px 0; padding: 8px 12px; margin-bottom: 10px; font-size: 0.78rem; color: #6b21a8;">
-📌 <b>版本日期参考</b><br>
-• beta15_旋转木马: 2025-12-03 ~ 2025-12-17<br>
-• beta17_暖冬测试: 2025-12-31 ~ 2026-01-20
+<div style="display: flex; align-items: center; margin-bottom: 8px;">
+  <span style="font-size: 1.4rem; font-weight: 800; color: #6b21a8;">📅 监测日期</span>
+  <span class="version-tooltip">ℹ️
+    <span class="tooltip-text">
+      <b>📌 版本日期参考</b><br>
+      • beta15_旋转木马: 12-03 ~ 12-17<br>
+      • beta17_暖冬测试: 12-31 ~ 01-20
+    </span>
+  </span>
 </div>
 ''', unsafe_allow_html=True)
 
@@ -2718,7 +2765,7 @@ def show_homepage():
                                 st.session_state.homepage_valid_date_selected, "%Y-%m-%d"
                             ).date()
                             selected_date_obj = st.date_input(
-                                "📅 监测日期",
+                                "",
                                 value=corrected_date,
                                 min_value=extended_min_date,
                                 max_value=extended_max_date,
@@ -2746,7 +2793,7 @@ def show_homepage():
                             st.session_state.homepage_need_date_correction = False
                         else:
                             selected_date_obj = st.date_input(
-                                "📅 监测日期",
+                                "",
                                 value=initial_date,
                                 min_value=extended_min_date,
                                 max_value=extended_max_date,
