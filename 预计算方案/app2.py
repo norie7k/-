@@ -187,8 +187,8 @@ section[data-testid="stSidebar"] button#st-key-quick_next_disabled {
     background: rgba(30, 41, 59, 0.6) !important;
     border: 1px solid rgba(148, 163, 184, 0.25) !important;
     color: #94a3b8 !important;
-    font-size: 0.55rem !important;
-    padding: 0.25rem 0.3rem !important;
+    font-size: 0.48rem !important;
+    padding: 0.22rem 0.26rem !important;
     min-height: auto !important;
     height: auto !important;
     white-space: nowrap !important;
@@ -198,7 +198,7 @@ section[data-testid="stSidebar"] button#st-key-quick_prev_day p,
 section[data-testid="stSidebar"] button#st-key-quick_next_day p,
 section[data-testid="stSidebar"] button#st-key-quick_prev_disabled p,
 section[data-testid="stSidebar"] button#st-key-quick_next_disabled p {
-    font-size: 0.55rem !important;
+    font-size: 0.48rem !important;
     margin: 0 !important;
     white-space: nowrap !important;
 }
@@ -3000,7 +3000,7 @@ def main():
             </div>
             """, unsafe_allow_html=True)
         with col_back:
-            if st.button("🏠", key="sidebar_back_home", help="返回主页"):
+            if st.button("返回", key="sidebar_back_home", help="返回主页"):
                 st.session_state.show_results = False
                 st.session_state.query_type = "daily"
                 st.rerun()
