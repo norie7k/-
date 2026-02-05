@@ -221,6 +221,28 @@ section[data-testid="stSidebar"] .stAlert {
   margin: 0.5rem 0 !important;
 }
 
+/* sidebar 日期切换按钮 */
+section[data-testid="stSidebar"] button[key^="prev_day"],
+section[data-testid="stSidebar"] button[key^="next_day"] {
+  background: rgba(30, 41, 59, 0.8) !important;
+  border: 1px solid rgba(148, 163, 184, 0.3) !important;
+  color: #94a3b8 !important;
+  font-size: 0.9rem !important;
+  font-weight: 500 !important;
+  padding: 0.5rem 0.8rem !important;
+}
+section[data-testid="stSidebar"] button[key^="prev_day"]:not(:disabled):hover,
+section[data-testid="stSidebar"] button[key^="next_day"]:not(:disabled):hover {
+  background: rgba(139, 92, 246, 0.2) !important;
+  border-color: rgba(168, 85, 247, 0.5) !important;
+  color: #c7d2fe !important;
+}
+section[data-testid="stSidebar"] button[key^="prev_day"]:disabled,
+section[data-testid="stSidebar"] button[key^="next_day"]:disabled {
+  opacity: 0.3 !important;
+  cursor: not-allowed !important;
+}
+
 /* 下拉菜单弹层（options） */
 div[data-baseweb="menu"]{
   background: rgba(15,23,42,.98) !important;
@@ -3136,10 +3158,46 @@ def main():
             _set_nonce()
             st.rerun()
         
-        if st.button("🏠 返回主页", use_container_width=True):
-            st.session_state.show_results = False
-            st.session_state.query_type = "daily"
-            st.rerun()
+        # 日期切换按钮（仅在每日查询模式下显示）
+        if current_query_type == "daily" and available_dates:
+            st.markdown("<div style='margin: 1rem 0 0.5rem 0;'></div>", unsafe_allow_html=True)
+            
+            current_date = st.session_state.get("confirmed_date", "")
+            if current_date and current_date in available_dates:
+                sorted_dates = sorted(available_dates)
+                current_index = sorted_dates.index(current_date)
+                
+                has_prev = current_index > 0
+                has_next = current_index < len(sorted_dates) - 1
+                
+                prev_date = sorted_dates[current_index - 1] if has_prev else None
+                next_date = sorted_dates[current_index + 1] if has_next else None
+                
+                col1, col2 = st.columns(2)
+                
+                with col1:
+                    if prev_date:
+                        prev_label = datetime.strptime(prev_date, "%Y-%m-%d").strftime("%m/%d")
+                        if st.button(f"← {prev_label}", use_container_width=True, key="prev_day"):
+                            st.session_state.selected_date_cache = prev_date
+                            st.session_state.confirmed_date = prev_date
+                            st.cache_data.clear()
+                            _set_nonce()
+                            st.rerun()
+                    else:
+                        st.button("← 无", use_container_width=True, disabled=True, key="prev_day_disabled")
+                
+                with col2:
+                    if next_date:
+                        next_label = datetime.strptime(next_date, "%Y-%m-%d").strftime("%m/%d")
+                        if st.button(f"{next_label} →", use_container_width=True, key="next_day"):
+                            st.session_state.selected_date_cache = next_date
+                            st.session_state.confirmed_date = next_date
+                            st.cache_data.clear()
+                            _set_nonce()
+                            st.rerun()
+                    else:
+                        st.button("无 →", use_container_width=True, disabled=True, key="next_day_disabled")
         
         st.markdown("---")
         st.markdown("""
@@ -3148,39 +3206,47 @@ def main():
         </div>
         """, unsafe_allow_html=True)
 
-    # 主内容区 - 顶部返回按钮
+    # 主内容区 - 顶部返回图标
     st.markdown("""
     <style>
-    .back-button-container {
-        margin-bottom: 1.5rem;
+    .back-home-icon {
+        position: absolute;
+        top: 0.8rem;
+        left: 0;
+        z-index: 100;
     }
-    .back-button-container button {
-        background: rgba(30, 41, 59, 0.7) !important;
-        border: 1px solid rgba(148, 163, 184, 0.3) !important;
-        color: #e2e8f0 !important;
-        padding: 0.6rem 1.2rem !important;
-        font-size: 0.95rem !important;
-        font-weight: 500 !important;
-        border-radius: 8px !important;
+    .back-home-icon button {
+        background: rgba(30, 41, 59, 0.8) !important;
+        border: 1px solid rgba(148, 163, 184, 0.25) !important;
+        color: #94a3b8 !important;
+        padding: 0.45rem 0.6rem !important;
+        font-size: 1.3rem !important;
+        line-height: 1 !important;
+        border-radius: 6px !important;
         transition: all 0.2s ease !important;
+        min-width: auto !important;
+        width: auto !important;
+        height: auto !important;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15) !important;
     }
-    .back-button-container button:hover {
-        background: rgba(30, 41, 59, 0.95) !important;
+    .back-home-icon button:hover {
+        background: rgba(139, 92, 246, 0.25) !important;
         border-color: rgba(168, 85, 247, 0.5) !important;
+        color: #c7d2fe !important;
         transform: translateX(-3px) !important;
-        box-shadow: 0 2px 12px rgba(139, 92, 246, 0.2) !important;
+        box-shadow: 0 3px 10px rgba(139, 92, 246, 0.25) !important;
     }
     </style>
     """, unsafe_allow_html=True)
     
-    st.markdown('<div class="back-button-container">', unsafe_allow_html=True)
-    col_back, col_spacer = st.columns([0.12, 0.88])
-    with col_back:
-        if st.button("← 返回", key="back_to_home_top", help="返回主页"):
+    col_icon, col_space = st.columns([0.08, 0.92])
+    with col_icon:
+        st.markdown('<div class="back-home-icon">', unsafe_allow_html=True)
+        if st.button("◀", key="back_to_home_icon", help="返回主页"):
             st.session_state.show_results = False
             st.session_state.query_type = "daily"
             st.rerun()
-    st.markdown('</div>', unsafe_allow_html=True)
+        st.markdown('</div>', unsafe_allow_html=True)
     
     query_type = st.session_state.get("query_type", "daily")
     
