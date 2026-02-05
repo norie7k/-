@@ -279,6 +279,23 @@ section[data-testid="stSidebar"] input{
   color: var(--text) !important;
 }
 
+/* 主内容区返回主页按钮 */
+button#st-key-back_home_main {
+  background: rgba(30, 41, 59, 0.85) !important;
+  border: 1px solid rgba(148, 163, 184, 0.4) !important;
+  color: #c7d2fe !important;
+  font-size: 1.5rem !important;
+  padding: 0.4rem 0.7rem !important;
+  border-radius: 8px !important;
+  margin-top: -3.5rem !important;
+  transition: all 0.2s ease !important;
+}
+button#st-key-back_home_main:hover {
+  background: rgba(139, 92, 246, 0.25) !important;
+  border-color: rgba(168, 85, 247, 0.5) !important;
+  transform: translateX(-2px) !important;
+}
+
 /* sidebar 分隔线 */
 section[data-testid="stSidebar"] hr {
   border: none !important;
@@ -1717,15 +1734,24 @@ def render_result(result: dict, group_key: str | None = None, available_dates: l
     except:
         formatted_date = date
     
-    # 报告标题（居中显示）
-    st.markdown(
-        f"""<div style="text-align: center; padding: 0 0 1rem 0; margin-top: -4rem;">
+    # 报告标题（带返回按钮）
+    col_back, col_title = st.columns([0.06, 0.94])
+    
+    with col_back:
+        if st.button("‹", key="back_home_main", help="返回主页"):
+            st.session_state.show_results = False
+            st.session_state.query_type = "daily"
+            st.rerun()
+    
+    with col_title:
+        st.markdown(
+            f"""<div style="text-align: center; padding: 0 0 1rem 0; margin-top: -4rem; margin-left: -2rem;">
 <h1 style="margin: 0; color: #e9d5ff; font-size: 2rem; font-weight: 700;">
 📊 {platform_display} {group_display} {formatted_date} 分析报告 <span style="color: #fbbf24;">_热门讨论TOP5</span>
 </h1>
 </div>""",
-        unsafe_allow_html=True,
-    )
+            unsafe_allow_html=True,
+        )
 
     # ========= 热门话题列表（摘要卡 + 展开详情）=========
     sorted_clusters = sorted(clusters, key=lambda x: float(x.get("热度评分", 0) or 0), reverse=True)
