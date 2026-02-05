@@ -1506,21 +1506,26 @@ section[data-testid="stMain"] [data-testid="stDateInput"]{
 }
 
 /* 主页查询区域 - 下拉框文字清晰 */
-section[data-testid="stMain"] [data-baseweb="select"] [data-testid="stMarkdownContainer"],
-section[data-testid="stMain"] [data-baseweb="select"] span,
-section[data-testid="stMain"] [data-baseweb="select"] div[aria-selected="true"],
-section[data-testid="stMain"] [data-baseweb="select"] [role="button"]{
+section[data-testid="stMain"] [data-baseweb="select"] *{
   color: #1f2937 !important;
   opacity: 1 !important;
-  font-weight: 500 !important;
+  -webkit-text-fill-color: #1f2937 !important;
+}
+section[data-testid="stMain"] [data-baseweb="select"] [role="button"]{
+  font-weight: 600 !important;
+  font-size: 0.95rem !important;
 }
 section[data-testid="stMain"] [data-baseweb="select"] > div:first-child{
   background: #ffffff !important;
-  border: 1px solid #d1d5db !important;
+  border: 1.5px solid #d1d5db !important;
   border-radius: 8px !important;
 }
 section[data-testid="stMain"] [data-baseweb="select"] > div:first-child:hover{
   border-color: #B592E8 !important;
+}
+section[data-testid="stMain"] [data-baseweb="select"] svg{
+  fill: #6b7280 !important;
+  color: #6b7280 !important;
 }
 
 /* 查询区域容器样式 - 通过标记ID定位 */
