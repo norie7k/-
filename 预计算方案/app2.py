@@ -916,20 +916,21 @@ section[data-testid="stMain"] div[data-testid="stExpander"] div[role="region"]{
 /* ===== 讨论点直接展示样式（不折叠）===== */
 .dp-card-wrapper{
   background: #ffffff;
-  border: 1px solid #e9ecef;
-  border-left: 3px solid #C8A2E8;
-  border-radius: 0 8px 8px 0;
-  margin: 12px 0;
+  border: 1px solid #ddd6fe;
+  border-left: 4px solid #8b5cf6;
+  border-radius: 0 10px 10px 0;
+  margin: 14px 0;
   overflow: hidden;
+  box-shadow: 0 2px 8px rgba(139,92,246,0.1);
 }
 .dp-card-header-fixed{
-  background: #f8f9fa;
-  border-bottom: 1px solid #e9ecef;
-  padding: 10px 14px;
+  background: linear-gradient(135deg, #f5f0ff 0%, #eff6ff 100%);
+  border-bottom: 1px solid #ddd6fe;
+  padding: 12px 16px;
 }
 .dp-card-header-fixed .dp-title{
   font-weight: 700;
-  font-size: 1.05rem;
+  font-size: 1.08rem;
   color: #7c3aed;
 }
 .dp-content-direct{
@@ -938,13 +939,18 @@ section[data-testid="stMain"] div[data-testid="stExpander"] div[role="region"]{
 }
 
 .dp-section-title{
-  font-size: 0.88rem;
+  font-size: 0.92rem;
   font-weight: 700;
-  color: #6b21a8;
-  margin: 12px 0 8px 0;
+  color: #7c3aed;
+  background: linear-gradient(135deg, #ede9fe 0%, #e0e7ff 100%);
+  border-left: 4px solid #8b5cf6;
+  border-radius: 0 8px 8px 0;
+  padding: 10px 14px;
+  margin: 14px 0 10px 0;
   display: flex;
   align-items: center;
   gap: 6px;
+  box-shadow: 0 2px 6px rgba(139,92,246,0.1);
 }
 .dp-section-title:first-child{
   margin-top: 0;
