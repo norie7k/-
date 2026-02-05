@@ -138,9 +138,9 @@ section[data-testid="stSidebar"] .stCaption{ color: var(--muted) !important; }
 section[data-testid="stSidebar"] button[kind="primary"] {
     background: linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%) !important;
     border: none !important;
-    font-size: 0.9rem !important;
+    font-size: 0.85rem !important;
     font-weight: 600 !important;
-    padding: 0.55rem 0.9rem !important;
+    padding: 0.5rem 0.85rem !important;
     margin: 0.3rem 0 !important;
 }
 section[data-testid="stSidebar"] button[kind="primary"]:hover {
@@ -3173,41 +3173,49 @@ def main():
             st.markdown("<div style='margin: 1rem 0 0.5rem 0;'></div>", unsafe_allow_html=True)
             
             current_date = st.session_state.get("confirmed_date", "")
-            if current_date and current_date in available_dates:
-                sorted_dates = sorted(available_dates)
-                current_index = sorted_dates.index(current_date)
+            if current_date:
+                from datetime import timedelta
                 
-                has_prev = current_index > 0
-                has_next = current_index < len(sorted_dates) - 1
-                
-                prev_date = sorted_dates[current_index - 1] if has_prev else None
-                next_date = sorted_dates[current_index + 1] if has_next else None
-                
-                col1, col2 = st.columns(2)
-                
-                with col1:
-                    if prev_date:
-                        prev_label = datetime.strptime(prev_date, "%Y-%m-%d").strftime("%m/%d")
-                        if st.button(f"← {prev_label}", use_container_width=True, key="prev_day"):
-                            st.session_state.selected_date_cache = prev_date
-                            st.session_state.confirmed_date = prev_date
-                            st.cache_data.clear()
-                            _set_nonce()
-                            st.rerun()
-                    else:
-                        st.button("← 无", use_container_width=True, disabled=True, key="prev_day_disabled")
-                
-                with col2:
-                    if next_date:
-                        next_label = datetime.strptime(next_date, "%Y-%m-%d").strftime("%m/%d")
-                        if st.button(f"{next_label} →", use_container_width=True, key="next_day"):
-                            st.session_state.selected_date_cache = next_date
-                            st.session_state.confirmed_date = next_date
-                            st.cache_data.clear()
-                            _set_nonce()
-                            st.rerun()
-                    else:
-                        st.button("无 →", use_container_width=True, disabled=True, key="next_day_disabled")
+                # 计算前一天和后一天的日期
+                try:
+                    current_date_obj = datetime.strptime(current_date, "%Y-%m-%d").date()
+                    prev_date_obj = current_date_obj - timedelta(days=1)
+                    next_date_obj = current_date_obj + timedelta(days=1)
+                    
+                    prev_date_str = prev_date_obj.strftime("%Y-%m-%d")
+                    next_date_str = next_date_obj.strftime("%Y-%m-%d")
+                    
+                    # 检查前后日期是否有数据
+                    has_prev_data = prev_date_str in available_dates
+                    has_next_data = next_date_str in available_dates
+                    
+                    col1, col2 = st.columns(2)
+                    
+                    with col1:
+                        prev_label = prev_date_obj.strftime("%m/%d")
+                        if has_prev_data:
+                            if st.button(f"← {prev_label}", use_container_width=True, key="prev_day"):
+                                st.session_state.selected_date_cache = prev_date_str
+                                st.session_state.confirmed_date = prev_date_str
+                                st.cache_data.clear()
+                                _set_nonce()
+                                st.rerun()
+                        else:
+                            st.button(f"← {prev_label}", use_container_width=True, disabled=True, key="prev_day_disabled")
+                    
+                    with col2:
+                        next_label = next_date_obj.strftime("%m/%d")
+                        if has_next_data:
+                            if st.button(f"{next_label} →", use_container_width=True, key="next_day"):
+                                st.session_state.selected_date_cache = next_date_str
+                                st.session_state.confirmed_date = next_date_str
+                                st.cache_data.clear()
+                                _set_nonce()
+                                st.rerun()
+                        else:
+                            st.button(f"{next_label} →", use_container_width=True, disabled=True, key="next_day_disabled")
+                except:
+                    pass
         
         st.markdown("---")
         st.markdown("""
