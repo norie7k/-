@@ -9,7 +9,7 @@ import streamlit as st
 import streamlit.components.v1 as components
 import json
 import requests
-from datetime import datetime
+from datetime import datetime, timedelta
 from pathlib import Path
 import time
 import html
@@ -181,10 +181,20 @@ section[data-testid="stSidebar"] button#st-key-quick_next_disabled {
     background: rgba(30, 41, 59, 0.6) !important;
     border: 1px solid rgba(148, 163, 184, 0.25) !important;
     color: #94a3b8 !important;
-    font-size: 0.8rem !important;
-    padding: 0.35rem 0.5rem !important;
+    font-size: 0.7rem !important;
+    padding: 0.3rem 0.4rem !important;
     min-height: auto !important;
     height: auto !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+}
+section[data-testid="stSidebar"] button#st-key-quick_prev_day p,
+section[data-testid="stSidebar"] button#st-key-quick_next_day p,
+section[data-testid="stSidebar"] button#st-key-quick_prev_disabled p,
+section[data-testid="stSidebar"] button#st-key-quick_next_disabled p {
+    font-size: 0.7rem !important;
+    margin: 0 !important;
+    white-space: nowrap !important;
 }
 section[data-testid="stSidebar"] button#st-key-quick_prev_day:hover,
 section[data-testid="stSidebar"] button#st-key-quick_next_day:hover {
@@ -194,7 +204,7 @@ section[data-testid="stSidebar"] button#st-key-quick_next_day:hover {
 }
 section[data-testid="stSidebar"] button#st-key-quick_prev_disabled,
 section[data-testid="stSidebar"] button#st-key-quick_next_disabled {
-    opacity: 0.4 !important;
+    opacity: 0.5 !important;
     cursor: not-allowed !important;
 }
 
@@ -3267,6 +3277,11 @@ def main():
                 prev_date = sorted_dates[current_idx - 1] if current_idx > 0 else None
                 next_date = sorted_dates[current_idx + 1] if current_idx >= 0 and current_idx < len(sorted_dates) - 1 else None
                 
+                # 计算当前日期的前一天和后一天（用于tooltip显示）
+                current_date_obj = datetime.strptime(current_date_str, "%Y-%m-%d")
+                calc_prev_date = (current_date_obj - timedelta(days=1)).strftime("%Y年%m月%d日")
+                calc_next_date = (current_date_obj + timedelta(days=1)).strftime("%Y年%m月%d日")
+                
                 st.markdown("<div style='margin: 0.6rem 0 0.3rem 0;'></div>", unsafe_allow_html=True)
                 
                 col_prev, col_next = st.columns(2)
@@ -3282,7 +3297,7 @@ def main():
                             _set_nonce()
                             st.rerun()
                     else:
-                        st.button("← 前一天", key="quick_prev_disabled", use_container_width=True, disabled=True, help="无更早数据")
+                        st.button("← 前一天", key="quick_prev_disabled", use_container_width=True, disabled=True, help=f"{calc_prev_date}（无数据）")
                 
                 with col_next:
                     if next_date:
@@ -3295,7 +3310,7 @@ def main():
                             _set_nonce()
                             st.rerun()
                     else:
-                        st.button("后一天 →", key="quick_next_disabled", use_container_width=True, disabled=True, help="无更新数据")
+                        st.button("后一天 →", key="quick_next_disabled", use_container_width=True, disabled=True, help=f"{calc_next_date}（无数据）")
         
         st.markdown("---")
         st.markdown("""
