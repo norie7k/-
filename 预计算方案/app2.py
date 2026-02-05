@@ -231,45 +231,26 @@ section[data-testid="stSidebar"] .stAlert {
   margin: 0.5rem 0 !important;
 }
 
-/* sidebar 日期切换按钮 */
-section[data-testid="stSidebar"] button[key^="prev_day"],
-section[data-testid="stSidebar"] button[key^="next_day"] {
+/* 返回主页按钮 */
+button[key="back_home_from_result"] {
   background: rgba(30, 41, 59, 0.8) !important;
   border: 1px solid rgba(148, 163, 184, 0.3) !important;
-  color: #e2e8f0 !important;
-  font-size: 0.55rem !important;
-  font-weight: 400 !important;
-  padding: 0.4rem 0.2rem !important;
-  white-space: nowrap !important;
-  overflow: hidden !important;
-  line-height: 1 !important;
-  min-height: auto !important;
-  height: auto !important;
-  letter-spacing: -0.3px !important;
+  color: #94a3b8 !important;
+  padding: 0.5rem 0.7rem !important;
+  font-size: 1.1rem !important;
+  border-radius: 8px !important;
+  transition: all 0.2s ease !important;
+  min-width: auto !important;
+  margin-top: -2.5rem !important;
 }
-section[data-testid="stSidebar"] button[key^="prev_day"] p,
-section[data-testid="stSidebar"] button[key^="next_day"] p,
-section[data-testid="stSidebar"] button[key^="prev_day"] span,
-section[data-testid="stSidebar"] button[key^="next_day"] span {
-  white-space: nowrap !important;
-  font-size: 0.55rem !important;
-  font-weight: 400 !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  line-height: 1 !important;
-  letter-spacing: -0.3px !important;
-}
-section[data-testid="stSidebar"] button[key^="prev_day"]:not(:disabled):hover,
-section[data-testid="stSidebar"] button[key^="next_day"]:not(:disabled):hover {
-  background: rgba(139, 92, 246, 0.2) !important;
+button[key="back_home_from_result"]:hover {
+  background: rgba(139, 92, 246, 0.25) !important;
   border-color: rgba(168, 85, 247, 0.5) !important;
   color: #c7d2fe !important;
+  transform: translateX(-2px) !important;
+  box-shadow: 0 2px 8px rgba(139, 92, 246, 0.2) !important;
 }
-section[data-testid="stSidebar"] button[key^="prev_day"]:disabled,
-section[data-testid="stSidebar"] button[key^="next_day"]:disabled {
-  opacity: 0.3 !important;
-  cursor: not-allowed !important;
-}
+
 
 /* 下拉菜单弹层（options） */
 div[data-baseweb="menu"]{
@@ -1690,15 +1671,24 @@ def render_result(result: dict, group_key: str | None = None, available_dates: l
     except:
         formatted_date = date
     
-    # 报告标题（居中显示，无卡片背景，贴顶）
-    st.markdown(
-        f"""<div style="text-align: center; padding: 0 0 1rem 0; margin-top: -4rem;">
+    # 报告标题（带返回按钮）
+    col_back, col_title = st.columns([0.06, 0.94])
+    
+    with col_back:
+        if st.button("◀", key="back_home_from_result", help="返回主页"):
+            st.session_state.show_results = False
+            st.session_state.query_type = "daily"
+            st.rerun()
+    
+    with col_title:
+        st.markdown(
+            f"""<div style="text-align: center; padding: 0 0 1rem 0; margin-top: -4rem; margin-left: -3rem;">
 <h1 style="margin: 0; color: #e9d5ff; font-size: 2rem; font-weight: 700;">
 📊 {platform_display} {group_display} {formatted_date} 分析报告 <span style="color: #fbbf24;">_热门讨论TOP5</span>
 </h1>
 </div>""",
-        unsafe_allow_html=True,
-    )
+            unsafe_allow_html=True,
+        )
 
     # ========= 热门话题列表（摘要卡 + 展开详情）=========
     sorted_clusters = sorted(clusters, key=lambda x: float(x.get("热度评分", 0) or 0), reverse=True)
@@ -3224,56 +3214,6 @@ def main():
             st.cache_data.clear()
             _set_nonce()
             st.rerun()
-        
-        # 日期切换按钮（仅在每日查询模式下显示）
-        if current_query_type == "daily" and available_dates:
-            st.markdown("<div style='margin: 1rem 0 0.5rem 0;'></div>", unsafe_allow_html=True)
-            
-            current_date = st.session_state.get("confirmed_date", "")
-            if current_date:
-                from datetime import timedelta
-                
-                # 计算前一天和后一天的日期
-                try:
-                    current_date_obj = datetime.strptime(current_date, "%Y-%m-%d").date()
-                    prev_date_obj = current_date_obj - timedelta(days=1)
-                    next_date_obj = current_date_obj + timedelta(days=1)
-                    
-                    prev_date_str = prev_date_obj.strftime("%Y-%m-%d")
-                    next_date_str = next_date_obj.strftime("%Y-%m-%d")
-                    
-                    # 检查前后日期是否有数据
-                    has_prev_data = prev_date_str in available_dates
-                    has_next_data = next_date_str in available_dates
-                    
-                    col1, col2 = st.columns(2)
-                    
-                    with col1:
-                        WJ = "\u2060"  # Word Joiner：防止在 / 处换行
-                        prev_label = prev_date_obj.strftime(f"%Y{WJ}/%m{WJ}/%d")
-                        if has_prev_data:
-                            if st.button(f"◀{prev_label}", use_container_width=True, key="prev_day"):
-                                st.session_state.selected_date_cache = prev_date_str
-                                st.session_state.confirmed_date = prev_date_str
-                                st.cache_data.clear()
-                                _set_nonce()
-                                st.rerun()
-                        else:
-                            st.button(f"◀{prev_label}", use_container_width=True, disabled=True, key="prev_day_disabled")
-                    
-                    with col2:
-                        next_label = next_date_obj.strftime(f"%Y{WJ}/%m{WJ}/%d")
-                        if has_next_data:
-                            if st.button(f"{next_label}▶", use_container_width=True, key="next_day"):
-                                st.session_state.selected_date_cache = next_date_str
-                                st.session_state.confirmed_date = next_date_str
-                                st.cache_data.clear()
-                                _set_nonce()
-                                st.rerun()
-                        else:
-                            st.button(f"{next_label}▶", use_container_width=True, disabled=True, key="next_day_disabled")
-                except:
-                    pass
         
         st.markdown("---")
         st.markdown("""
