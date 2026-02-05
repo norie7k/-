@@ -1783,9 +1783,9 @@ def render_result(result: dict, group_key: str | None = None, available_dates: l
             prev_date_str = prev_date_obj.strftime("%Y-%m-%d")
             next_date_str = next_date_obj.strftime("%Y-%m-%d")
             
-            prev_display = prev_date_obj.strftime("%m-%d")
-            next_display = next_date_obj.strftime("%m-%d")
-            current_display = current_date_obj.strftime("%m-%d")
+            prev_display = prev_date_obj.strftime("%Y-%m-%d")
+            next_display = next_date_obj.strftime("%Y-%m-%d")
+            current_display = current_date_obj.strftime("%Y-%m-%d")
             
             has_prev = prev_date_str in available_dates
             has_next = next_date_str in available_dates
