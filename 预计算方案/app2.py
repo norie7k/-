@@ -939,18 +939,16 @@ section[data-testid="stMain"] div[data-testid="stExpander"] div[role="region"]{
 }
 
 .dp-section-title{
-  font-size: 0.92rem;
-  font-weight: 700;
-  color: #7c3aed;
-  background: linear-gradient(135deg, #ede9fe 0%, #e0e7ff 100%);
-  border-left: 4px solid #8b5cf6;
-  border-radius: 0 8px 8px 0;
-  padding: 10px 14px;
-  margin: 14px 0 10px 0;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #6b7280;
+  background: transparent;
+  border: none;
+  padding: 0;
+  margin: 12px 0 6px 0;
   display: flex;
   align-items: center;
-  gap: 6px;
-  box-shadow: 0 2px 6px rgba(139,92,246,0.1);
+  gap: 5px;
 }
 .dp-section-title:first-child{
   margin-top: 0;
@@ -1890,7 +1888,7 @@ def render_result(result: dict, group_key: str | None = None, available_dates: l
         discussion_list = cluster.get("讨论点列表", []) or []
         
         if discussion_list:
-            discussion_content_html += f'<div style="color: #6b21a8; font-size: 1.05rem; margin-bottom: 10px; font-weight: 700;">💬 讨论点（共 {len(discussion_list)} 条）</div>'
+            discussion_content_html += f'<div style="background: linear-gradient(135deg, #ede9fe 0%, #e0e7ff 100%); border-left: 4px solid #8b5cf6; border-radius: 0 8px 8px 0; padding: 12px 16px; margin-bottom: 14px; color: #7c3aed; font-size: 1.08rem; font-weight: 700; box-shadow: 0 2px 6px rgba(139,92,246,0.12);">💬 讨论点（共 {len(discussion_list)} 条）</div>'
             
             for dp_i, dp in enumerate(discussion_list, 1):
                 discussion_content_html += build_discussion_point_html(dp, dp_i, group_key, date, idx)
@@ -2277,7 +2275,7 @@ def render_version_result(result: dict, group_key: str | None = None):
         # 构建讨论点内容
         discussion_content_html = ""
         if discussion_points:
-            discussion_content_html += f'<div style="color: #6b21a8; font-size: 1.05rem; margin-bottom: 10px; font-weight: 700;">📋 核心讨论点（共 {len(discussion_points)} 条）</div>'
+            discussion_content_html += f'<div style="background: linear-gradient(135deg, #ede9fe 0%, #e0e7ff 100%); border-left: 4px solid #8b5cf6; border-radius: 0 8px 8px 0; padding: 12px 16px; margin-bottom: 14px; color: #7c3aed; font-size: 1.08rem; font-weight: 700; box-shadow: 0 2px 6px rgba(139,92,246,0.12);">📋 核心讨论点（共 {len(discussion_points)} 条）</div>'
             
             for dp_i, dp in enumerate(discussion_points, 1):
                 dp_title = dp.get("point", "")
