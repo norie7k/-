@@ -565,7 +565,7 @@ section[data-testid="stMain"] div[data-testid="stExpander"] div[role="region"]{
 }
 .dp-title{
   font-weight: 800;
-  font-size: 1.25rem;
+  font-size: 1.35rem;
   color: #fff;
   flex: 1;
 }
@@ -664,7 +664,7 @@ section[data-testid="stMain"] div[data-testid="stExpander"] div[role="region"]{
 }
 .dp-card-header-fixed .dp-title{
   font-weight: 800;
-  font-size: 1.25rem;
+  font-size: 1.35rem;
   color: #fff;
 }
 .dp-content-direct{
@@ -716,8 +716,8 @@ section[data-testid="stMain"] div[data-testid="stExpander"] div[role="region"]{
   margin: 10px 0;
 }
 .opinion-card-header{
-  font-size: 1.15rem;
-  font-weight: 800;
+  font-size: 1.05rem;
+  font-weight: 700;
   color: #22d3ee;
   margin-bottom: 10px;
   display: flex;
