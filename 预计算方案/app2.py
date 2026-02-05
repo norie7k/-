@@ -2219,118 +2219,6 @@ def render_version_result(result: dict, group_key: str | None = None):
 </script>
 """, height=0)
 
-# ==================== 自定义日历选择器 ====================
-
-def render_custom_calendar(available_dates: list, current_date: str, key_prefix: str = "cal"):
-    """
-    渲染紧凑型自定义日历选择器（类似原生date_input样式）
-    """
-    import calendar
-    
-    if not available_dates:
-        return None
-    
-    date_set = set(available_dates)
-    date_objects = [datetime.strptime(d, "%Y-%m-%d").date() for d in available_dates]
-    
-    # 确定显示的月份
-    if current_date:
-        try:
-            display_date = datetime.strptime(current_date, "%Y-%m-%d").date()
-        except:
-            display_date = max(date_objects)
-    else:
-        display_date = max(date_objects)
-    
-    if f"{key_prefix}_display_year" in st.session_state:
-        display_year = st.session_state[f"{key_prefix}_display_year"]
-        display_month = st.session_state[f"{key_prefix}_display_month"]
-    else:
-        display_year = display_date.year
-        display_month = display_date.month
-    
-    selected_new_date = None
-    cal = calendar.Calendar(firstweekday=0)
-    month_days = cal.monthdayscalendar(display_year, display_month)
-    
-    # 当前选中日期显示
-    display_current = current_date.replace("-", "/") if current_date else ""
-    months_cn = ["一月", "二月", "三月", "四月", "五月", "六月", 
-                 "七月", "八月", "九月", "十月", "十一月", "十二月"]
-    
-    # 顶部：当前日期输入框样式
-    st.markdown(f'''
-    <div style="background: rgba(30,41,59,0.8); border: 1px solid rgba(148,163,184,0.3); 
-         border-radius: 8px; padding: 8px 12px; margin-bottom: 8px; font-size: 0.95rem; color: #e2e8f0;">
-        {display_current}
-    </div>
-    ''', unsafe_allow_html=True)
-    
-    # 月份导航
-    nav_col1, nav_col2, nav_col3, nav_col4, nav_col5 = st.columns([0.8, 1.5, 1.5, 0.8, 0.1])
-    
-    with nav_col1:
-        if st.button("‹", key=f"{key_prefix}_prev", help="上月"):
-            prev_month = display_month - 1
-            prev_year = display_year
-            if prev_month < 1:
-                prev_month = 12
-                prev_year -= 1
-            st.session_state[f"{key_prefix}_display_year"] = prev_year
-            st.session_state[f"{key_prefix}_display_month"] = prev_month
-            st.rerun()
-    
-    with nav_col2:
-        st.markdown(f"<div style='text-align:center; color:#e2e8f0; font-weight:500; padding-top:6px;'>{months_cn[display_month-1]}</div>", unsafe_allow_html=True)
-    
-    with nav_col3:
-        st.markdown(f"<div style='text-align:center; color:#e2e8f0; font-weight:500; padding-top:6px;'>{display_year}</div>", unsafe_allow_html=True)
-    
-    with nav_col4:
-        if st.button("›", key=f"{key_prefix}_next", help="下月"):
-            next_month = display_month + 1
-            next_year = display_year
-            if next_month > 12:
-                next_month = 1
-                next_year += 1
-            st.session_state[f"{key_prefix}_display_year"] = next_year
-            st.session_state[f"{key_prefix}_display_month"] = next_month
-            st.rerun()
-    
-    # 星期标题
-    weekdays = ["一", "二", "三", "四", "五", "六", "日"]
-    week_cols = st.columns(7)
-    for i, wd in enumerate(weekdays):
-        with week_cols[i]:
-            st.markdown(f"<div style='text-align:center; color:#64748b; font-size:0.8rem; font-weight:500;'>{wd}</div>", unsafe_allow_html=True)
-    
-    # 日历网格 - 每行7列
-    for week in month_days:
-        day_cols = st.columns(7)
-        for i, day in enumerate(week):
-            with day_cols[i]:
-                if day == 0:
-                    st.markdown("<div style='height:32px;'></div>", unsafe_allow_html=True)
-                else:
-                    date_str = f"{display_year}-{display_month:02d}-{day:02d}"
-                    has_data = date_str in date_set
-                    is_selected = date_str == current_date
-                    
-                    if has_data:
-                        btn_type = "primary" if is_selected else "secondary"
-                        if st.button(str(day), key=f"{key_prefix}_d_{date_str}", type=btn_type, use_container_width=True):
-                            selected_new_date = date_str
-                    else:
-                        # 无数据 - 灰色不可点击
-                        st.markdown(f'''
-                        <div style="text-align:center; padding:6px 0; color:#334155; font-size:0.85rem;">
-                            {day}
-                        </div>
-                        ''', unsafe_allow_html=True)
-    
-    return selected_new_date
-
-
 # ==================== 主页欢迎界面 ====================
 
 def show_homepage():
@@ -2372,10 +2260,35 @@ def show_homepage():
         
         tab1, tab2 = st.tabs(["🗂️每日查询", "🗃版本查询"])
         
+        # JavaScript：动态修改 tab 文字样式
+        components.html("""
+<script>
+(function() {
+    const parentDoc = window.parent.document;
+    
+    function styleTabButtons() {
+        // 查找所有tab按钮
+        const tabButtons = parentDoc.querySelectorAll('button[data-baseweb="tab"]');
+        tabButtons.forEach(btn => {
+            btn.style.fontSize = '1.1rem';
+            btn.style.fontWeight = '600';
+        });
+    }
+    
+    // 初始执行
+    styleTabButtons();
+    
+    // 监听变化
+    const observer = new MutationObserver(styleTabButtons);
+    observer.observe(parentDoc.body, { childList: true, subtree: true });
+})();
+</script>
+""", height=0)
+
         # === 日常查询标签 ===
         with tab1:
-            col_group, col_date = st.columns([1, 1])
-            
+            col_group, col_date, col_button = st.columns([1, 1, 0.8])
+
             with col_group:
                 group_options = {k: GROUPS[k]["name"] for k in GROUPS.keys()}
                 selected_group_daily = st.selectbox(
@@ -2384,49 +2297,335 @@ def show_homepage():
                     format_func=lambda x: group_options[x],
                     key="homepage_group_daily",
                 )
-                
-                # 加载可用日期
+
+                # 加载日期列表
                 with st.spinner("加载可用日期..."):
                     index = load_index(selected_group_daily)
                     available_dates = index.get("available_dates", [])
-            
+
             with col_date:
                 if available_dates:
-                    # 转换为date对象列表
-                    date_objects = [datetime.strptime(d, "%Y-%m-%d").date() for d in available_dates]
-                    max_date = max(date_objects)
-                    min_date = min(date_objects)
-                    
-                    selected_date_obj = st.date_input(
-                        "📅 监测日期",
-                        value=max_date,
-                        min_value=min_date,
-                        max_value=max_date,
-                        key="homepage_date_daily",
-                    )
-                    selected_date = selected_date_obj.strftime("%Y-%m-%d") if selected_date_obj else None
+                    # 转换为date对象
+                    date_objects = []
+                    for date_str in available_dates:
+                        try:
+                            date_objects.append(datetime.strptime(date_str, "%Y-%m-%d").date())
+                        except:
+                            pass
+
+                    if date_objects:
+                        from datetime import date as date_type
+
+                        sorted_date_objects = sorted(date_objects, reverse=True)
+                        default_date = sorted_date_objects[0]
+
+                        min_date = min(date_objects)
+                        max_date = max(date_objects)
+
+                        min_year = min_date.year
+                        max_year = max_date.year
+                        extended_min_date = date_type(min_year, 1, 1)
+                        extended_max_date = date_type(max_year, 12, 31)
+
+                        # 初始化session state
+                        if "homepage_date_cache" not in st.session_state:
+                            st.session_state.homepage_date_cache = default_date.strftime("%Y-%m-%d")
+
+                        try:
+                            cached_date_obj = datetime.strptime(
+                                st.session_state.homepage_date_cache, "%Y-%m-%d"
+                            ).date()
+                            initial_date = cached_date_obj if cached_date_obj in date_objects else default_date
+                        except:
+                            initial_date = default_date
+
+                        def on_homepage_date_change():
+                            selected_date_obj_check = st.session_state.get("homepage_date_input", initial_date)
+                            if isinstance(selected_date_obj_check, str):
+                                try:
+                                    selected_date_obj_check = datetime.strptime(
+                                        selected_date_obj_check, "%Y-%m-%d"
+                                    ).date()
+                                except:
+                                    selected_date_obj_check = initial_date
+
+                            selected_date_str_check = selected_date_obj_check.strftime("%Y-%m-%d")
+
+                            if selected_date_str_check not in available_dates:
+                                selected_date_obj_dt = datetime.combine(
+                                    selected_date_obj_check, datetime.min.time()
+                                )
+                                closest_date = min(
+                                    date_objects,
+                                    key=lambda x: abs(
+                                        (datetime.combine(x, datetime.min.time()) - selected_date_obj_dt).days
+                                    ),
+                                )
+                                closest_date_str = closest_date.strftime("%Y-%m-%d")
+                                st.session_state.homepage_date_cache = closest_date_str
+                                st.session_state.homepage_need_date_correction = True
+                                st.session_state.homepage_invalid_date_selected = selected_date_str_check
+                                st.session_state.homepage_valid_date_selected = closest_date_str
+                                st.rerun()
+                            else:
+                                st.session_state.homepage_date_cache = selected_date_str_check
+                                st.session_state.homepage_need_date_correction = False
+
+                        if st.session_state.get("homepage_need_date_correction", False):
+                            corrected_date = datetime.strptime(
+                                st.session_state.homepage_valid_date_selected, "%Y-%m-%d"
+                            ).date()
+                            selected_date_obj = st.date_input(
+                                "📅 监测日期",
+                                value=corrected_date,
+                                min_value=extended_min_date,
+                                max_value=extended_max_date,
+                                help="选择需要查看的日期",
+                                key="homepage_date_input",
+                                on_change=on_homepage_date_change,
+                            )
+
+                            invalid_date = st.session_state.get("homepage_invalid_date_selected", "")
+                            valid_date = st.session_state.get("homepage_valid_date_selected", "")
+                            if invalid_date:
+                                formatted_invalid_date = datetime.strptime(invalid_date, "%Y-%m-%d").strftime(
+                                    "%Y年%m月%d日"
+                                )
+                                formatted_valid_date = datetime.strptime(valid_date, "%Y-%m-%d").strftime(
+                                    "%Y年%m月%d日"
+                                )
+                                st.markdown(
+                                    f'<div style="padding: 0.6rem; background-color: rgba(255, 193, 7, 0.10); '
+                                    f'border-left: 3px solid #ffc107; border-radius: 8px; margin: 0.5rem 0;">'
+                                    f'<p style="margin: 0; font-size: 0.85rem; font-weight: 600; color: #ffd166;">'
+                                    f'⚠️ {formatted_invalid_date}暂无数据，已选择：{formatted_valid_date}</p></div>',
+                                    unsafe_allow_html=True,
+                                )
+                            st.session_state.homepage_need_date_correction = False
+                        else:
+                            selected_date_obj = st.date_input(
+                                "📅 监测日期",
+                                value=initial_date,
+                                min_value=extended_min_date,
+                                max_value=extended_max_date,
+                                help="选择需要查看的日期",
+                                key="homepage_date_input",
+                                on_change=on_homepage_date_change,
+                            )
+
+                        # JavaScript禁用不可用日期 + 月份中文化
+                        available_dates_js = json.dumps(available_dates)
+
+                        components.html(f"""
+<script>
+(function(){{
+  const availableDates = {available_dates_js};
+  
+  const monthMap = {{
+    'January': '一月', 'February': '二月', 'March': '三月', 'April': '四月',
+    'May': '五月', 'June': '六月', 'July': '七月', 'August': '八月',
+    'September': '九月', 'October': '十月', 'November': '十一月', 'December': '十二月'
+  }};
+  
+  const weekdayMap = {{
+    'Mo': '一', 'Tu': '二', 'We': '三', 'Th': '四', 'Fr': '五', 'Sa': '六', 'Su': '日',
+    'Mon': '一', 'Tue': '二', 'Wed': '三', 'Thu': '四', 'Fri': '五', 'Sat': '六', 'Sun': '日'
+  }};
+  
+  function translateMonthToChinese(){{
+    const parentDoc = window.parent.document;
+    const popovers = parentDoc.querySelectorAll('div[data-baseweb="popover"]');
+    popovers.forEach(popover => {{
+      const buttons = popover.querySelectorAll('button');
+      buttons.forEach(btn => {{
+        let text = btn.textContent || '';
+        for(const [en, cn] of Object.entries(monthMap)){{
+          if(text.includes(en) && !text.includes(cn)){{
+            btn.textContent = text.replace(en, cn);
+            break;
+          }}
+        }}
+      }});
+      
+      const listItems = popover.querySelectorAll('ul li, [role="listbox"] [role="option"], [role="option"]');
+      listItems.forEach(item => {{
+        let text = item.textContent || '';
+        for(const [en, cn] of Object.entries(monthMap)){{
+          if(text.includes(en) && !text.includes(cn)){{
+            item.textContent = text.replace(en, cn);
+            break;
+          }}
+        }}
+      }});
+      
+      const thead = popover.querySelector('thead');
+      if(thead){{
+        const allElements = thead.querySelectorAll('*');
+        allElements.forEach(el => {{
+          if(el.children.length === 0){{
+            let text = (el.textContent || '').trim();
+            if(weekdayMap[text]){{
+              el.textContent = weekdayMap[text];
+            }}
+          }}
+        }});
+      }}
+      
+      const dayDivs = popover.querySelectorAll('div');
+      dayDivs.forEach(div => {{
+        let text = (div.textContent || '').trim();
+        if(text.length <= 3 && weekdayMap[text]){{
+          div.textContent = weekdayMap[text];
+        }}
+      }});
+    }});
+  }}
+  
+  function disableUnavailableDates(){{
+    const parentDoc = window.parent.document;
+    const popover = parentDoc.querySelector('div[data-baseweb="popover"]');
+
+    translateMonthToChinese();
+    if(!popover) return;
+
+    const table = popover.querySelector('table');
+    if(!table) return;
+
+    let currentYear = null;
+    let currentMonth = null;
+
+    const headerButtons = popover.querySelectorAll('button[role="combobox"]');
+    headerButtons.forEach(btn => {{
+      const text = (btn.textContent || btn.getAttribute('aria-label') || '').trim();
+      const yearMatch = text.match(/(\\d{{4}})/);
+      if(yearMatch) currentYear = parseInt(yearMatch[1]);
+      const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+      const monthNamesCN = ['一月','二月','三月','四月','五月','六月','七月','八月','九月','十月','十一月','十二月'];
+      for(let i=0;i<monthNames.length;i++){{
+        if(text.toLowerCase().includes(monthNames[i].toLowerCase()) || text.includes(monthNamesCN[i])){{
+          currentMonth = i; break;
+        }}
+      }}
+    }});
+
+    if(currentYear === null || currentMonth === null){{
+      const now = new Date();
+      if(currentYear === null) currentYear = now.getFullYear();
+      if(currentMonth === null) currentMonth = now.getMonth();
+    }}
+
+    const tbody = table.querySelector('tbody');
+    if(!tbody) return;
+
+    const dateButtons = tbody.querySelectorAll('button');
+    dateButtons.forEach(button => {{
+      let dayText = button.textContent.trim();
+      dayText = dayText.replace(/🚫/g,'').replace(/\\s+/g,'').trim();
+      if(button.dataset.originalText) dayText = button.dataset.originalText;
+      const day = parseInt(dayText);
+      if(isNaN(day) || day<1 || day>31) return;
+
+      const dateStr = `${{currentYear}}-${{String(currentMonth+1).padStart(2,'0')}}-${{String(day).padStart(2,'0')}}`;
+
+      if(!availableDates.includes(dateStr)){{
+        if(!button.dataset.originalText) button.dataset.originalText = dayText;
+        button.disabled = true;
+        button.setAttribute('aria-disabled','true');
+        button.style.color = '#64748b';
+        button.style.backgroundColor = 'rgba(15, 23, 42, 0.3)';
+        button.style.cursor = 'not-allowed';
+        button.style.pointerEvents = 'none';
+        button.style.opacity = '0.4';
+        button.classList.add('date-disabled');
+        button.textContent = dayText;
+      }}else{{
+        button.disabled = false;
+        button.removeAttribute('aria-disabled');
+        button.style.color = '';
+        button.style.backgroundColor = '';
+        button.style.cursor = '';
+        button.style.pointerEvents = 'auto';
+        button.style.opacity = '';
+        button.classList.remove('date-disabled');
+        if(button.dataset.originalText){{
+          button.textContent = button.dataset.originalText;
+          delete button.dataset.originalText;
+        }}
+      }}
+    }});
+  }}
+  
+  const parentDoc = window.parent.document;
+  const observer = new MutationObserver(function(){{
+    const hasPopover = parentDoc.querySelector('div[data-baseweb="popover"]');
+    if(hasPopover){{
+      translateMonthToChinese();
+      disableUnavailableDates();
+    }}
+  }});
+  observer.observe(parentDoc.body, {{ childList:true, subtree:true }});
+
+  parentDoc.addEventListener('click', function(e){{
+    const t = e.target;
+    if(t.closest('[data-baseweb="popover"]') ||
+       t.closest('input[type="date"]') ||
+       t.closest('button[aria-label*="date"]') ||
+       t.closest('button[role="combobox"]')){{
+      setTimeout(disableUnavailableDates, 10);
+      setTimeout(disableUnavailableDates, 50);
+      setTimeout(disableUnavailableDates, 150);
+    }}
+  }}, true);
+
+  setTimeout(disableUnavailableDates, 100);
+  setTimeout(disableUnavailableDates, 300);
+
+  setInterval(function(){{
+    const parentDoc = window.parent.document;
+    const popover = parentDoc.querySelector('div[data-baseweb="popover"]');
+    if(popover && popover.style.display !== 'none'){{
+      translateMonthToChinese();
+      disableUnavailableDates();
+    }}
+  }}, 50);
+
+  parentDoc.addEventListener('click', function(){{
+    setTimeout(translateMonthToChinese, 10);
+    setTimeout(translateMonthToChinese, 50);
+    setTimeout(translateMonthToChinese, 150);
+  }});
+}})();
+</script>
+""", height=0)
+
+                        selected_date = selected_date_obj.strftime("%Y-%m-%d")
+                        if selected_date in available_dates:
+                            st.session_state.homepage_date_cache = selected_date
+                    else:
+                        selected_date = None
                 else:
                     st.warning("该社群暂无数据")
                     selected_date = None
-            
-            # 查询按钮
-            st.markdown("<div style='height: 0.8rem;'></div>", unsafe_allow_html=True)
-            if st.button(
-                "✨ 查看分析",
-                use_container_width=True,
-                type="primary",
-                disabled=not selected_date,
-                key="btn_daily",
-            ):
-                st.session_state.show_results = True
-                st.session_state.query_type = "daily"
-                st.session_state.selected_group_homepage = selected_group_daily
-                st.session_state.selected_date_homepage = selected_date
-                st.session_state.confirmed_group = selected_group_daily
-                st.session_state.selected_group_cache = selected_group_daily
-                st.session_state.confirmed_date = selected_date
-                st.session_state.selected_date_cache = selected_date
-                st.rerun()
+
+            with col_button:
+                # 添加顶部间距对齐
+                st.markdown("<div style='height: 1.75rem;'></div>", unsafe_allow_html=True)
+                if st.button(
+                    "✨ 查看分析",
+                    use_container_width=True,
+                    type="primary",
+                    disabled=not selected_date,
+                    key="btn_daily",
+                ):
+                    st.session_state.show_results = True
+                    st.session_state.query_type = "daily"
+                    st.session_state.selected_group_homepage = selected_group_daily
+                    st.session_state.selected_date_homepage = selected_date
+                    st.session_state.confirmed_group = selected_group_daily
+                    st.session_state.selected_group_cache = selected_group_daily
+                    st.session_state.confirmed_date = selected_date
+                    st.session_state.selected_date_cache = selected_date
+                    st.rerun()
 
 
         # === 版本查询标签 ===
