@@ -188,6 +188,30 @@ section[data-testid="stSidebar"] button[kind="secondary"]:hover {
     border-color: rgba(200, 162, 232, 0.6) !important;
 }
 
+/* 返回主页按钮 */
+section[data-testid="stSidebar"] button#st-key-sidebar_back_home {
+    background: linear-gradient(135deg, rgba(200,162,232,0.15), rgba(169,185,240,0.15)) !important;
+    border: 1px solid rgba(200, 162, 232, 0.4) !important;
+    color: #6b21a8 !important;
+    font-size: 0.9rem !important;
+    font-weight: 600 !important;
+    padding: 0.5rem 1rem !important;
+    border-radius: 10px !important;
+    transition: all 0.2s ease !important;
+}
+section[data-testid="stSidebar"] button#st-key-sidebar_back_home:hover {
+    background: linear-gradient(135deg, rgba(200,162,232,0.25), rgba(169,185,240,0.25)) !important;
+    border-color: rgba(200, 162, 232, 0.6) !important;
+    transform: translateX(-2px) !important;
+    box-shadow: 0 4px 12px rgba(200, 162, 232, 0.3) !important;
+}
+section[data-testid="stSidebar"] button#st-key-sidebar_back_home p,
+section[data-testid="stSidebar"] button#st-key-sidebar_back_home span {
+    color: #6b21a8 !important;
+    font-size: 0.9rem !important;
+    font-weight: 600 !important;
+}
+
 /* 前一天/后一天快捷按钮 */
 section[data-testid="stSidebar"] button#st-key-quick_prev_day,
 section[data-testid="stSidebar"] button#st-key-quick_next_day,
@@ -3023,6 +3047,14 @@ def main():
     
     # 侧边栏
     with st.sidebar:
+        # 返回主页按钮
+        if st.button("← 返回主页", key="sidebar_back_home", use_container_width=True):
+            st.session_state.show_results = False
+            st.session_state.query_type = "daily"
+            st.rerun()
+        
+        st.markdown("<div style='margin: 0.5rem 0;'></div>", unsafe_allow_html=True)
+        
         st.markdown("""
         <div style="text-align: center; padding: 0.5rem 0 1rem 0;">
             <h2 style="margin: 0; font-size: 1.3rem; color: #6b21a8;">🔍 查询条件</h2>
