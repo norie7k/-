@@ -1793,34 +1793,35 @@ def render_result(result: dict, group_key: str | None = None, available_dates: l
             st.markdown("---")
             st.markdown("### 📅 日期导航")
             
-            nav_col1, nav_col2, nav_col3 = st.columns([1, 1, 1])
+            # 居中紧凑布局
+            _, nav_col1, nav_col2, nav_col3, _ = st.columns([0.5, 1, 1, 1, 0.5])
             
             with nav_col1:
                 if has_prev:
-                    if st.button(f"← {prev_display}", key="nav_prev", use_container_width=True):
+                    if st.button(f"◀ {prev_display}", key="nav_prev", use_container_width=True):
                         st.session_state.confirmed_date = prev_date_str
                         st.session_state.selected_date_cache = prev_date_str
                         st.rerun()
                 else:
-                    st.button(f"← {prev_display}", key="nav_prev_disabled", use_container_width=True, disabled=True)
+                    st.button(f"◀ {prev_display}", key="nav_prev_disabled", use_container_width=True, disabled=True)
             
             with nav_col2:
                 st.markdown(
-                    f"""<div style="text-align: center; padding: 0.5rem; background: rgba(168,85,247,0.2); 
-                    border-radius: 8px; border: 1px solid rgba(168,85,247,0.4);">
-                    <span style="font-size: 1.1rem; font-weight: 700; color: #e9d5ff;">当前: {current_display}</span>
+                    f"""<div style="text-align: center; padding: 0.55rem 0.8rem; background: rgba(168,85,247,0.25); 
+                    border-radius: 8px; border: 2px solid rgba(168,85,247,0.5);">
+                    <span style="font-size: 1.15rem; font-weight: 700; color: #e9d5ff;">📅 {current_display}</span>
                     </div>""",
                     unsafe_allow_html=True
                 )
             
             with nav_col3:
                 if has_next:
-                    if st.button(f"{next_display} →", key="nav_next", use_container_width=True):
+                    if st.button(f"{next_display} ▶", key="nav_next", use_container_width=True):
                         st.session_state.confirmed_date = next_date_str
                         st.session_state.selected_date_cache = next_date_str
                         st.rerun()
                 else:
-                    st.button(f"{next_display} →", key="nav_next_disabled", use_container_width=True, disabled=True)
+                    st.button(f"{next_display} ▶", key="nav_next_disabled", use_container_width=True, disabled=True)
     
     # ========= 导出 =========
     st.markdown("### 📥 导出结果")
