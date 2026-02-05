@@ -999,17 +999,26 @@ button[data-baseweb="tab"]{
   flex: 1 1 0% !important;
   min-width: 0 !important;
   height: auto !important;
-  padding: 12px 20px !important;
+  padding: 14px 24px !important;
   background: rgba(0,0,0,0.4) !important;
   border-radius: 12px !important;
   color: var(--text-dim) !important;
   font-weight: 800 !important;
-  font-size: 1.4rem !important;
+  font-size: 1.5rem !important;
   justify-content: center !important;
   text-align: center !important;
   border: 2px solid var(--glass-border) !important;
   letter-spacing: 0.03em !important;
   transition: all 0.25s ease !important;
+}
+/* Tab按钮内部文字 */
+div[data-baseweb="tab-list"] button[role="tab"] p,
+div[data-baseweb="tab-list"] button[role="tab"] span,
+.stTabs button p,
+.stTabs button span{
+  font-size: 1.5rem !important;
+  font-weight: 800 !important;
+  color: inherit !important;
 }
 div[data-baseweb="tab-list"] button[role="tab"]:hover,
 .stTabs [data-baseweb="tab"]:hover,
@@ -1185,12 +1194,27 @@ button[aria-selected="true"]{
 }
 
 /* 主页查询区域 - 所有标签字体放大 */
-section[data-testid="stMain"] label{
+section[data-testid="stMain"] label,
+section[data-testid="stMain"] [data-testid="stWidgetLabel"] label,
+section[data-testid="stMain"] [data-testid="stWidgetLabel"] p,
+section[data-testid="stMain"] .stSelectbox label,
+section[data-testid="stMain"] .stDateInput label,
+[data-testid="stWidgetLabel"] label,
+[data-testid="stWidgetLabel"] p,
+.stSelectbox [data-testid="stWidgetLabel"],
+.stDateInput [data-testid="stWidgetLabel"]{
   font-size: 1.4rem !important;
   font-weight: 800 !important;
   color: #e9d5ff !important;
   margin-bottom: 10px !important;
   letter-spacing: 0.02em !important;
+}
+
+/* Streamlit label 内部的 p 标签 */
+[data-testid="stWidgetLabel"] p{
+  font-size: 1.4rem !important;
+  font-weight: 800 !important;
+  color: #e9d5ff !important;
 }
 
 /* 主页查询区域 - 下拉框宽度缩短 */
