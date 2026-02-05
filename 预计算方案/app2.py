@@ -786,18 +786,18 @@ section[data-testid="stMain"] div[data-testid="stExpander"] div[role="region"]{
 
 /* ===== 讨论点 / 观点 / 引用 ===== */
 .discussion-point{
-  background: rgba(200,162,232,.12);
-  border: 1px solid rgba(200,162,232,.22);
-  padding: .78rem .95rem;
-  margin: .7rem 0 .55rem 0;
-  border-radius: 12px;
+  background: #f8f9fa;
+  border-left: 3px solid #C8A2E8;
+  padding: .7rem 1rem;
+  margin: .6rem 0;
+  border-radius: 0 8px 8px 0;
 }
-.discussion-point strong{ color:#334155; font-size: 1.02rem; }
+.discussion-point strong{ color:#1a1a2e; font-size: 1rem; }
 
 /* 讨论点可展开卡片 */
 .dp-expander{
   margin: 6px 0;
-  border-radius: 10px;
+  border-radius: 8px;
 }
 .dp-expander-summary{
   list-style: none;
@@ -808,15 +808,17 @@ section[data-testid="stMain"] div[data-testid="stExpander"] div[role="region"]{
   display: none;
 }
 .dp-card{
-  background: linear-gradient(145deg, rgba(200,162,232,.12), rgba(169,185,240,.08));
-  border: 1px solid rgba(200,162,232,.22);
-  border-radius: 10px;
-  padding: 8px 12px;
+  background: #f8f9fa;
+  border: 1px solid #e9ecef;
+  border-left: 3px solid #C8A2E8;
+  border-radius: 0 8px 8px 0;
+  padding: 10px 14px;
   transition: all 0.2s ease;
 }
 .dp-card:hover{
-  background: linear-gradient(145deg, rgba(200,162,232,.18), rgba(169,185,240,.12));
-  border-color: rgba(200,162,232,.35);
+  background: #f1f3f5;
+  border-color: #dee2e6;
+  border-left-color: #C8A2E8;
 }
 .dp-header{
   display: flex;
@@ -831,25 +833,23 @@ section[data-testid="stMain"] div[data-testid="stExpander"] div[role="region"]{
   flex: 1;
 }
 .dp-toggle-btn{
-  font-size: 0.72rem;
-  font-weight: 600;
-  color: #6b21a8;
-  background: rgba(200,162,232,.15);
-  padding: 4px 10px;
-  border-radius: 6px;
-  border: 1px solid rgba(200,162,232,.3);
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: #6c757d;
+  background: transparent;
+  padding: 4px 8px;
+  border-radius: 4px;
+  border: none;
   transition: all 0.2s ease;
   white-space: nowrap;
 }
 .dp-card:hover .dp-toggle-btn{
-  background: rgba(200,162,232,.25);
-  border-color: rgba(200,162,232,.5);
-  color: #6b21a8;
+  color: #495057;
 }
 .dp-toggle-btn .expand-text{ display: inline; }
 .dp-toggle-btn .collapse-text{ display: none; }
 .dp-expander[open] .dp-toggle-btn{
-  background: rgba(200,162,232,.3);
+  color: #495057;
 }
 .dp-expander[open] .dp-toggle-btn .expand-text{ display: none; }
 .dp-expander[open] .dp-toggle-btn .collapse-text{ display: inline; }
@@ -860,8 +860,8 @@ section[data-testid="stMain"] div[data-testid="stExpander"] div[role="region"]{
 /* 讨论点详情包装器 */
 .dp-details-wrapper{
   position: relative;
-  border: 1px solid rgba(200,162,232,.22);
-  border-radius: 10px;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
   overflow: hidden;
 }
 /* 讨论点Sticky卡片 */
@@ -869,20 +869,20 @@ section[data-testid="stMain"] div[data-testid="stExpander"] div[role="region"]{
   position: sticky;
   top: 0;
   z-index: 50;
-  background: linear-gradient(180deg, rgba(255,255,255,1) 0%, rgba(255,255,255,0.98) 90%, rgba(255,255,255,0.8) 100%);
+  background: #ffffff;
   padding-bottom: 4px;
 }
 .dp-card-sticky .dp-card{
-  background: linear-gradient(145deg, rgba(200,162,232,.15), rgba(169,185,240,.10));
-  border: 1px solid rgba(200,162,232,.28);
-  border-radius: 10px;
+  background: #f8f9fa;
+  border: 1px solid #e9ecef;
+  border-left: 3px solid #C8A2E8;
+  border-radius: 0 8px 8px 0;
   margin: 0;
   cursor: pointer;
   transition: all 0.2s ease;
 }
 .dp-card-sticky .dp-card:hover{
-  background: linear-gradient(145deg, rgba(200,162,232,.22), rgba(169,185,240,.15));
-  border-color: rgba(200,162,232,.4);
+  background: #f1f3f5;
 }
 /* 讨论点内容区域（自适应高度，无需滚动） */
 .dp-scrollable{
@@ -890,54 +890,54 @@ section[data-testid="stMain"] div[data-testid="stExpander"] div[role="region"]{
 }
 /* 讨论点收起按钮 */
 .dp-collapse-btn{
-  background: rgba(200,162,232,.12);
-  border: 1px solid rgba(200,162,232,.2);
-  border-radius: 8px;
+  background: transparent;
+  border: none;
   padding: 6px 12px;
   margin: 8px 10px;
   text-align: left;
-  color: #7c3aed;
-  font-weight: 600;
+  color: #6c757d;
+  font-weight: 500;
   font-size: 0.75rem;
   cursor: pointer;
   transition: all 0.2s ease;
 }
 .dp-collapse-btn:hover{
-  background: rgba(200,162,232,.2);
+  color: #495057;
 }
 .dp-content{
-  background: rgba(248,250,252,.6);
-  padding: 10px 12px;
+  background: #ffffff;
+  padding: 12px 14px;
 }
 
 /* ===== 讨论点直接展示样式（不折叠）===== */
 .dp-card-wrapper{
-  background: linear-gradient(145deg, rgba(200,162,232,.08), rgba(169,185,240,.05));
-  border: 1px solid rgba(200,162,232,.20);
-  border-radius: 12px;
-  margin: 10px 0;
+  background: #ffffff;
+  border: 1px solid #e9ecef;
+  border-left: 3px solid #C8A2E8;
+  border-radius: 0 8px 8px 0;
+  margin: 12px 0;
   overflow: hidden;
 }
 .dp-card-header-fixed{
-  background: linear-gradient(145deg, rgba(200,162,232,.15), rgba(169,185,240,.10));
-  border-bottom: 1px solid rgba(200,162,232,.18);
+  background: #f8f9fa;
+  border-bottom: 1px solid #e9ecef;
   padding: 10px 14px;
 }
 .dp-card-header-fixed .dp-title{
-  font-weight: 800;
-  font-size: 1.2rem;
-  color: #334155;
+  font-weight: 700;
+  font-size: 1.05rem;
+  color: #1a1a2e;
 }
 .dp-content-direct{
-  background: rgba(248,250,252,.7);
+  background: #ffffff;
   padding: 12px 14px;
 }
 
 .dp-section-title{
-  font-size: 0.82rem;
-  font-weight: 700;
-  color: var(--text);
-  margin: 8px 0 6px 0;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #6c757d;
+  margin: 10px 0 6px 0;
   display: flex;
   align-items: center;
   gap: 6px;
@@ -947,43 +947,45 @@ section[data-testid="stMain"] div[data-testid="stExpander"] div[role="region"]{
 }
 
 .opinion-item{
-  background: rgba(34,211,238,.10);
-  border: 1px solid rgba(34,211,238,.16);
-  padding: 6px 10px;
-  margin: 4px 0;
-  border-radius: 8px;
+  background: #f8f9fa;
+  border: none;
+  border-left: 2px solid #adb5bd;
+  padding: 8px 12px;
+  margin: 6px 0;
+  border-radius: 0 4px 4px 0;
   color: var(--text);
-  font-size: 1.05rem;
+  font-size: 0.95rem;
   line-height: 1.6;
 }
 .example-quote{
-  background: rgba(99,102,241,.10);
-  border: 1px solid rgba(99,102,241,.16);
-  padding: 5px 10px;
-  margin: 3px 0;
-  border-radius: 8px;
-  color: #6b21a8;
+  background: #f8f9fa;
+  border: none;
+  padding: 8px 12px;
+  margin: 6px 0;
+  border-radius: 4px;
+  color: #495057;
   font-style: italic;
-  font-size: 0.88rem;
+  font-size: 0.9rem;
   line-height: 1.5;
 }
 
 /* ===== 新增：观点卡片样式（V2格式）===== */
 .opinion-card{
-  background: rgba(34,211,238,.08);
-  border: 1px solid rgba(34,211,238,.18);
-  border-radius: 10px;
+  background: #ffffff;
+  border: 1px solid #e9ecef;
+  border-left: 3px solid #6c757d;
+  border-radius: 0 6px 6px 0;
   padding: 12px 14px;
   margin: 10px 0;
 }
 .opinion-card-header{
-  font-size: 1.12rem;
-  font-weight: 700;
-  color: #0891b2;
-  margin-bottom: 10px;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #495057;
+  margin-bottom: 8px;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   line-height: 1.4;
 }
 .opinion-card-content{
@@ -992,56 +994,56 @@ section[data-testid="stMain"] div[data-testid="stExpander"] div[role="region"]{
 
 /* 原文发言展开器 */
 .raw-msg-expander{
-  margin-top: 8px;
-  border-radius: 8px;
+  margin-top: 10px;
+  border-radius: 4px;
 }
 .raw-msg-summary{
   list-style: none;
   cursor: pointer;
   user-select: none;
-  background: rgba(251,146,60,.12);
-  border: 1px solid rgba(251,146,60,.22);
-  border-radius: 8px;
-  padding: 6px 10px;
-  font-size: 0.8rem;
-  font-weight: 600;
-  color: #7c3aed;
+  background: #f8f9fa;
+  border: 1px solid #e9ecef;
+  border-radius: 4px;
+  padding: 8px 12px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #6c757d;
   transition: all 0.2s ease;
 }
 .raw-msg-summary::-webkit-details-marker{
   display: none;
 }
 .raw-msg-summary:hover{
-  background: rgba(251,146,60,.18);
-  border-color: rgba(251,146,60,.35);
+  background: #f1f3f5;
+  color: #495057;
 }
 .raw-msg-expander[open] .raw-msg-summary{
   border-bottom-left-radius: 0;
   border-bottom-right-radius: 0;
 }
 .raw-msg-content{
-  background: rgba(251,146,60,.06);
-  border: 1px solid rgba(251,146,60,.18);
+  background: #f8f9fa;
+  border: 1px solid #e9ecef;
   border-top: none;
-  border-bottom-left-radius: 8px;
-  border-bottom-right-radius: 8px;
-  padding: 8px 10px;
+  border-bottom-left-radius: 4px;
+  border-bottom-right-radius: 4px;
+  padding: 10px 12px;
   max-height: 300px;
   overflow-y: auto;
 }
 .raw-msg-item{
-  background: rgba(255,255,255,.9);
-  border: 1px solid rgba(200,162,232,.2);
-  border-radius: 6px;
-  padding: 6px 10px;
-  margin: 4px 0;
-  font-size: 0.88rem;
+  background: #ffffff;
+  border: 1px solid #e9ecef;
+  border-radius: 4px;
+  padding: 8px 12px;
+  margin: 6px 0;
+  font-size: 0.9rem;
   line-height: 1.5;
 }
 .raw-msg-item .msg-meta{
-  color: var(--muted);
-  font-size: 0.78rem;
-  margin-bottom: 2px;
+  color: #adb5bd;
+  font-size: 0.8rem;
+  margin-bottom: 4px;
 }
 .raw-msg-item .msg-content{
   color: var(--text);
