@@ -399,12 +399,20 @@ div[data-baseweb="popover"] tbody button[aria-selected="true"]{
   border-radius: 8px !important;
 }
 
-/* 禁用日期 */
-div[data-baseweb="popover"] button.date-disabled{
-  opacity: 0.35 !important;
+/* 禁用日期（无数据） */
+div[data-baseweb="popover"] div[role="gridcell"].date-disabled,
+div[data-baseweb="popover"] div[role="gridcell"][aria-disabled="true"]{
+  background-color: #f1f3f5 !important;
+  color: #adb5bd !important;
+  opacity: 0.5 !important;
   cursor: not-allowed !important;
   pointer-events: none !important;
   user-select: none !important;
+}
+div[data-baseweb="popover"] div[role="gridcell"].date-disabled:hover,
+div[data-baseweb="popover"] div[role="gridcell"][aria-disabled="true"]:hover{
+  background-color: #e9ecef !important;
+  cursor: not-allowed !important;
 }
 
 /* ===== 按钮 ===== */
@@ -2860,35 +2868,31 @@ def show_homepage():
       if(currentMonth === null) currentMonth = now.getMonth();
     }}
 
-    const dateButtons = table.querySelectorAll('button');
-    dateButtons.forEach(button => {{
-      let dayText = button.textContent.trim();
+    // 禁用无数据日期（同时处理button和div[role=gridcell]）
+    const dateCells = table.querySelectorAll('div[role="gridcell"], button');
+    dateCells.forEach(cell => {{
+      let dayText = cell.textContent.trim();
       dayText = dayText.replace(/🚫/g,'').replace(/\\s+/g,'').trim();
-      if(button.dataset.originalText) dayText = button.dataset.originalText;
+      if(cell.dataset.originalText) dayText = cell.dataset.originalText;
       const day = parseInt(dayText);
       if(isNaN(day) || day<1 || day>31) return;
-      if(button.closest('thead')) return;
+      if(cell.closest('thead')) return;
+      // 跳过导航按钮和月/年选择
+      if(cell.getAttribute('role') === 'combobox') return;
+      if(cell.getAttribute('aria-label') && (cell.getAttribute('aria-label').includes('month') || cell.getAttribute('aria-label').includes('月'))) return;
 
       const dateStr = `${{currentYear}}-${{String(currentMonth+1).padStart(2,'0')}}-${{String(day).padStart(2,'0')}}`;
 
       if(!availableDates.includes(dateStr)){{
-        if(!button.dataset.originalText) button.dataset.originalText = dayText;
-        button.disabled = true;
-        button.setAttribute('aria-disabled','true');
-        button.style.cursor = 'not-allowed';
-        button.style.pointerEvents = 'none';
-        button.classList.add('date-disabled');
-        button.textContent = dayText;
+        cell.setAttribute('aria-disabled','true');
+        cell.classList.add('date-disabled');
+        cell.style.setProperty('pointer-events', 'none', 'important');
+        cell.style.setProperty('cursor', 'not-allowed', 'important');
       }}else{{
-        button.disabled = false;
-        button.removeAttribute('aria-disabled');
-        button.style.cursor = '';
-        button.style.pointerEvents = 'auto';
-        button.classList.remove('date-disabled');
-        if(button.dataset.originalText){{
-          button.textContent = button.dataset.originalText;
-          delete button.dataset.originalText;
-        }}
+        cell.removeAttribute('aria-disabled');
+        cell.classList.remove('date-disabled');
+        cell.style.removeProperty('pointer-events');
+        cell.style.removeProperty('cursor');
       }}
     }});
   }}
