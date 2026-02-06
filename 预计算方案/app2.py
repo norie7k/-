@@ -393,6 +393,7 @@ div[data-baseweb="popover"]{
 /* 日历所有内部元素强制亮色 */
 div[data-baseweb="popover"] *{
   color: #1f2937 !important;
+  background-color: #ffffff !important;
 }
 div[data-baseweb="popover"] div,
 div[data-baseweb="popover"] span,
