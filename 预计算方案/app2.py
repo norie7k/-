@@ -2919,12 +2919,19 @@ def show_homepage():
         // 根据版本设置颜色
         const vColor = getVersionColor(dateStr);
         if(vColor){{
-          button.style.backgroundColor = vColor.bg;
-          button.style.borderRadius = '4px';
-          button.style.color = '#1f2937';
+          button.style.setProperty('background-color', vColor.bg, 'important');
+          button.style.setProperty('border-radius', '6px', 'important');
+          button.style.setProperty('color', '#1f2937', 'important');
+          button.style.setProperty('font-weight', '600', 'important');
+          // 同时设置内部div的样式
+          const innerDiv = button.querySelector('div');
+          if(innerDiv){{
+            innerDiv.style.setProperty('background-color', vColor.bg, 'important');
+          }}
         }}else{{
-          button.style.backgroundColor = '';
-          button.style.color = '';
+          button.style.removeProperty('background-color');
+          button.style.removeProperty('color');
+          button.style.removeProperty('font-weight');
         }}
       }}
     }});
