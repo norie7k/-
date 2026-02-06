@@ -30,7 +30,6 @@ GROUPS = {
 
 # 版本周期配置（新增版本在列表末尾追加即可，颜色会自动交替）
 VERSION_PERIODS = [
-    {"name": "beta15_旋转木马测试", "start": "2025-12-03", "end": "2025-12-17"},
     {"name": "beta17_暖冬测试",   "start": "2025-12-31", "end": "2026-01-20"},
     {"name": "beta18_地图炮测试",  "start": "2026-01-21", "end": "2026-02-03"},
     {"name": "beta19_立春测试",    "start": "2026-02-04", "end": "2026-02-24"},
@@ -2795,159 +2794,168 @@ def show_homepage():
                         )
                         st.markdown(f'<style>{" ".join(cal_css_parts)}</style>', unsafe_allow_html=True)
 
-                        # ===== JavaScript：只设置 data 属性 + 翻译，绝不修改 inline style =====
-                        components.html("""
+                        # 构建日期→版本名称映射（供JS tooltip用）
+                        date_version_map = {}
+                        for vp in VERSION_PERIODS:
+                            s = datetime.strptime(vp["start"], "%Y-%m-%d").date()
+                            e_date = datetime.strptime(vp["end"], "%Y-%m-%d").date()
+                            # 格式化显示名：beta17_暖冬测试（12/31~01/20）
+                            s_display = s.strftime("%m/%d")
+                            e_display = e_date.strftime("%m/%d")
+                            label = f'{vp["name"]}（{s_display}~{e_display}）'
+                            d = s
+                            while d <= e_date:
+                                date_version_map[d.strftime("%Y-%m-%d")] = label
+                                d += timedelta(days=1)
+                        date_version_map_js = json.dumps(date_version_map, ensure_ascii=False)
+
+                        # ===== JavaScript：设置 data 属性 + tooltip + 翻译，绝不修改 inline style =====
+                        components.html(f"""
 <script>
-(function(){
-  const monthMap = {
+(function(){{
+  var monthMap = {{
     'January':'一月','February':'二月','March':'三月','April':'四月',
     'May':'五月','June':'六月','July':'七月','August':'八月',
     'September':'九月','October':'十月','November':'十一月','December':'十二月'
-  };
-  const weekdayMap = {
+  }};
+  var weekdayMap = {{
     'Mo':'一','Tu':'二','We':'三','Th':'四','Fr':'五','Sa':'六','Su':'日',
     'Mon':'一','Tue':'二','Wed':'三','Thu':'四','Fri':'五','Sat':'六','Sun':'日'
-  };
+  }};
+  var versionMap = {date_version_map_js};
 
-  const parentDoc = window.parent.document;
+  var parentDoc = window.parent.document;
 
-  // 安全翻译：只修改叶子节点的文字，不破坏父元素的子结构
-  function safeReplace(el, map){
-    if(!el.children || !el.children.length){
-      // 叶子节点：直接改 textContent 安全
+  function safeReplace(el, map){{
+    if(!el.children || !el.children.length){{
       var t = el.textContent || '';
-      for(var key in map){
-        if(t.indexOf(key) !== -1 && t.indexOf(map[key]) === -1){
+      for(var key in map){{
+        if(t.indexOf(key) !== -1 && t.indexOf(map[key]) === -1){{
           el.textContent = t.replace(key, map[key]);
           return;
-        }
-      }
-    } else {
-      // 有子元素：递归进入子元素，不动父级的 textContent
-      for(var i=0; i<el.children.length; i++){
+        }}
+      }}
+    }} else {{
+      for(var i=0; i<el.children.length; i++){{
         safeReplace(el.children[i], map);
-      }
-      // 也检查直属文本节点（混合内容场景）
-      for(var j=0; j<el.childNodes.length; j++){
+      }}
+      for(var j=0; j<el.childNodes.length; j++){{
         var node = el.childNodes[j];
-        if(node.nodeType === 3){ // Text node
+        if(node.nodeType === 3){{
           var v = node.nodeValue || '';
-          for(var key in map){
-            if(v.indexOf(key) !== -1 && v.indexOf(map[key]) === -1){
+          for(var key in map){{
+            if(v.indexOf(key) !== -1 && v.indexOf(map[key]) === -1){{
               node.nodeValue = v.replace(key, map[key]);
               return;
-            }
-          }
-        }
-      }
-    }
-  }
+            }}
+          }}
+        }}
+      }}
+    }}
+  }}
 
-  // 翻译所有 popover（日历 + 月份下拉框是不同的 popover）
-  function translateAll(){
-    parentDoc.querySelectorAll('div[data-baseweb="popover"]').forEach(function(pop){
-      // 月份按钮（combobox）— 安全递归替换，不破坏 React DOM 结构
-      pop.querySelectorAll('button').forEach(function(btn){
+  function translateAll(){{
+    parentDoc.querySelectorAll('div[data-baseweb="popover"]').forEach(function(pop){{
+      pop.querySelectorAll('button').forEach(function(btn){{
         safeReplace(btn, monthMap);
-      });
-      // 月份下拉选项
-      pop.querySelectorAll('[role="option"], li').forEach(function(item){
+      }});
+      pop.querySelectorAll('[role="option"], li').forEach(function(item){{
         safeReplace(item, monthMap);
-      });
-      // 星期几（叶子节点，安全替换）
+      }});
       var thead = pop.querySelector('thead');
-      if(thead){
-        thead.querySelectorAll('*').forEach(function(el){
-          if(!el.children.length){
+      if(thead){{
+        thead.querySelectorAll('*').forEach(function(el){{
+          if(!el.children.length){{
             var t = (el.textContent||'').trim();
             if(weekdayMap[t]) el.textContent = weekdayMap[t];
-          }
-        });
-      }
-    });
-  }
+          }}
+        }});
+      }}
+    }});
+  }}
 
-  // 给日期格子打 data-date 标签（找到包含日历表格的 popover）
-  function labelAllDates(){
-    parentDoc.querySelectorAll('div[data-baseweb="popover"]').forEach(function(pop){
+  function labelAllDates(){{
+    parentDoc.querySelectorAll('div[data-baseweb="popover"]').forEach(function(pop){{
       var cells = pop.querySelectorAll('div[role="gridcell"]');
-      if(!cells.length) return; // 这个 popover 不是日历
+      if(!cells.length) return;
 
-      // 读取当前年月
       var currentYear = null, currentMonth = null;
       var mEN = ['January','February','March','April','May','June','July','August','September','October','November','December'];
       var mCN = ['一月','二月','三月','四月','五月','六月','七月','八月','九月','十月','十一月','十二月'];
 
-      pop.querySelectorAll('button[role="combobox"]').forEach(function(btn){
+      pop.querySelectorAll('button[role="combobox"]').forEach(function(btn){{
         var t = (btn.textContent || btn.getAttribute('aria-label') || '').trim();
-        var ym = t.match(/(\\d{4})/);
+        var ym = t.match(/(\\d{{4}})/);
         if(ym) currentYear = parseInt(ym[1]);
-        for(var i=0;i<mEN.length;i++){
-          if(t.toLowerCase().indexOf(mEN[i].toLowerCase()) !== -1 || t.indexOf(mCN[i]) !== -1){
+        for(var i=0;i<mEN.length;i++){{
+          if(t.toLowerCase().indexOf(mEN[i].toLowerCase()) !== -1 || t.indexOf(mCN[i]) !== -1){{
             currentMonth = i; break;
-          }
-        }
-      });
-      if(currentYear===null||currentMonth===null){
+          }}
+        }}
+      }});
+      if(currentYear===null||currentMonth===null){{
         var now=new Date();
         if(currentYear===null) currentYear=now.getFullYear();
         if(currentMonth===null) currentMonth=now.getMonth();
-      }
+      }}
 
       var items = [];
-      cells.forEach(function(c){
+      cells.forEach(function(c){{
         var d = parseInt((c.textContent||'').trim());
-        items.push({cell:c, day:isNaN(d)?-1:d});
-      });
+        items.push({{cell:c, day:isNaN(d)?-1:d}});
+      }});
 
       var first1=-1;
-      for(var i=0;i<items.length;i++){ if(items[i].day===1){first1=i;break;} }
+      for(var i=0;i<items.length;i++){{ if(items[i].day===1){{first1=i;break;}} }}
       var second1=-1;
-      if(first1>=0) for(var i=first1+1;i<items.length;i++){ if(items[i].day===1){second1=i;break;} }
+      if(first1>=0) for(var i=first1+1;i<items.length;i++){{ if(items[i].day===1){{second1=i;break;}} }}
 
-      items.forEach(function(it,idx){
+      items.forEach(function(it,idx){{
         var cell=it.cell, day=it.day;
         if(day<1||day>31) return;
         var y=currentYear, m=currentMonth;
         var isOverflow = (first1>=0 && idx<first1) || (second1>=0 && idx>=second1);
-        if(first1>=0 && idx<first1){ m--; if(m<0){m=11;y--;} }
-        else if(second1>=0 && idx>=second1){ m++; if(m>11){m=0;y++;} }
+        if(first1>=0 && idx<first1){{ m--; if(m<0){{m=11;y--;}} }}
+        else if(second1>=0 && idx>=second1){{ m++; if(m>11){{m=0;y++;}} }}
         var ds = y+'-'+String(m+1).padStart(2,'0')+'-'+String(day).padStart(2,'0');
         cell.setAttribute('data-date', ds);
         if(isOverflow) cell.setAttribute('data-overflow','1');
         else cell.removeAttribute('data-overflow');
-      });
-    });
-  }
+        // 设置版本 tooltip
+        if(versionMap[ds]){{
+          cell.setAttribute('title', versionMap[ds]);
+        }} else {{
+          cell.removeAttribute('title');
+        }}
+      }});
+    }});
+  }}
 
-  function runAll(){
+  function runAll(){{
     translateAll();
     labelAllDates();
-  }
+  }}
 
-  // MutationObserver：监听 DOM 变化（含文字变化）
   var timer = null;
-  var obs = new MutationObserver(function(){
+  var obs = new MutationObserver(function(){{
     clearTimeout(timer);
     timer = setTimeout(runAll, 60);
-  });
-  obs.observe(parentDoc.body, {childList:true, subtree:true, characterData:true});
+  }});
+  obs.observe(parentDoc.body, {{childList:true, subtree:true, characterData:true}});
 
-  // 点击事件：箭头切月、打开下拉等操作后多次延迟刷新翻译
-  parentDoc.addEventListener('click', function(e){
+  parentDoc.addEventListener('click', function(e){{
     var t = e.target;
-    if(t.closest && t.closest('[data-baseweb="popover"]')){
+    if(t.closest && t.closest('[data-baseweb="popover"]')){{
       setTimeout(runAll, 50);
       setTimeout(runAll, 150);
       setTimeout(runAll, 300);
       setTimeout(runAll, 500);
-    }
-  }, true);
+    }}
+  }}, true);
 
-  // 初始检测
   setTimeout(runAll, 200);
   setTimeout(runAll, 500);
-})();
+}})();
 </script>
 """, height=0)
 
