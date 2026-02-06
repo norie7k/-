@@ -3592,6 +3592,7 @@ def main():
                         if st.button("←前一天", key="quick_prev_day", use_container_width=True, help=prev_tooltip):
                             st.session_state.confirmed_date = prev_date
                             st.session_state.selected_date_cache = prev_date
+                            st.session_state.selected_date_input = datetime.strptime(prev_date, "%Y-%m-%d").date()
                             st.session_state.confirmed_group = st.session_state.get("selected_group_cache", "")
                             st.cache_data.clear()
                             _set_nonce()
@@ -3605,6 +3606,7 @@ def main():
                         if st.button("后一天→", key="quick_next_day", use_container_width=True, help=next_tooltip):
                             st.session_state.confirmed_date = next_date
                             st.session_state.selected_date_cache = next_date
+                            st.session_state.selected_date_input = datetime.strptime(next_date, "%Y-%m-%d").date()
                             st.session_state.confirmed_group = st.session_state.get("selected_group_cache", "")
                             st.cache_data.clear()
                             _set_nonce()
