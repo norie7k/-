@@ -1066,48 +1066,6 @@ section[data-testid="stMain"] div[data-testid="stExpander"] div[role="region"]{
   color: #1f2937;
 }
 
-/* Tooltip 样式 */
-.version-tooltip{
-  position: relative;
-  display: inline-block;
-  cursor: help;
-  margin-left: 6px;
-  font-size: 0.9rem;
-  color: #B592E8;
-  vertical-align: middle;
-}
-.version-tooltip .tooltip-text{
-  visibility: hidden;
-  opacity: 0;
-  position: absolute;
-  z-index: 9999;
-  bottom: 130%;
-  left: 50%;
-  transform: translateX(-50%);
-  background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%);
-  color: #ffffff;
-  padding: 12px 16px;
-  border-radius: 10px;
-  font-size: 0.78rem;
-  line-height: 1.6;
-  white-space: nowrap;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.25);
-  transition: opacity 0.2s, visibility 0.2s;
-}
-.version-tooltip .tooltip-text::after{
-  content: "";
-  position: absolute;
-  top: 100%;
-  left: 50%;
-  transform: translateX(-50%);
-  border: 8px solid transparent;
-  border-top-color: #312e81;
-}
-.version-tooltip:hover .tooltip-text{
-  visibility: visible;
-  opacity: 1;
-}
-
 /* Metric */
 [data-testid="stMetricValue"]{ color: #6b21a8 !important; font-weight: 900 !important; }
 [data-testid="stMetricLabel"]{ color: var(--muted) !important; }
@@ -2750,18 +2708,7 @@ def show_homepage():
                                 st.session_state.homepage_need_date_correction = False
 
                         # 自定义标签带tooltip
-                        st.markdown('''
-<div style="display: flex; align-items: center; margin-bottom: 8px;">
-  <span style="font-size: 1.4rem; font-weight: 800; color: #6b21a8;">📅 监测日期</span>
-  <span class="version-tooltip">ℹ️
-    <span class="tooltip-text">
-      <b>📌 版本日期参考</b><br>
-      • beta15_旋转木马:2025-12-03 ~ 2025-12-17<br>
-      • beta17_暖冬测试: 2025-12-31 ~ 2026-01-20<br
-    </span>
-  </span>
-</div>
-''', unsafe_allow_html=True)
+                        st.markdown('<div style="font-size: 1.4rem; font-weight: 800; color: #6b21a8; margin-bottom: 8px;">📅 监测日期</div>', unsafe_allow_html=True)
 
                         if st.session_state.get("homepage_need_date_correction", False):
                             corrected_date = datetime.strptime(
@@ -2806,13 +2753,39 @@ def show_homepage():
                                 label_visibility="collapsed"
                             )
 
-                        # JavaScript禁用不可用日期 + 月份中文化
+                        # JavaScript禁用不可用日期 + 月份中文化 + 版本颜色
                         available_dates_js = json.dumps(available_dates)
 
                         components.html(f"""
 <script>
 (function(){{
   const availableDates = {available_dates_js};
+  
+  // 版本日期范围定义（交替使用2种颜色）
+  const versionRanges = [
+    {{ name: 'beta17', start: '2025-12-31', end: '2026-01-20', colorType: 2 }},
+    {{ name: 'beta18', start: '2026-01-21', end: '2026-02-03', colorType: 1 }},
+    {{ name: 'beta19', start: '2026-02-04', end: '2026-02-24', colorType: 2 }}
+  ];
+  
+  // 两种版本颜色
+  const versionColors = {{
+    1: {{ bg: 'rgba(169, 185, 240, 0.35)', border: '#A9B9F0' }},  // 蓝紫色
+    2: {{ bg: 'rgba(124, 218, 201, 0.35)', border: '#7CDAC9' }}   // 青绿色
+  }};
+  
+  // 判断日期属于哪个版本
+  function getVersionColor(dateStr) {{
+    const date = new Date(dateStr);
+    for (const v of versionRanges) {{
+      const start = new Date(v.start);
+      const end = new Date(v.end);
+      if (date >= start && date <= end) {{
+        return versionColors[v.colorType];
+      }}
+    }}
+    return null;
+  }}
   
   const monthMap = {{
     'January': '一月', 'February': '二月', 'March': '三月', 'April': '四月',
@@ -2934,8 +2907,6 @@ def show_homepage():
       }}else{{
         button.disabled = false;
         button.removeAttribute('aria-disabled');
-        button.style.color = '';
-        button.style.backgroundColor = '';
         button.style.cursor = '';
         button.style.pointerEvents = 'auto';
         button.style.opacity = '';
@@ -2943,6 +2914,17 @@ def show_homepage():
         if(button.dataset.originalText){{
           button.textContent = button.dataset.originalText;
           delete button.dataset.originalText;
+        }}
+        
+        // 根据版本设置颜色
+        const vColor = getVersionColor(dateStr);
+        if(vColor){{
+          button.style.backgroundColor = vColor.bg;
+          button.style.borderRadius = '4px';
+          button.style.color = '#1f2937';
+        }}else{{
+          button.style.backgroundColor = '';
+          button.style.color = '';
         }}
       }}
     }});
@@ -3273,18 +3255,7 @@ def main():
                 selected_version = None
         
         elif available_dates:
-            st.markdown('''
-<div style="display: flex; align-items: center; margin-bottom: 6px;">
-  <span style="font-size: 1rem; font-weight: 700; color: #1f2937;">📅 监测日期</span>
-  <span class="version-tooltip" style="margin-left: 4px;">ℹ️
-    <span class="tooltip-text">
-      <b>📌 版本日期参考</b><br>
-      • beta15_旋转木马: 12-03 ~ 12-17<br>
-      • beta17_暖冬测试: 12-31 ~ 01-20
-    </span>
-  </span>
-</div>
-''', unsafe_allow_html=True)
+            st.markdown("##### 📅 监测日期")
 
             date_objects = []
             for date_str in available_dates:
