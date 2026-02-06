@@ -2808,92 +2808,124 @@ def show_homepage():
     'Mon':'一','Tue':'二','Wed':'三','Thu':'四','Fri':'五','Sat':'六','Sun':'日'
   };
 
-  function translate(popover){
-    // 月份按钮
-    popover.querySelectorAll('button').forEach(btn => {
-      let t = btn.textContent || '';
-      for(const [en,cn] of Object.entries(monthMap)){
-        if(t.includes(en) && !t.includes(cn)){ btn.textContent = t.replace(en,cn); break; }
-      }
-    });
-    // 月份下拉选项
-    popover.querySelectorAll('[role="option"]').forEach(item => {
-      let t = item.textContent || '';
-      for(const [en,cn] of Object.entries(monthMap)){
-        if(t.includes(en) && !t.includes(cn)){ item.textContent = t.replace(en,cn); break; }
-      }
-    });
-    // 星期几
-    const thead = popover.querySelector('thead');
-    if(thead){
-      thead.querySelectorAll('*').forEach(el => {
-        if(!el.children.length){
-          let t = (el.textContent||'').trim();
-          if(weekdayMap[t]) el.textContent = weekdayMap[t];
+  const parentDoc = window.parent.document;
+
+  // 翻译所有 popover（日历 + 月份下拉框是不同的 popover）
+  function translateAll(){
+    parentDoc.querySelectorAll('div[data-baseweb="popover"]').forEach(function(pop){
+      // 月份按钮（combobox）
+      pop.querySelectorAll('button').forEach(function(btn){
+        var t = btn.textContent || '';
+        for(var en in monthMap){
+          if(t.indexOf(en) !== -1 && t.indexOf(monthMap[en]) === -1){
+            btn.textContent = t.replace(en, monthMap[en]);
+            break;
+          }
         }
       });
-    }
-  }
-
-  function labelDates(popover){
-    let currentYear = null, currentMonth = null;
-    popover.querySelectorAll('button[role="combobox"]').forEach(btn => {
-      const t = (btn.textContent || btn.getAttribute('aria-label') || '').trim();
-      const ym = t.match(/(\\d{4})/);
-      if(ym) currentYear = parseInt(ym[1]);
-      const mEN = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-      const mCN = ['一月','二月','三月','四月','五月','六月','七月','八月','九月','十月','十一月','十二月'];
-      for(let i=0;i<mEN.length;i++){
-        if(t.toLowerCase().includes(mEN[i].toLowerCase()) || t.includes(mCN[i])){ currentMonth=i; break; }
+      // 月份下拉选项（点击月份后弹出的列表）
+      pop.querySelectorAll('[role="option"], li').forEach(function(item){
+        var t = item.textContent || '';
+        for(var en in monthMap){
+          if(t.indexOf(en) !== -1 && t.indexOf(monthMap[en]) === -1){
+            item.textContent = t.replace(en, monthMap[en]);
+            break;
+          }
+        }
+      });
+      // 星期几
+      var thead = pop.querySelector('thead');
+      if(thead){
+        thead.querySelectorAll('*').forEach(function(el){
+          if(!el.children.length){
+            var t = (el.textContent||'').trim();
+            if(weekdayMap[t]) el.textContent = weekdayMap[t];
+          }
+        });
       }
     });
-    if(currentYear===null||currentMonth===null){
-      const now=new Date();
-      if(currentYear===null) currentYear=now.getFullYear();
-      if(currentMonth===null) currentMonth=now.getMonth();
-    }
+  }
 
-    const cells = popover.querySelectorAll('div[role="gridcell"]');
-    const items = [];
-    cells.forEach(c => {
-      const d = parseInt((c.textContent||'').trim());
-      items.push({cell:c, day:isNaN(d)?-1:d});
-    });
+  // 给日期格子打 data-date 标签（找到包含日历表格的 popover）
+  function labelAllDates(){
+    parentDoc.querySelectorAll('div[data-baseweb="popover"]').forEach(function(pop){
+      var cells = pop.querySelectorAll('div[role="gridcell"]');
+      if(!cells.length) return; // 这个 popover 不是日历
 
-    let first1 = -1;
-    for(let i=0;i<items.length;i++){ if(items[i].day===1){first1=i;break;} }
-    let second1 = -1;
-    if(first1>=0) for(let i=first1+1;i<items.length;i++){ if(items[i].day===1){second1=i;break;} }
+      // 读取当前年月
+      var currentYear = null, currentMonth = null;
+      var mEN = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+      var mCN = ['一月','二月','三月','四月','五月','六月','七月','八月','九月','十月','十一月','十二月'];
 
-    items.forEach((it,idx) => {
-      const {cell,day} = it;
-      if(day<1||day>31) return;
-      let y=currentYear, m=currentMonth;
-      const isOverflow = (first1>=0 && idx<first1) || (second1>=0 && idx>=second1);
-      if(first1>=0 && idx<first1){ m--; if(m<0){m=11;y--;} }
-      else if(second1>=0 && idx>=second1){ m++; if(m>11){m=0;y++;} }
-      const ds = y+'-'+String(m+1).padStart(2,'0')+'-'+String(day).padStart(2,'0');
-      cell.setAttribute('data-date', ds);
-      if(isOverflow) cell.setAttribute('data-overflow','1');
-      else cell.removeAttribute('data-overflow');
+      pop.querySelectorAll('button[role="combobox"]').forEach(function(btn){
+        var t = (btn.textContent || btn.getAttribute('aria-label') || '').trim();
+        var ym = t.match(/(\\d{4})/);
+        if(ym) currentYear = parseInt(ym[1]);
+        for(var i=0;i<mEN.length;i++){
+          if(t.toLowerCase().indexOf(mEN[i].toLowerCase()) !== -1 || t.indexOf(mCN[i]) !== -1){
+            currentMonth = i; break;
+          }
+        }
+      });
+      if(currentYear===null||currentMonth===null){
+        var now=new Date();
+        if(currentYear===null) currentYear=now.getFullYear();
+        if(currentMonth===null) currentMonth=now.getMonth();
+      }
+
+      var items = [];
+      cells.forEach(function(c){
+        var d = parseInt((c.textContent||'').trim());
+        items.push({cell:c, day:isNaN(d)?-1:d});
+      });
+
+      var first1=-1;
+      for(var i=0;i<items.length;i++){ if(items[i].day===1){first1=i;break;} }
+      var second1=-1;
+      if(first1>=0) for(var i=first1+1;i<items.length;i++){ if(items[i].day===1){second1=i;break;} }
+
+      items.forEach(function(it,idx){
+        var cell=it.cell, day=it.day;
+        if(day<1||day>31) return;
+        var y=currentYear, m=currentMonth;
+        var isOverflow = (first1>=0 && idx<first1) || (second1>=0 && idx>=second1);
+        if(first1>=0 && idx<first1){ m--; if(m<0){m=11;y--;} }
+        else if(second1>=0 && idx>=second1){ m++; if(m>11){m=0;y++;} }
+        var ds = y+'-'+String(m+1).padStart(2,'0')+'-'+String(day).padStart(2,'0');
+        cell.setAttribute('data-date', ds);
+        if(isOverflow) cell.setAttribute('data-overflow','1');
+        else cell.removeAttribute('data-overflow');
+      });
     });
   }
 
-  const parentDoc = window.parent.document;
-  let timer = null;
-  function onPopoverChange(){
+  function runAll(){
+    translateAll();
+    labelAllDates();
+  }
+
+  // MutationObserver：监听 DOM 变化（含文字变化）
+  var timer = null;
+  var obs = new MutationObserver(function(){
     clearTimeout(timer);
-    timer = setTimeout(function(){
-      const p = parentDoc.querySelector('div[data-baseweb="popover"]');
-      if(p){ translate(p); labelDates(p); }
-    }, 80);
-  }
+    timer = setTimeout(runAll, 60);
+  });
+  obs.observe(parentDoc.body, {childList:true, subtree:true, characterData:true});
 
-  const obs = new MutationObserver(onPopoverChange);
-  obs.observe(parentDoc.body, {childList:true, subtree:true});
+  // 点击事件：箭头切月、打开下拉等操作后多次延迟刷新翻译
+  parentDoc.addEventListener('click', function(e){
+    var t = e.target;
+    if(t.closest && t.closest('[data-baseweb="popover"]')){
+      setTimeout(runAll, 50);
+      setTimeout(runAll, 150);
+      setTimeout(runAll, 300);
+      setTimeout(runAll, 500);
+    }
+  }, true);
 
   // 初始检测
-  setTimeout(onPopoverChange, 200);
+  setTimeout(runAll, 200);
+  setTimeout(runAll, 500);
 })();
 </script>
 """, height=0)
