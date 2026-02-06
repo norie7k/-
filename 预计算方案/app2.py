@@ -2881,40 +2881,70 @@ def show_homepage():
     const tbody = table.querySelector('tbody');
     if(!tbody) return;
 
-    const dateButtons = tbody.querySelectorAll('button');
-    dateButtons.forEach(button => {{
-      let dayText = button.textContent.trim();
-      dayText = dayText.replace(/🚫/g,'').replace(/\\s+/g,'').trim();
-      if(button.dataset.originalText) dayText = button.dataset.originalText;
-      const day = parseInt(dayText);
-      if(isNaN(day) || day<1 || day>31) return;
+    const rows = tbody.querySelectorAll('tr');
+    let prevMonthDone = false;
+    rows.forEach(row => {{
+      const buttons = row.querySelectorAll('button');
+      buttons.forEach(button => {{
+        let dayText = button.textContent.trim();
+        dayText = dayText.replace(/🚫/g,'').replace(/\\s+/g,'').trim();
+        if(button.dataset.originalText) dayText = button.dataset.originalText;
+        const day = parseInt(dayText);
+        if(isNaN(day) || day<1 || day>31) return;
 
-      const dateStr = `${{currentYear}}-${{String(currentMonth+1).padStart(2,'0')}}-${{String(day).padStart(2,'0')}}`;
+        // 判断这个日期属于哪个月（处理上月/下月溢出）
+        let actualYear = currentYear;
+        let actualMonth = currentMonth; // 0-based
+        if(!prevMonthDone && day > 20){{
+          // 第一行中大数字 = 上个月的日期
+          actualMonth = currentMonth - 1;
+          if(actualMonth < 0){{ actualMonth = 11; actualYear--; }}
+        }}else{{
+          prevMonthDone = true;
+          if(prevMonthDone && day < 15){{
+            // 最后几行中小数字，可能是下个月
+            const rowIndex = Array.from(rows).indexOf(row);
+            if(rowIndex >= 4){{
+              actualMonth = currentMonth + 1;
+              if(actualMonth > 11){{ actualMonth = 0; actualYear++; }}
+            }}
+          }}
+        }}
 
-      if(!availableDates.includes(dateStr)){{
-        if(!button.dataset.originalText) button.dataset.originalText = dayText;
-        button.disabled = true;
-        button.setAttribute('aria-disabled','true');
-        button.style.color = '#94a3b8';
-        button.style.backgroundColor = '#f1f5f9';
-        button.style.cursor = 'not-allowed';
-        button.style.pointerEvents = 'none';
-        button.style.opacity = '0.4';
-        button.classList.add('date-disabled');
-        button.textContent = dayText;
-        button.title = '';
-      }}else{{
-        button.disabled = false;
-        button.removeAttribute('aria-disabled');
+        const dateStr = `${{actualYear}}-${{String(actualMonth+1).padStart(2,'0')}}-${{String(day).padStart(2,'0')}}`;
+
+        // 先重置样式
+        button.style.removeProperty('background-color');
+        button.style.removeProperty('font-weight');
+        button.style.removeProperty('border-radius');
+        button.style.color = '';
         button.style.cursor = '';
         button.style.pointerEvents = 'auto';
         button.style.opacity = '';
+        button.disabled = false;
+        button.removeAttribute('aria-disabled');
         button.classList.remove('date-disabled');
+        button.title = '';
         if(button.dataset.originalText){{
           button.textContent = button.dataset.originalText;
           delete button.dataset.originalText;
         }}
-        // 版本颜色
+
+        // 不可用日期 = 灰色
+        if(!availableDates.includes(dateStr)){{
+          if(!button.dataset.originalText) button.dataset.originalText = dayText;
+          button.disabled = true;
+          button.setAttribute('aria-disabled','true');
+          button.style.color = '#94a3b8';
+          button.style.backgroundColor = '#f1f5f9';
+          button.style.cursor = 'not-allowed';
+          button.style.pointerEvents = 'none';
+          button.style.opacity = '0.4';
+          button.classList.add('date-disabled');
+          button.textContent = dayText;
+        }}
+
+        // 版本颜色（无论是否可用都显示）
         const vc = versionColors[dateStr];
         if(vc){{
           button.style.setProperty('background-color', vc.bg, 'important');
@@ -2922,13 +2952,12 @@ def show_homepage():
           button.style.setProperty('font-weight', '700', 'important');
           button.style.setProperty('border-radius', '6px', 'important');
           button.title = vc.version;
-        }}else{{
-          button.style.removeProperty('background-color');
-          button.style.removeProperty('font-weight');
-          button.style.color = '#1f2937';
-          button.title = '';
+          // 不可用但有版本色的日期：保持版本色但半透明
+          if(!availableDates.includes(dateStr)){{
+            button.style.setProperty('opacity', '0.45', 'important');
+          }}
         }}
-      }}
+      }});
     }});
   }}
   
