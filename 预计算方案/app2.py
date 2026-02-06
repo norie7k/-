@@ -400,14 +400,10 @@ div[data-baseweb="popover"] tbody button[aria-selected="true"]{
 }
 
 /* 禁用日期 */
-div[data-baseweb="popover"] button[disabled],
-div[data-baseweb="popover"] button[aria-disabled="true"],
 div[data-baseweb="popover"] button.date-disabled{
-  opacity: 0.4 !important;
+  opacity: 0.35 !important;
   cursor: not-allowed !important;
   pointer-events: none !important;
-  color: #94a3b8 !important;
-  background: #f1f5f9 !important;
   user-select: none !important;
 }
 
@@ -2762,27 +2758,49 @@ def show_homepage():
                                 label_visibility="collapsed"
                             )
 
-                        # JavaScript禁用不可用日期 + 月份中文化 + 版本颜色
-                        available_dates_js = json.dumps(available_dates)
+                        # ===== 纯CSS方案：版本日期颜色 =====
+                        def _ordinal(n):
+                            if 11 <= n <= 13: return f"{n}th"
+                            return f"{n}{['th','st','nd','rd','th','th','th','th','th','th'][n%10]}"
                         
-                        # 构建版本颜色映射
-                        version_date_colors = {}
+                        _en_months = ['','January','February','March','April','May','June',
+                                      'July','August','September','October','November','December']
+                        
+                        version_css_rules = []
                         for vi, vp in enumerate(VERSION_PERIODS):
                             bg_color, text_color = VERSION_COLOR_A if vi % 2 == 0 else VERSION_COLOR_B
                             s = datetime.strptime(vp["start"], "%Y-%m-%d").date()
                             e = datetime.strptime(vp["end"], "%Y-%m-%d").date()
                             d = s
+                            selectors = []
                             while d <= e:
-                                ds = d.strftime("%Y-%m-%d")
-                                version_date_colors[ds] = {"bg": bg_color, "text": text_color, "version": vp["name"]}
+                                label_part = f"{_en_months[d.month]} {_ordinal(d.day)}"
+                                selectors.append(f'div[data-baseweb="popover"] button[aria-label*="{label_part}"]')
                                 d += timedelta(days=1)
-                        version_colors_js = json.dumps(version_date_colors)
+                            if selectors:
+                                # 每50个选择器一组避免CSS过长
+                                for i in range(0, len(selectors), 50):
+                                    chunk = selectors[i:i+50]
+                                    rule = ",\n".join(chunk)
+                                    version_css_rules.append(
+                                        f'{rule}{{\n'
+                                        f'  background-color: {bg_color} !important;\n'
+                                        f'  color: {text_color} !important;\n'
+                                        f'  font-weight: 700 !important;\n'
+                                        f'  border-radius: 6px !important;\n'
+                                        f'}}'
+                                    )
+                        
+                        if version_css_rules:
+                            st.markdown(f'<style>\n{chr(10).join(version_css_rules)}\n</style>', unsafe_allow_html=True)
+                        
+                        # JavaScript禁用不可用日期 + 月份中文化
+                        available_dates_js = json.dumps(available_dates)
 
                         components.html(f"""
 <script>
 (function(){{
   const availableDates = {available_dates_js};
-  const versionColors = {version_colors_js};
   
   const monthMap = {{
     'January': '一月', 'February': '二月', 'March': '三月', 'April': '四月',
@@ -2878,81 +2896,34 @@ def show_homepage():
       if(currentMonth === null) currentMonth = now.getMonth();
     }}
 
-    // 获取所有日期按钮（兼容不同baseweb版本）
-    const allButtons = table.querySelectorAll('button');
-    
-    allButtons.forEach(button => {{
+    const dateButtons = table.querySelectorAll('button');
+    dateButtons.forEach(button => {{
       let dayText = button.textContent.trim();
       dayText = dayText.replace(/🚫/g,'').replace(/\\s+/g,'').trim();
       if(button.dataset.originalText) dayText = button.dataset.originalText;
       const day = parseInt(dayText);
       if(isNaN(day) || day<1 || day>31) return;
-      
-      // 检查按钮是否在表头（星期行），如果是则跳过
       if(button.closest('thead')) return;
 
-      // 使用aria-label获取准确日期（baseweb会设置如 "January 27, 2026"）
-      let dateStr = '';
-      const ariaLabel = button.getAttribute('aria-label') || '';
-      
-      // 尝试从aria-label解析日期
-      const dateMatch = ariaLabel.match(/(\\w+)\\s+(\\d+),?\\s*(\\d{{4}})/);
-      if(dateMatch){{
-        const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-        const mIdx = monthNames.findIndex(m => m.toLowerCase() === dateMatch[1].toLowerCase());
-        if(mIdx >= 0){{
-          dateStr = `${{dateMatch[3]}}-${{String(mIdx+1).padStart(2,'0')}}-${{String(parseInt(dateMatch[2])).padStart(2,'0')}}`;
-        }}
-      }}
-      
-      // 如果aria-label解析失败，用当前月份拼接
-      if(!dateStr){{
-        dateStr = `${{currentYear}}-${{String(currentMonth+1).padStart(2,'0')}}-${{String(day).padStart(2,'0')}}`;
-      }}
+      const dateStr = `${{currentYear}}-${{String(currentMonth+1).padStart(2,'0')}}-${{String(day).padStart(2,'0')}}`;
 
-      // 先重置样式
-      button.style.removeProperty('background-color');
-      button.style.removeProperty('font-weight');
-      button.style.removeProperty('border-radius');
-      button.style.color = '';
-      button.style.cursor = '';
-      button.style.pointerEvents = 'auto';
-      button.style.opacity = '';
-      button.disabled = false;
-      button.removeAttribute('aria-disabled');
-      button.classList.remove('date-disabled');
-      button.title = '';
-      if(button.dataset.originalText){{
-        button.textContent = button.dataset.originalText;
-        delete button.dataset.originalText;
-      }}
-
-      // 不可用日期 = 灰色
       if(!availableDates.includes(dateStr)){{
         if(!button.dataset.originalText) button.dataset.originalText = dayText;
         button.disabled = true;
         button.setAttribute('aria-disabled','true');
-        button.style.setProperty('color', '#94a3b8', 'important');
-        button.style.setProperty('background-color', '#f1f5f9', 'important');
         button.style.cursor = 'not-allowed';
         button.style.pointerEvents = 'none';
-        button.style.setProperty('opacity', '0.4', 'important');
         button.classList.add('date-disabled');
         button.textContent = dayText;
-      }}
-
-      // 版本颜色（无论是否可用都显示，覆盖上面的灰色）
-      const vc = versionColors[dateStr];
-      if(vc){{
-        button.style.setProperty('background-color', vc.bg, 'important');
-        button.style.setProperty('color', vc.text, 'important');
-        button.style.setProperty('font-weight', '700', 'important');
-        button.style.setProperty('border-radius', '6px', 'important');
-        button.title = vc.version;
-        if(!availableDates.includes(dateStr)){{
-          button.style.setProperty('opacity', '0.45', 'important');
-        }}else{{
-          button.style.setProperty('opacity', '1', 'important');
+      }}else{{
+        button.disabled = false;
+        button.removeAttribute('aria-disabled');
+        button.style.cursor = '';
+        button.style.pointerEvents = 'auto';
+        button.classList.remove('date-disabled');
+        if(button.dataset.originalText){{
+          button.textContent = button.dataset.originalText;
+          delete button.dataset.originalText;
         }}
       }}
     }});
