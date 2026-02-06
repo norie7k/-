@@ -2758,42 +2758,6 @@ def show_homepage():
                                 label_visibility="collapsed"
                             )
 
-                        # ===== 纯CSS方案：版本日期颜色 =====
-                        def _ordinal(n):
-                            if 11 <= n <= 13: return f"{n}th"
-                            return f"{n}{['th','st','nd','rd','th','th','th','th','th','th'][n%10]}"
-                        
-                        _en_months = ['','January','February','March','April','May','June',
-                                      'July','August','September','October','November','December']
-                        
-                        version_css_rules = []
-                        for vi, vp in enumerate(VERSION_PERIODS):
-                            bg_color, text_color = VERSION_COLOR_A if vi % 2 == 0 else VERSION_COLOR_B
-                            s = datetime.strptime(vp["start"], "%Y-%m-%d").date()
-                            e = datetime.strptime(vp["end"], "%Y-%m-%d").date()
-                            d = s
-                            selectors = []
-                            while d <= e:
-                                label_part = f"{_en_months[d.month]} {_ordinal(d.day)}"
-                                selectors.append(f'div[data-baseweb="popover"] button[aria-label*="{label_part}"]')
-                                d += timedelta(days=1)
-                            if selectors:
-                                # 每50个选择器一组避免CSS过长
-                                for i in range(0, len(selectors), 50):
-                                    chunk = selectors[i:i+50]
-                                    rule = ",\n".join(chunk)
-                                    version_css_rules.append(
-                                        f'{rule}{{\n'
-                                        f'  background-color: {bg_color} !important;\n'
-                                        f'  color: {text_color} !important;\n'
-                                        f'  font-weight: 700 !important;\n'
-                                        f'  border-radius: 6px !important;\n'
-                                        f'}}'
-                                    )
-                        
-                        if version_css_rules:
-                            st.markdown(f'<style>\n{chr(10).join(version_css_rules)}\n</style>', unsafe_allow_html=True)
-                        
                         # JavaScript禁用不可用日期 + 月份中文化
                         available_dates_js = json.dumps(available_dates)
 
@@ -3133,6 +3097,48 @@ def main():
     )
 
     st.markdown(STYLE_CSS, unsafe_allow_html=True)
+    
+    # ===== 版本日期颜色 CSS（纯CSS方案，全局注入）=====
+    def _ordinal(n):
+        if 11 <= n <= 13: return f"{n}th"
+        return f"{n}{['th','st','nd','rd','th','th','th','th','th','th'][n%10]}"
+    
+    _en_months = ['','January','February','March','April','May','June',
+                  'July','August','September','October','November','December']
+    
+    version_css_parts = []
+    for vi, vp in enumerate(VERSION_PERIODS):
+        bg_color, text_color = VERSION_COLOR_A if vi % 2 == 0 else VERSION_COLOR_B
+        s = datetime.strptime(vp["start"], "%Y-%m-%d").date()
+        e = datetime.strptime(vp["end"], "%Y-%m-%d").date()
+        d = s
+        selectors = []
+        while d <= e:
+            ordinal_day = _ordinal(d.day)
+            month_name = _en_months[d.month]
+            # 匹配多种可能的aria-label格式
+            selectors.append(f'[data-baseweb="popover"] button[aria-label*="{month_name} {ordinal_day}"]')
+            selectors.append(f'[data-baseweb="popover"] button[aria-label*="{month_name} {d.day},"]')
+            selectors.append(f'[data-baseweb="popover"] button[aria-label*="{month_name} {d.day} "]')
+            d += timedelta(days=1)
+        if selectors:
+            for i in range(0, len(selectors), 30):
+                chunk = selectors[i:i+30]
+                rule = ",\n".join(chunk)
+                version_css_parts.append(
+                    f'{rule}{{\n'
+                    f'  background-color: {bg_color} !important;\n'
+                    f'  color: {text_color} !important;\n'
+                    f'  font-weight: 700 !important;\n'
+                    f'  border-radius: 6px !important;\n'
+                    f'}}'
+                )
+    
+    # 调试+版本颜色CSS
+    # 先加一条测试规则：popover里所有button都加红色边框（确认CSS能到达）
+    test_rule = '[data-baseweb="popover"] button { border: 2px solid red !important; }'
+    version_css = test_rule + '\n/* 版本日期颜色 */\n' + '\n'.join(version_css_parts)
+    st.markdown(f'<style>{version_css}</style>', unsafe_allow_html=True)
     
     if not st.session_state.show_results:
         show_homepage()
