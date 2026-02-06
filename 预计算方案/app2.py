@@ -36,8 +36,8 @@ VERSION_PERIODS = [
     {"name": "beta19_立春测试",    "start": "2026-02-04", "end": "2026-02-24"},
 ]
 # 交替使用的两种颜色（背景色, 文字色）
-VERSION_COLOR_A = ("rgba(181,146,232,0.55)", "#4c1d95")  # 紫色系
-VERSION_COLOR_B = ("rgba(133,182,242,0.50)", "#1e3a8a")  # 蓝色系
+VERSION_COLOR_A = ("rgba(167,120,230,0.75)", "#4c1d95")  # 紫色系
+VERSION_COLOR_B = ("rgba(100,160,240,0.70)", "#1e3a8a")  # 蓝色系
 
 # ==================== CSS（收敛版：稳 + 清晰）===================
 
@@ -2784,7 +2784,8 @@ def show_homepage():
                                 cal_css_parts.append(
                                     f'div[data-baseweb="popover"] div[role="gridcell"][data-date="{ds}"]'
                                     f'{{background:{bg_color}!important;color:{text_color}!important;'
-                                    f'font-weight:700!important;border-radius:6px!important;}}'
+                                    f'font-weight:700!important;border-radius:6px!important;'
+                                    f'opacity:0.9!important;}}'
                                 )
                                 d += timedelta(days=1)
                         # 溢出日期（相邻月份）
