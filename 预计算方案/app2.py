@@ -437,15 +437,15 @@ div[data-baseweb="popover"] button[aria-label="后一个月"] svg{
   fill: #6b21a8 !important;
   color: #6b21a8 !important;
 }
-/* 普通日期按钮 */
+/* 普通日期按钮 - 不用!important以便JS版本颜色能覆盖 */
 div[data-baseweb="popover"] table button,
 div[data-baseweb="popover"] tbody button{
-  color: #1f2937 !important;
-  background: transparent !important;
+  color: #1f2937;
+  background: transparent;
 }
 div[data-baseweb="popover"] table button:hover,
 div[data-baseweb="popover"] tbody button:hover{
-  background: rgba(200,162,232,.18) !important;
+  background: rgba(200,162,232,.18);
 }
 /* 选中日期 */
 div[data-baseweb="popover"] table button[aria-selected="true"],
@@ -2987,15 +2987,15 @@ def show_homepage():
         // 版本颜色
         const vc = versionColors[dateStr];
         if(vc){{
-          button.style.backgroundColor = vc.bg;
-          button.style.color = vc.text;
-          button.style.fontWeight = '700';
-          button.style.borderRadius = '6px';
+          button.style.setProperty('background-color', vc.bg, 'important');
+          button.style.setProperty('color', vc.text, 'important');
+          button.style.setProperty('font-weight', '700', 'important');
+          button.style.setProperty('border-radius', '6px', 'important');
           button.title = vc.version;
         }}else{{
-          button.style.backgroundColor = '';
-          button.style.color = '';
-          button.style.fontWeight = '';
+          button.style.removeProperty('background-color');
+          button.style.removeProperty('font-weight');
+          button.style.color = '#1f2937';
           button.title = '';
         }}
       }}
