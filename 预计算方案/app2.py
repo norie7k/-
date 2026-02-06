@@ -390,16 +390,30 @@ div[data-baseweb="popover"]{
   z-index: 9999 !important;
   box-shadow: 0 4px 20px rgba(200,162,232,.15) !important;
 }
-/* 日历内部面板背景 */
-div[data-baseweb="popover"] div[data-baseweb="calendar"],
-div[data-baseweb="popover"] [data-baseweb="calendar"]{
-  background: #ffffff !important;
+/* 日历所有内部元素强制亮色 */
+div[data-baseweb="popover"] *{
   color: #1f2937 !important;
 }
-/* 日历头部（月/年选择） */
-div[data-baseweb="popover"] [data-baseweb="calendar"] div:first-child{
-  background: #ffffff !important;
+div[data-baseweb="popover"] div,
+div[data-baseweb="popover"] span,
+div[data-baseweb="popover"] table,
+div[data-baseweb="popover"] thead,
+div[data-baseweb="popover"] tbody,
+div[data-baseweb="popover"] tr,
+div[data-baseweb="popover"] th,
+div[data-baseweb="popover"] td{
+  background-color: #ffffff !important;
+  color: #1f2937 !important;
 }
+/* 星期标题行 */
+div[data-baseweb="popover"] thead th,
+div[data-baseweb="popover"] thead th div,
+div[data-baseweb="popover"] thead th span{
+  background-color: #f8f9fa !important;
+  color: #6b7280 !important;
+  font-weight: 600 !important;
+}
+/* 月/年选择按钮 */
 div[data-baseweb="popover"] button[role="combobox"]{
   background: #f8f9fa !important;
   color: #1f2937 !important;
@@ -409,19 +423,19 @@ div[data-baseweb="popover"] button[role="combobox"]:hover{
   background: #f1f5f9 !important;
 }
 /* 导航箭头 */
-div[data-baseweb="popover"] [aria-label="Next month"],
-div[data-baseweb="popover"] [aria-label="Previous month"]{
+div[data-baseweb="popover"] button[aria-label="Next month"],
+div[data-baseweb="popover"] button[aria-label="Previous month"],
+div[data-baseweb="popover"] button[aria-label="前一个月"],
+div[data-baseweb="popover"] button[aria-label="后一个月"]{
   background: transparent !important;
   color: #6b21a8 !important;
 }
-div[data-baseweb="popover"] [aria-label="Next month"]:hover,
-div[data-baseweb="popover"] [aria-label="Previous month"]:hover{
-  background: rgba(200,162,232,.15) !important;
-}
-/* 星期标题 */
-div[data-baseweb="popover"] thead th,
-div[data-baseweb="popover"] thead div{
-  color: #6b7280 !important;
+div[data-baseweb="popover"] button[aria-label="Next month"] svg,
+div[data-baseweb="popover"] button[aria-label="Previous month"] svg,
+div[data-baseweb="popover"] button[aria-label="前一个月"] svg,
+div[data-baseweb="popover"] button[aria-label="后一个月"] svg{
+  fill: #6b21a8 !important;
+  color: #6b21a8 !important;
 }
 /* 普通日期按钮 */
 div[data-baseweb="popover"] table button,
@@ -431,7 +445,7 @@ div[data-baseweb="popover"] tbody button{
 }
 div[data-baseweb="popover"] table button:hover,
 div[data-baseweb="popover"] tbody button:hover{
-  background: rgba(200,162,232,.15) !important;
+  background: rgba(200,162,232,.18) !important;
 }
 /* 选中日期 */
 div[data-baseweb="popover"] table button[aria-selected="true"],
@@ -439,12 +453,6 @@ div[data-baseweb="popover"] tbody button[aria-selected="true"]{
   background: #B592E8 !important;
   color: #ffffff !important;
   font-weight: 700 !important;
-  border-radius: 8px !important;
-}
-/* 今天标记 */
-div[data-baseweb="popover"] table button[aria-label*="today"],
-div[data-baseweb="popover"] tbody button[aria-current="date"]{
-  border: 2px solid #B592E8 !important;
   border-radius: 8px !important;
 }
 /* 下拉列表选项 */
@@ -455,8 +463,11 @@ div[data-baseweb="popover"] div[role="option"]{
 div[data-baseweb="popover"] div[role="option"]:hover{
   background: rgba(200,162,232,.15) !important;
 }
-div[data-baseweb="popover"] ul[role="listbox"]{
+div[data-baseweb="popover"] ul,
+div[data-baseweb="popover"] ul[role="listbox"],
+div[data-baseweb="popover"] ul li{
   background: #ffffff !important;
+  color: #1f2937 !important;
 }
 
 /* 禁用日期 */
