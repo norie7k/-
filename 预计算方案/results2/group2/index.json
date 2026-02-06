@@ -1,7 +1,9 @@
 {
   "group": "地球群2",
   "group_id": "2",
-  "available_dates": [],
+  "available_dates": [
+    "2025-12-31"
+  ],
   "available_versions": [],
-  "last_updated": ""
+  "last_updated": "2026-02-06T14:21:22.945525"
 }
