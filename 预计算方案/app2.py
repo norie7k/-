@@ -390,64 +390,6 @@ div[data-baseweb="popover"]{
   z-index: 9999 !important;
   box-shadow: 0 4px 20px rgba(200,162,232,.15) !important;
 }
-/* 日历所有内部元素强制亮色 */
-div[data-baseweb="popover"] *{
-  color: #1f2937 !important;
-  background-color: #ffffff !important;
-}
-div[data-baseweb="popover"] div,
-div[data-baseweb="popover"] span,
-div[data-baseweb="popover"] table,
-div[data-baseweb="popover"] thead,
-div[data-baseweb="popover"] tbody,
-div[data-baseweb="popover"] tr,
-div[data-baseweb="popover"] th,
-div[data-baseweb="popover"] td{
-  background-color: #ffffff !important;
-  color: #1f2937 !important;
-}
-/* 星期标题行 */
-div[data-baseweb="popover"] thead th,
-div[data-baseweb="popover"] thead th div,
-div[data-baseweb="popover"] thead th span{
-  background-color: #f8f9fa !important;
-  color: #6b7280 !important;
-  font-weight: 600 !important;
-}
-/* 月/年选择按钮 */
-div[data-baseweb="popover"] button[role="combobox"]{
-  background: #f8f9fa !important;
-  color: #1f2937 !important;
-  border: 1px solid #e5e7eb !important;
-}
-div[data-baseweb="popover"] button[role="combobox"]:hover{
-  background: #f1f5f9 !important;
-}
-/* 导航箭头 */
-div[data-baseweb="popover"] button[aria-label="Next month"],
-div[data-baseweb="popover"] button[aria-label="Previous month"],
-div[data-baseweb="popover"] button[aria-label="前一个月"],
-div[data-baseweb="popover"] button[aria-label="后一个月"]{
-  background: transparent !important;
-  color: #6b21a8 !important;
-}
-div[data-baseweb="popover"] button[aria-label="Next month"] svg,
-div[data-baseweb="popover"] button[aria-label="Previous month"] svg,
-div[data-baseweb="popover"] button[aria-label="前一个月"] svg,
-div[data-baseweb="popover"] button[aria-label="后一个月"] svg{
-  fill: #6b21a8 !important;
-  color: #6b21a8 !important;
-}
-/* 普通日期按钮 - 不用!important以便JS版本颜色能覆盖 */
-div[data-baseweb="popover"] table button,
-div[data-baseweb="popover"] tbody button{
-  color: #1f2937;
-  background: transparent;
-}
-div[data-baseweb="popover"] table button:hover,
-div[data-baseweb="popover"] tbody button:hover{
-  background: rgba(200,162,232,.18);
-}
 /* 选中日期 */
 div[data-baseweb="popover"] table button[aria-selected="true"],
 div[data-baseweb="popover"] tbody button[aria-selected="true"]{
@@ -455,20 +397,6 @@ div[data-baseweb="popover"] tbody button[aria-selected="true"]{
   color: #ffffff !important;
   font-weight: 700 !important;
   border-radius: 8px !important;
-}
-/* 下拉列表选项 */
-div[data-baseweb="popover"] div[role="option"]{
-  background: #ffffff !important;
-  color: #1f2937 !important;
-}
-div[data-baseweb="popover"] div[role="option"]:hover{
-  background: rgba(200,162,232,.15) !important;
-}
-div[data-baseweb="popover"] ul,
-div[data-baseweb="popover"] ul[role="listbox"],
-div[data-baseweb="popover"] ul li{
-  background: #ffffff !important;
-  color: #1f2937 !important;
 }
 
 /* 禁用日期 */
@@ -2923,13 +2851,6 @@ def show_homepage():
     translateMonthToChinese();
     if(!popover) return;
 
-    // 强制清除日历弹窗内所有深色背景
-    popover.querySelectorAll('*').forEach(el => {{
-      const bg = window.getComputedStyle(el).backgroundColor;
-      if(bg && bg !== 'rgba(0, 0, 0, 0)' && bg !== 'transparent' && bg !== 'rgb(255, 255, 255)' && bg !== 'rgb(248, 249, 250)'){{
-        el.style.setProperty('background-color', '#ffffff', 'important');
-      }}
-    }});
 
     const table = popover.querySelector('table');
     if(!table) return;
