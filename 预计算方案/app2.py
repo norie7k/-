@@ -2923,6 +2923,14 @@ def show_homepage():
     translateMonthToChinese();
     if(!popover) return;
 
+    // 强制清除日历弹窗内所有深色背景
+    popover.querySelectorAll('*').forEach(el => {{
+      const bg = window.getComputedStyle(el).backgroundColor;
+      if(bg && bg !== 'rgba(0, 0, 0, 0)' && bg !== 'transparent' && bg !== 'rgb(255, 255, 255)' && bg !== 'rgb(248, 249, 250)'){{
+        el.style.setProperty('background-color', '#ffffff', 'important');
+      }}
+    }});
+
     const table = popover.querySelector('table');
     if(!table) return;
 
