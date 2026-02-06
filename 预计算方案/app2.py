@@ -3134,11 +3134,14 @@ def main():
                     f'}}'
                 )
     
-    # 调试+版本颜色CSS
-    # 先加一条测试规则：popover里所有button都加红色边框（确认CSS能到达）
-    test_rule = '[data-baseweb="popover"] button { border: 2px solid red !important; }'
-    version_css = test_rule + '\n/* 版本日期颜色 */\n' + '\n'.join(version_css_parts)
-    st.markdown(f'<style>{version_css}</style>', unsafe_allow_html=True)
+    # 调试：测试不同选择器找到日期格子
+    test_rules = '''
+[data-baseweb="popover"] div[role="gridcell"] { border: 2px solid red !important; }
+[data-baseweb="popover"] td { border: 2px solid blue !important; }
+[data-baseweb="popover"] div[role="button"] { border: 2px solid green !important; }
+[data-baseweb="popover"] [data-baseweb="day"] { border: 2px solid orange !important; }
+'''
+    st.markdown(f'<style>{test_rules}</style>', unsafe_allow_html=True)
     
     if not st.session_state.show_results:
         show_homepage()
