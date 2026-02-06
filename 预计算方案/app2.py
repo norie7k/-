@@ -2810,30 +2810,50 @@ def show_homepage():
 
   const parentDoc = window.parent.document;
 
+  // 安全翻译：只修改叶子节点的文字，不破坏父元素的子结构
+  function safeReplace(el, map){
+    if(!el.children || !el.children.length){
+      // 叶子节点：直接改 textContent 安全
+      var t = el.textContent || '';
+      for(var key in map){
+        if(t.indexOf(key) !== -1 && t.indexOf(map[key]) === -1){
+          el.textContent = t.replace(key, map[key]);
+          return;
+        }
+      }
+    } else {
+      // 有子元素：递归进入子元素，不动父级的 textContent
+      for(var i=0; i<el.children.length; i++){
+        safeReplace(el.children[i], map);
+      }
+      // 也检查直属文本节点（混合内容场景）
+      for(var j=0; j<el.childNodes.length; j++){
+        var node = el.childNodes[j];
+        if(node.nodeType === 3){ // Text node
+          var v = node.nodeValue || '';
+          for(var key in map){
+            if(v.indexOf(key) !== -1 && v.indexOf(map[key]) === -1){
+              node.nodeValue = v.replace(key, map[key]);
+              return;
+            }
+          }
+        }
+      }
+    }
+  }
+
   // 翻译所有 popover（日历 + 月份下拉框是不同的 popover）
   function translateAll(){
     parentDoc.querySelectorAll('div[data-baseweb="popover"]').forEach(function(pop){
-      // 月份按钮（combobox）
+      // 月份按钮（combobox）— 安全递归替换，不破坏 React DOM 结构
       pop.querySelectorAll('button').forEach(function(btn){
-        var t = btn.textContent || '';
-        for(var en in monthMap){
-          if(t.indexOf(en) !== -1 && t.indexOf(monthMap[en]) === -1){
-            btn.textContent = t.replace(en, monthMap[en]);
-            break;
-          }
-        }
+        safeReplace(btn, monthMap);
       });
-      // 月份下拉选项（点击月份后弹出的列表）
+      // 月份下拉选项
       pop.querySelectorAll('[role="option"], li').forEach(function(item){
-        var t = item.textContent || '';
-        for(var en in monthMap){
-          if(t.indexOf(en) !== -1 && t.indexOf(monthMap[en]) === -1){
-            item.textContent = t.replace(en, monthMap[en]);
-            break;
-          }
-        }
+        safeReplace(item, monthMap);
       });
-      // 星期几
+      // 星期几（叶子节点，安全替换）
       var thead = pop.querySelector('thead');
       if(thead){
         thead.querySelectorAll('*').forEach(function(el){
