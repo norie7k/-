@@ -1,15 +1,15 @@
 [theme]
-# 主题配置
-primaryColor = "#6366f1"
-backgroundColor = "#0f172a"
-secondaryBackgroundColor = "#1e293b"
-textColor = "#f1f5f9"
+# 主题配置 - 亮色主题
+primaryColor = "#B592E8"
+backgroundColor = "#ffffff"
+secondaryBackgroundColor = "#f8f9fa"
+textColor = "#1f2937"
 font = "sans serif"
 
 [server]
 # 服务器配置
 headless = true
-enableCORS = false
+enableCORS = true
 enableXsrfProtection = true
 
 [browser]
