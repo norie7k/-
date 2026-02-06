@@ -3364,6 +3364,133 @@ def main():
                         label_visibility="collapsed"
                     )
 
+                # ===== 侧边栏日历：版本颜色 CSS + 翻译/tooltip JS =====
+                sidebar_cal_css = []
+                sidebar_cal_css.append(
+                    'div[data-baseweb="popover"] div[role="gridcell"][data-date]{'
+                    'opacity:0.35;cursor:default;}'
+                )
+                for ad in available_dates:
+                    sidebar_cal_css.append(
+                        f'div[data-baseweb="popover"] div[role="gridcell"][data-date="{ad}"]'
+                        f'{{opacity:1!important;cursor:pointer!important;}}'
+                    )
+                for vi, vp in enumerate(VERSION_PERIODS):
+                    bg_color, text_color = VERSION_COLOR_A if vi % 2 == 0 else VERSION_COLOR_B
+                    s = datetime.strptime(vp["start"], "%Y-%m-%d").date()
+                    e_date = datetime.strptime(vp["end"], "%Y-%m-%d").date()
+                    d = s
+                    while d <= e_date:
+                        ds = d.strftime("%Y-%m-%d")
+                        sidebar_cal_css.append(
+                            f'div[data-baseweb="popover"] div[role="gridcell"][data-date="{ds}"]'
+                            f'{{background:{bg_color}!important;color:{text_color}!important;'
+                            f'font-weight:700!important;border-radius:6px!important;'
+                            f'opacity:0.9!important;}}'
+                        )
+                        d += timedelta(days=1)
+                sidebar_cal_css.append(
+                    'div[data-baseweb="popover"] div[role="gridcell"][data-overflow]{'
+                    'opacity:0.25!important;pointer-events:none!important;}'
+                )
+                st.markdown(f'<style>{" ".join(sidebar_cal_css)}</style>', unsafe_allow_html=True)
+
+                # 版本tooltip映射
+                sidebar_ver_map = {}
+                for vp in VERSION_PERIODS:
+                    s = datetime.strptime(vp["start"], "%Y-%m-%d").date()
+                    e_date = datetime.strptime(vp["end"], "%Y-%m-%d").date()
+                    s_d = s.strftime("%m/%d")
+                    e_d = e_date.strftime("%m/%d")
+                    label = f'{vp["name"]}（{s_d}~{e_d}）'
+                    d = s
+                    while d <= e_date:
+                        sidebar_ver_map[d.strftime("%Y-%m-%d")] = label
+                        d += timedelta(days=1)
+                sidebar_ver_map_js = json.dumps(sidebar_ver_map, ensure_ascii=False)
+
+                components.html(f"""
+<script>
+(function(){{
+  var monthMap = {{
+    'January':'一月','February':'二月','March':'三月','April':'四月',
+    'May':'五月','June':'六月','July':'七月','August':'八月',
+    'September':'九月','October':'十月','November':'十一月','December':'十二月'
+  }};
+  var weekdayMap = {{
+    'Mo':'一','Tu':'二','We':'三','Th':'四','Fr':'五','Sa':'六','Su':'日',
+    'Mon':'一','Tue':'二','Wed':'三','Thu':'四','Fri':'五','Sat':'六','Sun':'日'
+  }};
+  var versionMap = {sidebar_ver_map_js};
+  var parentDoc = window.parent.document;
+
+  function safeReplace(el,map){{
+    if(!el.children||!el.children.length){{
+      var t=el.textContent||'';
+      for(var k in map){{if(t.indexOf(k)!==-1&&t.indexOf(map[k])===-1){{el.textContent=t.replace(k,map[k]);return;}}}}
+    }}else{{
+      for(var i=0;i<el.children.length;i++){{safeReplace(el.children[i],map);}}
+      for(var j=0;j<el.childNodes.length;j++){{
+        var n=el.childNodes[j];
+        if(n.nodeType===3){{var v=n.nodeValue||'';for(var k in map){{if(v.indexOf(k)!==-1&&v.indexOf(map[k])===-1){{n.nodeValue=v.replace(k,map[k]);return;}}}}}}
+      }}
+    }}
+  }}
+
+  function translateAll(){{
+    parentDoc.querySelectorAll('div[data-baseweb="popover"]').forEach(function(pop){{
+      pop.querySelectorAll('button').forEach(function(btn){{safeReplace(btn,monthMap);}});
+      pop.querySelectorAll('[role="option"],li').forEach(function(item){{safeReplace(item,monthMap);}});
+      var thead=pop.querySelector('thead');
+      if(thead){{thead.querySelectorAll('*').forEach(function(el){{if(!el.children.length){{var t=(el.textContent||'').trim();if(weekdayMap[t])el.textContent=weekdayMap[t];}}}});}}
+    }});
+  }}
+
+  function labelAllDates(){{
+    var mEN=['January','February','March','April','May','June','July','August','September','October','November','December'];
+    var mCN=['一月','二月','三月','四月','五月','六月','七月','八月','九月','十月','十一月','十二月'];
+    parentDoc.querySelectorAll('div[data-baseweb="popover"]').forEach(function(pop){{
+      var cells=pop.querySelectorAll('div[role="gridcell"]');
+      if(!cells.length) return;
+      var currentYear=null,currentMonth=null;
+      var headerText='';
+      var cb=pop.querySelectorAll('button[role="combobox"]');
+      if(cb.length){{cb.forEach(function(b){{headerText+=' '+(b.textContent||b.getAttribute('aria-label')||'');}});}}
+      if(!headerText.trim()){{pop.querySelectorAll('button,select,[role="heading"]').forEach(function(el){{if(!el.closest('table')&&!el.closest('thead')&&!el.closest('[role="grid"]')){{headerText+=' '+(el.textContent||'');}}}});}}
+      if(!headerText.trim()){{headerText=(pop.textContent||'').substring(0,150);}}
+      var ym=headerText.match(/(\\d{{4}})/);
+      if(ym) currentYear=parseInt(ym[1]);
+      for(var i=mEN.length-1;i>=0;i--){{if(headerText.toLowerCase().indexOf(mEN[i].toLowerCase())!==-1||headerText.indexOf(mCN[i])!==-1){{currentMonth=i;break;}}}}
+      if(currentYear===null||currentMonth===null){{var now=new Date();if(currentYear===null)currentYear=now.getFullYear();if(currentMonth===null)currentMonth=now.getMonth();}}
+
+      var items=[];
+      cells.forEach(function(c){{var d=parseInt((c.textContent||'').trim());items.push({{cell:c,day:isNaN(d)?-1:d}});}});
+      var f1=-1;for(var i=0;i<items.length;i++){{if(items[i].day===1){{f1=i;break;}}}}
+      var f2=-1;if(f1>=0)for(var i=f1+1;i<items.length;i++){{if(items[i].day===1){{f2=i;break;}}}}
+      items.forEach(function(it,idx){{
+        var cell=it.cell,day=it.day;if(day<1||day>31)return;
+        var y=currentYear,m=currentMonth;
+        var ov=(f1>=0&&idx<f1)||(f2>=0&&idx>=f2);
+        if(f1>=0&&idx<f1){{m--;if(m<0){{m=11;y--;}}}}
+        else if(f2>=0&&idx>=f2){{m++;if(m>11){{m=0;y++;}}}}
+        var ds=y+'-'+String(m+1).padStart(2,'0')+'-'+String(day).padStart(2,'0');
+        cell.setAttribute('data-date',ds);
+        if(ov)cell.setAttribute('data-overflow','1');else cell.removeAttribute('data-overflow');
+        if(versionMap[ds]){{cell.setAttribute('title',versionMap[ds]);}}else{{cell.removeAttribute('title');}}
+      }});
+    }});
+  }}
+
+  function runAll(){{translateAll();labelAllDates();}}
+  var timer=null;
+  var obs=new MutationObserver(function(){{clearTimeout(timer);timer=setTimeout(runAll,60);}});
+  obs.observe(parentDoc.body,{{childList:true,subtree:true,characterData:true}});
+  parentDoc.addEventListener('click',function(e){{var t=e.target;if(t.closest&&t.closest('[data-baseweb="popover"]')){{setTimeout(runAll,50);setTimeout(runAll,150);setTimeout(runAll,300);setTimeout(runAll,500);}}}},true);
+  setTimeout(runAll,200);setTimeout(runAll,500);
+}})();
+</script>
+""", height=0)
+
                 picker_date = selected_date_obj.strftime("%Y-%m-%d")
                 if picker_date in available_dates:
                     st.session_state.selected_date_cache = picker_date
