@@ -390,6 +390,10 @@ div[data-baseweb="popover"]{
   z-index: 9999 !important;
   box-shadow: 0 4px 20px rgba(200,162,232,.15) !important;
 }
+/* 确保所有日期格子可点击（不阻挡原生事件） */
+div[data-baseweb="popover"] div[role="gridcell"]{
+  cursor: pointer;
+}
 /* 选中日期 */
 div[data-baseweb="popover"] div[role="gridcell"][aria-selected="true"]{
   background: #B592E8 !important;
@@ -398,18 +402,11 @@ div[data-baseweb="popover"] div[role="gridcell"][aria-selected="true"]{
   border-radius: 8px !important;
 }
 
-/* 禁用日期 */
-div[data-baseweb="popover"] div[role="gridcell"].date-disabled{
-  opacity: 0.35 !important;
-  cursor: not-allowed !important;
+/* 确保 components.html 的 iframe 不阻挡日历弹出层 */
+iframe[height="0"], iframe[style*="height: 0"]{
   pointer-events: none !important;
-  user-select: none !important;
-}
-
-/* 确保可用日期可点击 */
-div[data-baseweb="popover"] div[role="gridcell"]{
-  pointer-events: auto !important;
-  cursor: pointer !important;
+  position: absolute !important;
+  z-index: -1 !important;
 }
 
 /* ===== 按钮 ===== */
@@ -2763,11 +2760,20 @@ def show_homepage():
                                 label_visibility="collapsed"
                             )
 
-                        # JavaScript禁用不可用日期 + 月份中文化 + 版本颜色
-                        available_dates_js = json.dumps(available_dates)
-                        
-                        # 构建版本颜色映射
-                        version_date_colors = {}
+                        # ===== 版本颜色 CSS 规则（纯CSS，不用JS修改inline style）=====
+                        cal_css_parts = []
+                        # 默认：所有带 data-date 属性的 gridcell 半透明（不可用）
+                        cal_css_parts.append(
+                            'div[data-baseweb="popover"] div[role="gridcell"][data-date]{'
+                            'opacity:0.35;cursor:default;}'
+                        )
+                        # 可用日期：正常显示
+                        for ad in available_dates:
+                            cal_css_parts.append(
+                                f'div[data-baseweb="popover"] div[role="gridcell"][data-date="{ad}"]'
+                                f'{{opacity:1!important;cursor:pointer!important;}}'
+                            )
+                        # 版本颜色
                         for vi, vp in enumerate(VERSION_PERIODS):
                             bg_color, text_color = VERSION_COLOR_A if vi % 2 == 0 else VERSION_COLOR_B
                             s = datetime.strptime(vp["start"], "%Y-%m-%d").date()
@@ -2775,227 +2781,120 @@ def show_homepage():
                             d = s
                             while d <= e_date:
                                 ds = d.strftime("%Y-%m-%d")
-                                version_date_colors[ds] = {"bg": bg_color, "text": text_color, "version": vp["name"]}
+                                cal_css_parts.append(
+                                    f'div[data-baseweb="popover"] div[role="gridcell"][data-date="{ds}"]'
+                                    f'{{background:{bg_color}!important;color:{text_color}!important;'
+                                    f'font-weight:700!important;border-radius:6px!important;}}'
+                                )
                                 d += timedelta(days=1)
-                        version_colors_js = json.dumps(version_date_colors)
+                        # 溢出日期（相邻月份）
+                        cal_css_parts.append(
+                            'div[data-baseweb="popover"] div[role="gridcell"][data-overflow]{'
+                            'opacity:0.25!important;pointer-events:none!important;}'
+                        )
+                        st.markdown(f'<style>{" ".join(cal_css_parts)}</style>', unsafe_allow_html=True)
 
-                        components.html(f"""
+                        # ===== JavaScript：只设置 data 属性 + 翻译，绝不修改 inline style =====
+                        components.html("""
 <script>
-(function(){{
-  const availableDates = {available_dates_js};
-  const versionColors = {version_colors_js};
-  
-  const monthMap = {{
-    'January': '一月', 'February': '二月', 'March': '三月', 'April': '四月',
-    'May': '五月', 'June': '六月', 'July': '七月', 'August': '八月',
-    'September': '九月', 'October': '十月', 'November': '十一月', 'December': '十二月'
-  }};
-  
-  const weekdayMap = {{
-    'Mo': '一', 'Tu': '二', 'We': '三', 'Th': '四', 'Fr': '五', 'Sa': '六', 'Su': '日',
-    'Mon': '一', 'Tue': '二', 'Wed': '三', 'Thu': '四', 'Fri': '五', 'Sat': '六', 'Sun': '日'
-  }};
-  
-  function translateMonthToChinese(){{
-    const parentDoc = window.parent.document;
-    const popovers = parentDoc.querySelectorAll('div[data-baseweb="popover"]');
-    popovers.forEach(popover => {{
-      const buttons = popover.querySelectorAll('button');
-      buttons.forEach(btn => {{
-        let text = btn.textContent || '';
-        for(const [en, cn] of Object.entries(monthMap)){{
-          if(text.includes(en) && !text.includes(cn)){{
-            btn.textContent = text.replace(en, cn);
-            break;
-          }}
-        }}
-      }});
-      
-      const listItems = popover.querySelectorAll('ul li, [role="listbox"] [role="option"], [role="option"]');
-      listItems.forEach(item => {{
-        let text = item.textContent || '';
-        for(const [en, cn] of Object.entries(monthMap)){{
-          if(text.includes(en) && !text.includes(cn)){{
-            item.textContent = text.replace(en, cn);
-            break;
-          }}
-        }}
-      }});
-      
-      const thead = popover.querySelector('thead');
-      if(thead){{
-        const allElements = thead.querySelectorAll('*');
-        allElements.forEach(el => {{
-          if(el.children.length === 0){{
-            let text = (el.textContent || '').trim();
-            if(weekdayMap[text]){{
-              el.textContent = weekdayMap[text];
-            }}
-          }}
-        }});
-      }}
-      
-      const dayDivs = popover.querySelectorAll('div');
-      dayDivs.forEach(div => {{
-        let text = (div.textContent || '').trim();
-        if(text.length <= 3 && weekdayMap[text]){{
-          div.textContent = weekdayMap[text];
-        }}
-      }});
-    }});
-  }}
-  
-  function disableUnavailableDates(){{
-    const parentDoc = window.parent.document;
-    const popover = parentDoc.querySelector('div[data-baseweb="popover"]');
+(function(){
+  const monthMap = {
+    'January':'一月','February':'二月','March':'三月','April':'四月',
+    'May':'五月','June':'六月','July':'七月','August':'八月',
+    'September':'九月','October':'十月','November':'十一月','December':'十二月'
+  };
+  const weekdayMap = {
+    'Mo':'一','Tu':'二','We':'三','Th':'四','Fr':'五','Sa':'六','Su':'日',
+    'Mon':'一','Tue':'二','Wed':'三','Thu':'四','Fri':'五','Sat':'六','Sun':'日'
+  };
 
-    translateMonthToChinese();
-    if(!popover) return;
+  function translate(popover){
+    // 月份按钮
+    popover.querySelectorAll('button').forEach(btn => {
+      let t = btn.textContent || '';
+      for(const [en,cn] of Object.entries(monthMap)){
+        if(t.includes(en) && !t.includes(cn)){ btn.textContent = t.replace(en,cn); break; }
+      }
+    });
+    // 月份下拉选项
+    popover.querySelectorAll('[role="option"]').forEach(item => {
+      let t = item.textContent || '';
+      for(const [en,cn] of Object.entries(monthMap)){
+        if(t.includes(en) && !t.includes(cn)){ item.textContent = t.replace(en,cn); break; }
+      }
+    });
+    // 星期几
+    const thead = popover.querySelector('thead');
+    if(thead){
+      thead.querySelectorAll('*').forEach(el => {
+        if(!el.children.length){
+          let t = (el.textContent||'').trim();
+          if(weekdayMap[t]) el.textContent = weekdayMap[t];
+        }
+      });
+    }
+  }
 
-    let currentYear = null;
-    let currentMonth = null;
+  function labelDates(popover){
+    let currentYear = null, currentMonth = null;
+    popover.querySelectorAll('button[role="combobox"]').forEach(btn => {
+      const t = (btn.textContent || btn.getAttribute('aria-label') || '').trim();
+      const ym = t.match(/(\\d{4})/);
+      if(ym) currentYear = parseInt(ym[1]);
+      const mEN = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+      const mCN = ['一月','二月','三月','四月','五月','六月','七月','八月','九月','十月','十一月','十二月'];
+      for(let i=0;i<mEN.length;i++){
+        if(t.toLowerCase().includes(mEN[i].toLowerCase()) || t.includes(mCN[i])){ currentMonth=i; break; }
+      }
+    });
+    if(currentYear===null||currentMonth===null){
+      const now=new Date();
+      if(currentYear===null) currentYear=now.getFullYear();
+      if(currentMonth===null) currentMonth=now.getMonth();
+    }
 
-    const headerButtons = popover.querySelectorAll('button[role="combobox"]');
-    headerButtons.forEach(btn => {{
-      const text = (btn.textContent || btn.getAttribute('aria-label') || '').trim();
-      const yearMatch = text.match(/(\\d{{4}})/);
-      if(yearMatch) currentYear = parseInt(yearMatch[1]);
-      const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-      const monthNamesCN = ['一月','二月','三月','四月','五月','六月','七月','八月','九月','十月','十一月','十二月'];
-      for(let i=0;i<monthNames.length;i++){{
-        if(text.toLowerCase().includes(monthNames[i].toLowerCase()) || text.includes(monthNamesCN[i])){{
-          currentMonth = i; break;
-        }}
-      }}
-    }});
+    const cells = popover.querySelectorAll('div[role="gridcell"]');
+    const items = [];
+    cells.forEach(c => {
+      const d = parseInt((c.textContent||'').trim());
+      items.push({cell:c, day:isNaN(d)?-1:d});
+    });
 
-    if(currentYear === null || currentMonth === null){{
-      const now = new Date();
-      if(currentYear === null) currentYear = now.getFullYear();
-      if(currentMonth === null) currentMonth = now.getMonth();
-    }}
+    let first1 = -1;
+    for(let i=0;i<items.length;i++){ if(items[i].day===1){first1=i;break;} }
+    let second1 = -1;
+    if(first1>=0) for(let i=first1+1;i<items.length;i++){ if(items[i].day===1){second1=i;break;} }
 
-    // 使用 div[role="gridcell"] 选取日期格子
-    const dateCells = popover.querySelectorAll('div[role="gridcell"]');
-    
-    // 智能判断每个日期属于哪个月（处理相邻月溢出）
-    const allDays = [];
-    dateCells.forEach(cell => {{
-      const dayText = (cell.textContent || '').trim();
-      const day = parseInt(dayText);
-      allDays.push({{ cell, day: isNaN(day) ? -1 : day }});
-    }});
-    
-    // 找到当前月的第一个"1"的位置
-    let firstOneIdx = -1;
-    for(let i = 0; i < allDays.length; i++){{
-      if(allDays[i].day === 1){{ firstOneIdx = i; break; }}
-    }}
-    // 找到第二个"1"(下个月开始)
-    let secondOneIdx = -1;
-    for(let i = firstOneIdx + 1; i < allDays.length; i++){{
-      if(allDays[i].day === 1){{ secondOneIdx = i; break; }}
-    }}
-    
-    allDays.forEach((item, idx) => {{
-      const {{ cell, day }} = item;
-      if(day < 1 || day > 31) return;
-      
-      let cellYear = currentYear;
-      let cellMonth = currentMonth; // 0-based
-      
-      if(firstOneIdx >= 0 && idx < firstOneIdx){{
-        // 上个月的溢出日期
-        cellMonth = currentMonth - 1;
-        if(cellMonth < 0){{ cellMonth = 11; cellYear--; }}
-      }} else if(secondOneIdx >= 0 && idx >= secondOneIdx){{
-        // 下个月的溢出日期
-        cellMonth = currentMonth + 1;
-        if(cellMonth > 11){{ cellMonth = 0; cellYear++; }}
-      }}
-      
-      const dateStr = `${{cellYear}}-${{String(cellMonth+1).padStart(2,'0')}}-${{String(day).padStart(2,'0')}}`;
+    items.forEach((it,idx) => {
+      const {cell,day} = it;
+      if(day<1||day>31) return;
+      let y=currentYear, m=currentMonth;
+      const isOverflow = (first1>=0 && idx<first1) || (second1>=0 && idx>=second1);
+      if(first1>=0 && idx<first1){ m--; if(m<0){m=11;y--;} }
+      else if(second1>=0 && idx>=second1){ m++; if(m>11){m=0;y++;} }
+      const ds = y+'-'+String(m+1).padStart(2,'0')+'-'+String(day).padStart(2,'0');
+      cell.setAttribute('data-date', ds);
+      if(isOverflow) cell.setAttribute('data-overflow','1');
+      else cell.removeAttribute('data-overflow');
+    });
+  }
 
-      // 先重置样式
-      cell.style.removeProperty('background-color');
-      cell.style.removeProperty('color');
-      cell.style.removeProperty('font-weight');
-      cell.style.removeProperty('border-radius');
-      cell.style.removeProperty('opacity');
-      cell.style.cursor = '';
-      cell.style.pointerEvents = '';
-      cell.classList.remove('date-disabled');
-
-      const isOverflow = (firstOneIdx >= 0 && idx < firstOneIdx) || (secondOneIdx >= 0 && idx >= secondOneIdx);
-
-      // 版本颜色
-      const vc = versionColors[dateStr];
-      if(vc){{
-        cell.style.setProperty('background-color', vc.bg, 'important');
-        cell.style.setProperty('color', vc.text, 'important');
-        cell.style.setProperty('font-weight', '700', 'important');
-        cell.style.setProperty('border-radius', '6px', 'important');
-        cell.title = vc.version;
-      }}
-
-      // 溢出日期（相邻月份）半透明
-      if(isOverflow){{
-        cell.style.setProperty('opacity', '0.35', 'important');
-        cell.style.setProperty('pointer-events', 'none', 'important');
-      }} else if(!availableDates.includes(dateStr)){{
-        // 当前月但不可用的日期
-        cell.style.setProperty('opacity', '0.3', 'important');
-        cell.style.setProperty('cursor', 'not-allowed', 'important');
-        cell.style.setProperty('pointer-events', 'none', 'important');
-        cell.classList.add('date-disabled');
-      }} else {{
-        cell.style.setProperty('opacity', '1', 'important');
-        cell.style.setProperty('pointer-events', 'auto', 'important');
-        cell.style.setProperty('cursor', 'pointer', 'important');
-      }}
-    }});
-  }}
-  
   const parentDoc = window.parent.document;
-  const observer = new MutationObserver(function(){{
-    const hasPopover = parentDoc.querySelector('div[data-baseweb="popover"]');
-    if(hasPopover){{
-      translateMonthToChinese();
-      disableUnavailableDates();
-    }}
-  }});
-  observer.observe(parentDoc.body, {{ childList:true, subtree:true }});
+  let timer = null;
+  function onPopoverChange(){
+    clearTimeout(timer);
+    timer = setTimeout(function(){
+      const p = parentDoc.querySelector('div[data-baseweb="popover"]');
+      if(p){ translate(p); labelDates(p); }
+    }, 80);
+  }
 
-  parentDoc.addEventListener('click', function(e){{
-    const t = e.target;
-    if(t.closest('[data-baseweb="popover"]') ||
-       t.closest('input[type="date"]') ||
-       t.closest('button[aria-label*="date"]') ||
-       t.closest('button[role="combobox"]')){{
-      setTimeout(disableUnavailableDates, 10);
-      setTimeout(disableUnavailableDates, 50);
-      setTimeout(disableUnavailableDates, 150);
-    }}
-  }}, true);
+  const obs = new MutationObserver(onPopoverChange);
+  obs.observe(parentDoc.body, {childList:true, subtree:true});
 
-  setTimeout(disableUnavailableDates, 100);
-  setTimeout(disableUnavailableDates, 300);
-
-  setInterval(function(){{
-    const parentDoc = window.parent.document;
-    const popover = parentDoc.querySelector('div[data-baseweb="popover"]');
-    if(popover && popover.style.display !== 'none'){{
-      translateMonthToChinese();
-      disableUnavailableDates();
-    }}
-  }}, 50);
-
-  parentDoc.addEventListener('click', function(){{
-    setTimeout(translateMonthToChinese, 10);
-    setTimeout(translateMonthToChinese, 50);
-    setTimeout(translateMonthToChinese, 150);
-  }});
-}})();
+  // 初始检测
+  setTimeout(onPopoverChange, 200);
+})();
 </script>
 """, height=0)
 
