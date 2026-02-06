@@ -2887,7 +2887,7 @@ def show_homepage():
         var t = (btn.textContent || btn.getAttribute('aria-label') || '').trim();
         var ym = t.match(/(\\d{{4}})/);
         if(ym) currentYear = parseInt(ym[1]);
-        for(var i=0;i<mEN.length;i++){{
+        for(var i=mEN.length-1;i>=0;i--){{
           if(t.toLowerCase().indexOf(mEN[i].toLowerCase()) !== -1 || t.indexOf(mCN[i]) !== -1){{
             currentMonth = i; break;
           }}
