@@ -399,20 +399,12 @@ div[data-baseweb="popover"] tbody button[aria-selected="true"]{
   border-radius: 8px !important;
 }
 
-/* 禁用日期（无数据） */
-div[data-baseweb="popover"] div[role="gridcell"].date-disabled,
-div[data-baseweb="popover"] div[role="gridcell"][aria-disabled="true"]{
-  background-color: #f1f3f5 !important;
-  color: #adb5bd !important;
-  opacity: 0.5 !important;
+/* 禁用日期 */
+div[data-baseweb="popover"] button.date-disabled{
+  opacity: 0.35 !important;
   cursor: not-allowed !important;
   pointer-events: none !important;
   user-select: none !important;
-}
-div[data-baseweb="popover"] div[role="gridcell"].date-disabled:hover,
-div[data-baseweb="popover"] div[role="gridcell"][aria-disabled="true"]:hover{
-  background-color: #e9ecef !important;
-  cursor: not-allowed !important;
 }
 
 /* ===== 按钮 ===== */
@@ -2766,20 +2758,13 @@ def show_homepage():
                                 label_visibility="collapsed"
                             )
 
-                        # JavaScript禁用不可用日期 + 月份中文化 + 版本颜色
+                        # JavaScript禁用不可用日期 + 月份中文化
                         available_dates_js = json.dumps(available_dates)
-                        # 生成版本周期数据供JS使用
-                        _vp_js_list = []
-                        for _vi, _vp in enumerate(VERSION_PERIODS):
-                            _bg, _txt = VERSION_COLOR_A if _vi % 2 == 0 else VERSION_COLOR_B
-                            _vp_js_list.append({"start": _vp["start"], "end": _vp["end"], "bg": _bg, "text": _txt})
-                        version_periods_js = json.dumps(_vp_js_list)
 
                         components.html(f"""
 <script>
 (function(){{
   const availableDates = {available_dates_js};
-  const versionPeriods = {version_periods_js};
   
   const monthMap = {{
     'January': '一月', 'February': '二月', 'March': '三月', 'April': '四月',
@@ -2841,113 +2826,70 @@ def show_homepage():
     }});
   }}
   
-  function getVersionColor(dateStr){{
-    for(const vp of versionPeriods){{
-      if(dateStr >= vp.start && dateStr <= vp.end){{
-        return vp;
-      }}
-    }}
-    return null;
-  }}
-  
-  function styleCalendarDates(){{
+  function disableUnavailableDates(){{
     const parentDoc = window.parent.document;
     const popover = parentDoc.querySelector('div[data-baseweb="popover"]');
 
     translateMonthToChinese();
     if(!popover) return;
 
-    // ===== 解析当前年月 =====
+
+    const table = popover.querySelector('table');
+    if(!table) return;
+
     let currentYear = null;
     let currentMonth = null;
-    const mEN = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-    const mCN = ['一月','二月','三月','四月','五月','六月','七月','八月','九月','十月','十一月','十二月'];
 
-    // 从所有按钮和span中寻找年份和月份
-    popover.querySelectorAll('button, span, div').forEach(el => {{
-      if(currentYear !== null && currentMonth !== null) return;
-      const text = (el.textContent || '').trim();
-      if(!text || text.length > 30) return;
-      // 年份
-      const ym = text.match(/(\\d{{4}})/);
-      if(ym && currentYear === null) currentYear = parseInt(ym[1]);
-      // 月份（英文和中文）
-      if(currentMonth === null){{
-        for(let i=0;i<12;i++){{
-          if(text.includes(mEN[i]) || text.includes(mCN[i])){{
-            currentMonth = i; break;
-          }}
+    const headerButtons = popover.querySelectorAll('button[role="combobox"]');
+    headerButtons.forEach(btn => {{
+      const text = (btn.textContent || btn.getAttribute('aria-label') || '').trim();
+      const yearMatch = text.match(/(\\d{{4}})/);
+      if(yearMatch) currentYear = parseInt(yearMatch[1]);
+      const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+      const monthNamesCN = ['一月','二月','三月','四月','五月','六月','七月','八月','九月','十月','十一月','十二月'];
+      for(let i=0;i<monthNames.length;i++){{
+        if(text.toLowerCase().includes(monthNames[i].toLowerCase()) || text.includes(monthNamesCN[i])){{
+          currentMonth = i; break;
         }}
       }}
     }});
 
-    if(currentYear === null) currentYear = new Date().getFullYear();
-    if(currentMonth === null) currentMonth = new Date().getMonth();
+    if(currentYear === null || currentMonth === null){{
+      const now = new Date();
+      if(currentYear === null) currentYear = now.getFullYear();
+      if(currentMonth === null) currentMonth = now.getMonth();
+    }}
 
-    // ===== 查找日期格子（不依赖table元素）=====
-    const processed = new WeakSet();
-    
-    function applyStyle(cell, day){{
-      if(processed.has(cell)) return;
-      processed.add(cell);
-      
+    const dateButtons = table.querySelectorAll('button');
+    dateButtons.forEach(button => {{
+      let dayText = button.textContent.trim();
+      dayText = dayText.replace(/🚫/g,'').replace(/\\s+/g,'').trim();
+      if(button.dataset.originalText) dayText = button.dataset.originalText;
+      const day = parseInt(dayText);
+      if(isNaN(day) || day<1 || day>31) return;
+      if(button.closest('thead')) return;
+
       const dateStr = `${{currentYear}}-${{String(currentMonth+1).padStart(2,'0')}}-${{String(day).padStart(2,'0')}}`;
 
-      if(availableDates.includes(dateStr)){{
-        // 有数据：移除禁用 + 应用版本颜色
-        cell.style.removeProperty('pointer-events');
-        cell.style.removeProperty('cursor');
-        cell.style.removeProperty('opacity');
-        
-        const vc = getVersionColor(dateStr);
-        if(vc){{
-          cell.style.setProperty('background-color', vc.bg, 'important');
-          cell.style.setProperty('color', vc.text, 'important');
-          cell.style.setProperty('font-weight', '700', 'important');
-          cell.style.setProperty('border-radius', '6px', 'important');
-        }} else {{
-          cell.style.removeProperty('background-color');
-          cell.style.removeProperty('color');
-          cell.style.removeProperty('font-weight');
-          cell.style.removeProperty('border-radius');
+      if(!availableDates.includes(dateStr)){{
+        if(!button.dataset.originalText) button.dataset.originalText = dayText;
+        button.disabled = true;
+        button.setAttribute('aria-disabled','true');
+        button.style.cursor = 'not-allowed';
+        button.style.pointerEvents = 'none';
+        button.classList.add('date-disabled');
+        button.textContent = dayText;
+      }}else{{
+        button.disabled = false;
+        button.removeAttribute('aria-disabled');
+        button.style.cursor = '';
+        button.style.pointerEvents = 'auto';
+        button.classList.remove('date-disabled');
+        if(button.dataset.originalText){{
+          button.textContent = button.dataset.originalText;
+          delete button.dataset.originalText;
         }}
-      }} else {{
-        // 无数据：灰色禁用
-        cell.style.setProperty('pointer-events', 'none', 'important');
-        cell.style.setProperty('cursor', 'not-allowed', 'important');
-        cell.style.setProperty('background-color', '#f1f3f5', 'important');
-        cell.style.setProperty('color', '#adb5bd', 'important');
-        cell.style.setProperty('opacity', '0.5', 'important');
       }}
-    }}
-
-    // 策略1: role="gridcell" 的元素
-    popover.querySelectorAll('[role="gridcell"]').forEach(cell => {{
-      const text = cell.textContent.trim();
-      const day = parseInt(text);
-      if(!isNaN(day) && day>=1 && day<=31) applyStyle(cell, day);
-    }});
-
-    // 策略2: table内的td和其子元素
-    const table = popover.querySelector('table');
-    if(table){{
-      table.querySelectorAll('td, td > div, td > span, td > button, tbody button').forEach(cell => {{
-        const text = cell.textContent.trim();
-        const day = parseInt(text);
-        if(!isNaN(day) && day>=1 && day<=31 && String(day)===text) applyStyle(cell, day);
-      }});
-    }}
-
-    // 策略3: 叶子节点（无子元素）中内容为1~31的数字
-    popover.querySelectorAll('div, span, button').forEach(cell => {{
-      if(cell.children.length > 0) return;
-      const text = cell.textContent.trim();
-      const day = parseInt(text);
-      if(isNaN(day) || day<1 || day>31 || String(day)!==text) return;
-      // 排除月份/年份选择等非日期元素
-      const role = cell.getAttribute('role') || '';
-      if(role === 'combobox' || role === 'option' || role === 'listbox') return;
-      applyStyle(cell, day);
     }});
   }}
   
@@ -2955,7 +2897,8 @@ def show_homepage():
   const observer = new MutationObserver(function(){{
     const hasPopover = parentDoc.querySelector('div[data-baseweb="popover"]');
     if(hasPopover){{
-      styleCalendarDates();
+      translateMonthToChinese();
+      disableUnavailableDates();
     }}
   }});
   observer.observe(parentDoc.body, {{ childList:true, subtree:true }});
@@ -2964,27 +2907,25 @@ def show_homepage():
     const t = e.target;
     if(t.closest('[data-baseweb="popover"]') ||
        t.closest('input[type="date"]') ||
-       t.closest('[data-baseweb="input"]') ||
        t.closest('button[aria-label*="date"]') ||
        t.closest('button[role="combobox"]')){{
-      setTimeout(styleCalendarDates, 10);
-      setTimeout(styleCalendarDates, 50);
-      setTimeout(styleCalendarDates, 150);
-      setTimeout(styleCalendarDates, 300);
+      setTimeout(disableUnavailableDates, 10);
+      setTimeout(disableUnavailableDates, 50);
+      setTimeout(disableUnavailableDates, 150);
     }}
   }}, true);
 
-  setTimeout(styleCalendarDates, 100);
-  setTimeout(styleCalendarDates, 300);
-  setTimeout(styleCalendarDates, 600);
+  setTimeout(disableUnavailableDates, 100);
+  setTimeout(disableUnavailableDates, 300);
 
   setInterval(function(){{
     const parentDoc = window.parent.document;
     const popover = parentDoc.querySelector('div[data-baseweb="popover"]');
     if(popover && popover.style.display !== 'none'){{
-      styleCalendarDates();
+      translateMonthToChinese();
+      disableUnavailableDates();
     }}
-  }}, 80);
+  }}, 50);
 
   parentDoc.addEventListener('click', function(){{
     setTimeout(translateMonthToChinese, 10);
@@ -3156,6 +3097,50 @@ def main():
     )
 
     st.markdown(STYLE_CSS, unsafe_allow_html=True)
+    
+    # ===== 版本日期颜色 CSS（纯CSS方案，全局注入）=====
+    def _ordinal(n):
+        if 11 <= n <= 13: return f"{n}th"
+        return f"{n}{['th','st','nd','rd','th','th','th','th','th','th'][n%10]}"
+    
+    _en_months = ['','January','February','March','April','May','June',
+                  'July','August','September','October','November','December']
+    
+    version_css_parts = []
+    for vi, vp in enumerate(VERSION_PERIODS):
+        bg_color, text_color = VERSION_COLOR_A if vi % 2 == 0 else VERSION_COLOR_B
+        s = datetime.strptime(vp["start"], "%Y-%m-%d").date()
+        e = datetime.strptime(vp["end"], "%Y-%m-%d").date()
+        d = s
+        selectors = []
+        while d <= e:
+            ordinal_day = _ordinal(d.day)
+            month_name = _en_months[d.month]
+            # 匹配多种可能的aria-label格式
+            selectors.append(f'[data-baseweb="popover"] button[aria-label*="{month_name} {ordinal_day}"]')
+            selectors.append(f'[data-baseweb="popover"] button[aria-label*="{month_name} {d.day},"]')
+            selectors.append(f'[data-baseweb="popover"] button[aria-label*="{month_name} {d.day} "]')
+            d += timedelta(days=1)
+        if selectors:
+            for i in range(0, len(selectors), 30):
+                chunk = selectors[i:i+30]
+                rule = ",\n".join(chunk)
+                version_css_parts.append(
+                    f'{rule}{{\n'
+                    f'  background-color: {bg_color} !important;\n'
+                    f'  color: {text_color} !important;\n'
+                    f'  font-weight: 700 !important;\n'
+                    f'  border-radius: 6px !important;\n'
+                    f'}}'
+                )
+    
+    # 调试：测试aria-label是否存在于gridcell上
+    test_rules = '''
+[data-baseweb="popover"] div[role="gridcell"][aria-label*="January"] { background-color: rgba(181,146,232,0.35) !important; border: 2px solid #B592E8 !important; }
+[data-baseweb="popover"] div[role="gridcell"][aria-label*="February"] { background-color: rgba(133,182,242,0.35) !important; border: 2px solid #85B6F2 !important; }
+[data-baseweb="popover"] div[role="gridcell"]:not([aria-label]) { border: 2px solid red !important; }
+'''
+    st.markdown(f'<style>{test_rules}</style>', unsafe_allow_html=True)
     
     if not st.session_state.show_results:
         show_homepage()
