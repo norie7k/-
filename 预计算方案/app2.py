@@ -2883,16 +2883,40 @@ def show_homepage():
       var mEN = ['January','February','March','April','May','June','July','August','September','October','November','December'];
       var mCN = ['一月','二月','三月','四月','五月','六月','七月','八月','九月','十月','十一月','十二月'];
 
-      pop.querySelectorAll('button[role="combobox"]').forEach(function(btn){{
-        var t = (btn.textContent || btn.getAttribute('aria-label') || '').trim();
-        var ym = t.match(/(\\d{{4}})/);
-        if(ym) currentYear = parseInt(ym[1]);
-        for(var i=mEN.length-1;i>=0;i--){{
-          if(t.toLowerCase().indexOf(mEN[i].toLowerCase()) !== -1 || t.indexOf(mCN[i]) !== -1){{
-            currentMonth = i; break;
+      // 兼容各版本 Streamlit：从日历头部区域提取年月
+      // 方法1: button[role="combobox"]
+      // 方法2: 所有按钮/select
+      // 方法3: 日历头部整体文本
+      var headerText = '';
+      var comboboxes = pop.querySelectorAll('button[role="combobox"]');
+      if(comboboxes.length){{
+        comboboxes.forEach(function(btn){{
+          headerText += ' ' + (btn.textContent || btn.getAttribute('aria-label') || '');
+        }});
+      }}
+      if(!headerText.trim()){{
+        // 获取非表格/非gridcell区域的所有文本（即头部导航区域）
+        pop.querySelectorAll('button, select, [role="heading"], [data-baseweb="calendar-header"] *').forEach(function(el){{
+          if(!el.closest('table') && !el.closest('thead') && !el.closest('[role="grid"]')){{
+            headerText += ' ' + (el.textContent || '');
           }}
+        }});
+      }}
+      if(!headerText.trim()){{
+        // 最后手段：取 popover 前150字符
+        headerText = (pop.textContent || '').substring(0, 150);
+      }}
+
+      // 从 headerText 提取年份
+      var ym = headerText.match(/(\\d{{4}})/);
+      if(ym) currentYear = parseInt(ym[1]);
+      // 从 headerText 提取月份（倒序匹配，防止十二月被二月误匹配）
+      for(var i=mEN.length-1;i>=0;i--){{
+        if(headerText.toLowerCase().indexOf(mEN[i].toLowerCase()) !== -1 || headerText.indexOf(mCN[i]) !== -1){{
+          currentMonth = i; break;
         }}
-      }});
+      }}
+
       if(currentYear===null||currentMonth===null){{
         var now=new Date();
         if(currentYear===null) currentYear=now.getFullYear();
