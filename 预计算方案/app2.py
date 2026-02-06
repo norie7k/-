@@ -391,8 +391,7 @@ div[data-baseweb="popover"]{
   box-shadow: 0 4px 20px rgba(200,162,232,.15) !important;
 }
 /* 选中日期 */
-div[data-baseweb="popover"] table button[aria-selected="true"],
-div[data-baseweb="popover"] tbody button[aria-selected="true"]{
+div[data-baseweb="popover"] div[role="gridcell"][aria-selected="true"]{
   background: #B592E8 !important;
   color: #ffffff !important;
   font-weight: 700 !important;
@@ -400,11 +399,17 @@ div[data-baseweb="popover"] tbody button[aria-selected="true"]{
 }
 
 /* 禁用日期 */
-div[data-baseweb="popover"] button.date-disabled{
+div[data-baseweb="popover"] div[role="gridcell"].date-disabled{
   opacity: 0.35 !important;
   cursor: not-allowed !important;
   pointer-events: none !important;
   user-select: none !important;
+}
+
+/* 确保可用日期可点击 */
+div[data-baseweb="popover"] div[role="gridcell"]{
+  pointer-events: auto !important;
+  cursor: pointer !important;
 }
 
 /* ===== 按钮 ===== */
@@ -2945,6 +2950,8 @@ def show_homepage():
         cell.classList.add('date-disabled');
       }} else {{
         cell.style.setProperty('opacity', '1', 'important');
+        cell.style.setProperty('pointer-events', 'auto', 'important');
+        cell.style.setProperty('cursor', 'pointer', 'important');
       }}
     }});
   }}
