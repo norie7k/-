@@ -2857,61 +2857,48 @@ def show_homepage():
     translateMonthToChinese();
     if(!popover) return;
 
-    const table = popover.querySelector('table');
-    if(!table) return;
-
+    // ===== 解析当前年月 =====
     let currentYear = null;
     let currentMonth = null;
+    const mEN = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+    const mCN = ['一月','二月','三月','四月','五月','六月','七月','八月','九月','十月','十一月','十二月'];
 
-    const headerButtons = popover.querySelectorAll('button[role="combobox"]');
-    headerButtons.forEach(btn => {{
-      const text = (btn.textContent || btn.getAttribute('aria-label') || '').trim();
-      const yearMatch = text.match(/(\\d{{4}})/);
-      if(yearMatch) currentYear = parseInt(yearMatch[1]);
-      const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-      const monthNamesCN = ['一月','二月','三月','四月','五月','六月','七月','八月','九月','十月','十一月','十二月'];
-      for(let i=0;i<monthNames.length;i++){{
-        if(text.toLowerCase().includes(monthNames[i].toLowerCase()) || text.includes(monthNamesCN[i])){{
-          currentMonth = i; break;
+    // 从所有按钮和span中寻找年份和月份
+    popover.querySelectorAll('button, span, div').forEach(el => {{
+      if(currentYear !== null && currentMonth !== null) return;
+      const text = (el.textContent || '').trim();
+      if(!text || text.length > 30) return;
+      // 年份
+      const ym = text.match(/(\\d{{4}})/);
+      if(ym && currentYear === null) currentYear = parseInt(ym[1]);
+      // 月份（英文和中文）
+      if(currentMonth === null){{
+        for(let i=0;i<12;i++){{
+          if(text.includes(mEN[i]) || text.includes(mCN[i])){{
+            currentMonth = i; break;
+          }}
         }}
       }}
     }});
 
-    if(currentYear === null || currentMonth === null){{
-      const now = new Date();
-      if(currentYear === null) currentYear = now.getFullYear();
-      if(currentMonth === null) currentMonth = now.getMonth();
-    }}
+    if(currentYear === null) currentYear = new Date().getFullYear();
+    if(currentMonth === null) currentMonth = new Date().getMonth();
 
-    // 遍历所有日期格子：禁用无数据日期 + 应用版本颜色
-    const allCells = table.querySelectorAll('div[role="gridcell"], td div, td, button');
-    allCells.forEach(cell => {{
-      // 获取日期文本
-      let dayText = cell.textContent.trim();
-      dayText = dayText.replace(/🚫/g,'').replace(/\\s+/g,'').trim();
-      if(cell.dataset.originalText) dayText = cell.dataset.originalText;
-      const day = parseInt(dayText);
-      if(isNaN(day) || day<1 || day>31) return;
-      if(cell.closest('thead')) return;
-      // 跳过导航按钮和月/年选择
-      if(cell.getAttribute('role') === 'combobox') return;
-      if(cell.getAttribute('role') === 'option') return;
-      const ariaLabel = cell.getAttribute('aria-label') || '';
-      if(ariaLabel.includes('month') || ariaLabel.includes('月') || ariaLabel.includes('year') || ariaLabel.includes('年')) return;
-      // 跳过如果父元素已经被处理过（避免重复处理td和td内的div）
-      if(cell.tagName === 'DIV' && cell.parentElement && cell.parentElement.tagName === 'TD' && cell.parentElement.dataset.versionStyled === 'true') return;
-
+    // ===== 查找日期格子（不依赖table元素）=====
+    const processed = new WeakSet();
+    
+    function applyStyle(cell, day){{
+      if(processed.has(cell)) return;
+      processed.add(cell);
+      
       const dateStr = `${{currentYear}}-${{String(currentMonth+1).padStart(2,'0')}}-${{String(day).padStart(2,'0')}}`;
 
       if(availableDates.includes(dateStr)){{
-        // 有数据的日期：移除禁用状态
-        cell.removeAttribute('aria-disabled');
-        cell.classList.remove('date-disabled');
+        // 有数据：移除禁用 + 应用版本颜色
         cell.style.removeProperty('pointer-events');
         cell.style.removeProperty('cursor');
         cell.style.removeProperty('opacity');
         
-        // 应用版本颜色
         const vc = getVersionColor(dateStr);
         if(vc){{
           cell.style.setProperty('background-color', vc.bg, 'important');
@@ -2919,47 +2906,50 @@ def show_homepage():
           cell.style.setProperty('font-weight', '700', 'important');
           cell.style.setProperty('border-radius', '6px', 'important');
         }} else {{
-          // 有数据但不在任何版本周期内：恢复默认
           cell.style.removeProperty('background-color');
           cell.style.removeProperty('color');
           cell.style.removeProperty('font-weight');
           cell.style.removeProperty('border-radius');
         }}
-        if(cell.tagName === 'TD') cell.dataset.versionStyled = 'true';
       }} else {{
-        // 无数据的日期：灰色禁用
-        cell.setAttribute('aria-disabled','true');
-        cell.classList.add('date-disabled');
+        // 无数据：灰色禁用
         cell.style.setProperty('pointer-events', 'none', 'important');
         cell.style.setProperty('cursor', 'not-allowed', 'important');
         cell.style.setProperty('background-color', '#f1f3f5', 'important');
         cell.style.setProperty('color', '#adb5bd', 'important');
         cell.style.setProperty('opacity', '0.5', 'important');
-        cell.style.removeProperty('font-weight');
-        cell.style.removeProperty('border-radius');
-        if(cell.tagName === 'TD') cell.dataset.versionStyled = 'true';
       }}
+    }}
+
+    // 策略1: role="gridcell" 的元素
+    popover.querySelectorAll('[role="gridcell"]').forEach(cell => {{
+      const text = cell.textContent.trim();
+      const day = parseInt(text);
+      if(!isNaN(day) && day>=1 && day<=31) applyStyle(cell, day);
+    }});
+
+    // 策略2: table内的td和其子元素
+    const table = popover.querySelector('table');
+    if(table){{
+      table.querySelectorAll('td, td > div, td > span, td > button, tbody button').forEach(cell => {{
+        const text = cell.textContent.trim();
+        const day = parseInt(text);
+        if(!isNaN(day) && day>=1 && day<=31 && String(day)===text) applyStyle(cell, day);
+      }});
+    }}
+
+    // 策略3: 叶子节点（无子元素）中内容为1~31的数字
+    popover.querySelectorAll('div, span, button').forEach(cell => {{
+      if(cell.children.length > 0) return;
+      const text = cell.textContent.trim();
+      const day = parseInt(text);
+      if(isNaN(day) || day<1 || day>31 || String(day)!==text) return;
+      // 排除月份/年份选择等非日期元素
+      const role = cell.getAttribute('role') || '';
+      if(role === 'combobox' || role === 'option' || role === 'listbox') return;
+      applyStyle(cell, day);
     }});
   }}
-  
-  // ===== 注入CSS到父文档确保版本颜色优先级 =====
-  try {{
-    const parentDoc = window.parent.document;
-    const existingStyle = parentDoc.getElementById('calendar-version-style');
-    if(existingStyle) existingStyle.remove();
-    const style = parentDoc.createElement('style');
-    style.id = 'calendar-version-style';
-    style.textContent = `
-      /* 确保版本颜色的内联样式不被覆盖 */
-      div[data-baseweb="popover"] div[role="gridcell"][style*="background-color"] {{
-        transition: none !important;
-      }}
-      div[data-baseweb="popover"] td[style*="background-color"] {{
-        transition: none !important;
-      }}
-    `;
-    parentDoc.head.appendChild(style);
-  }} catch(e) {{}}
   
   const parentDoc = window.parent.document;
   const observer = new MutationObserver(function(){{
