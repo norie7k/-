@@ -28,6 +28,17 @@ GROUPS = {
     "2": {"name": "🌎 地球群2", "dir": "group2"},
 }
 
+# 版本周期配置（新增版本在列表末尾追加即可，颜色会自动交替）
+VERSION_PERIODS = [
+    {"name": "beta15_旋转木马测试", "start": "2025-12-03", "end": "2025-12-17"},
+    {"name": "beta17_暖冬测试",   "start": "2025-12-31", "end": "2026-01-20"},
+    {"name": "beta18_地图炮测试",  "start": "2026-01-21", "end": "2026-02-03"},
+    {"name": "beta19_立春测试",    "start": "2026-02-04", "end": "2026-02-24"},
+]
+# 交替使用的两种颜色（背景色, 文字色）
+VERSION_COLOR_A = ("rgba(181,146,232,0.25)", "#6b21a8")  # 紫色系
+VERSION_COLOR_B = ("rgba(133,182,242,0.25)", "#1e40af")  # 蓝色系
+
 # ==================== CSS（收敛版：稳 + 清晰）===================
 
 STYLE_CSS = """
@@ -371,16 +382,81 @@ div[data-baseweb="option"]{
 }
 div[data-baseweb="option"]:hover{ background: rgba(200,162,232,.15) !important; }
 
-/* 日期 popover */
+/* 日期 popover - 亮色主题 */
 div[data-baseweb="popover"]{
-  background: rgba(255,255,255,.98) !important;
-  border: 1px solid rgba(200,162,232,.25) !important;
+  background: #ffffff !important;
+  border: 1px solid rgba(200,162,232,.3) !important;
   border-radius: 12px !important;
   z-index: 9999 !important;
-  box-shadow: 0 4px 20px rgba(200,162,232,.2) !important;
+  box-shadow: 0 4px 20px rgba(200,162,232,.15) !important;
+}
+/* 日历内部面板背景 */
+div[data-baseweb="popover"] div[data-baseweb="calendar"],
+div[data-baseweb="popover"] [data-baseweb="calendar"]{
+  background: #ffffff !important;
+  color: #1f2937 !important;
+}
+/* 日历头部（月/年选择） */
+div[data-baseweb="popover"] [data-baseweb="calendar"] div:first-child{
+  background: #ffffff !important;
+}
+div[data-baseweb="popover"] button[role="combobox"]{
+  background: #f8f9fa !important;
+  color: #1f2937 !important;
+  border: 1px solid #e5e7eb !important;
+}
+div[data-baseweb="popover"] button[role="combobox"]:hover{
+  background: #f1f5f9 !important;
+}
+/* 导航箭头 */
+div[data-baseweb="popover"] [aria-label="Next month"],
+div[data-baseweb="popover"] [aria-label="Previous month"]{
+  background: transparent !important;
+  color: #6b21a8 !important;
+}
+div[data-baseweb="popover"] [aria-label="Next month"]:hover,
+div[data-baseweb="popover"] [aria-label="Previous month"]:hover{
+  background: rgba(200,162,232,.15) !important;
+}
+/* 星期标题 */
+div[data-baseweb="popover"] thead th,
+div[data-baseweb="popover"] thead div{
+  color: #6b7280 !important;
+}
+/* 普通日期按钮 */
+div[data-baseweb="popover"] table button,
+div[data-baseweb="popover"] tbody button{
+  color: #1f2937 !important;
+  background: transparent !important;
+}
+div[data-baseweb="popover"] table button:hover,
+div[data-baseweb="popover"] tbody button:hover{
+  background: rgba(200,162,232,.15) !important;
+}
+/* 选中日期 */
+div[data-baseweb="popover"] table button[aria-selected="true"],
+div[data-baseweb="popover"] tbody button[aria-selected="true"]{
+  background: #B592E8 !important;
+  color: #ffffff !important;
+  font-weight: 700 !important;
+  border-radius: 8px !important;
+}
+/* 今天标记 */
+div[data-baseweb="popover"] table button[aria-label*="today"],
+div[data-baseweb="popover"] tbody button[aria-current="date"]{
+  border: 2px solid #B592E8 !important;
+  border-radius: 8px !important;
+}
+/* 下拉列表选项 */
+div[data-baseweb="popover"] div[role="option"]{
+  background: #ffffff !important;
+  color: #1f2937 !important;
 }
 div[data-baseweb="popover"] div[role="option"]:hover{
   background: rgba(200,162,232,.15) !important;
+}
+div[data-baseweb="popover"] ul[role="listbox"]{
+  background: #ffffff !important;
 }
 
 /* 禁用日期 */
@@ -390,16 +466,9 @@ div[data-baseweb="popover"] button.date-disabled{
   opacity: 0.4 !important;
   cursor: not-allowed !important;
   pointer-events: none !important;
-  color: var(--muted) !important;
-  background: rgba(148,163,184,.1) !important;
+  color: #94a3b8 !important;
+  background: #f1f5f9 !important;
   user-select: none !important;
-}
-div[data-baseweb="popover"] button.date-disabled .date-disabled-icon {
-  display: inline-block !important;
-  font-size: 10px !important;
-  margin-left: 2px !important;
-  vertical-align: middle !important;
-  opacity: 0.8 !important;
 }
 
 /* ===== 按钮 ===== */
@@ -2755,37 +2824,25 @@ def show_homepage():
 
                         # JavaScript禁用不可用日期 + 月份中文化 + 版本颜色
                         available_dates_js = json.dumps(available_dates)
+                        
+                        # 构建版本颜色映射
+                        version_date_colors = {}
+                        for vi, vp in enumerate(VERSION_PERIODS):
+                            bg_color, text_color = VERSION_COLOR_A if vi % 2 == 0 else VERSION_COLOR_B
+                            s = datetime.strptime(vp["start"], "%Y-%m-%d").date()
+                            e = datetime.strptime(vp["end"], "%Y-%m-%d").date()
+                            d = s
+                            while d <= e:
+                                ds = d.strftime("%Y-%m-%d")
+                                version_date_colors[ds] = {"bg": bg_color, "text": text_color, "version": vp["name"]}
+                                d += timedelta(days=1)
+                        version_colors_js = json.dumps(version_date_colors)
 
                         components.html(f"""
 <script>
 (function(){{
   const availableDates = {available_dates_js};
-  
-  // 版本日期范围定义（交替使用2种颜色）
-  const versionRanges = [
-    {{ name: 'beta17', start: '2025-12-31', end: '2026-01-20', colorType: 2 }},
-    {{ name: 'beta18', start: '2026-01-21', end: '2026-02-03', colorType: 1 }},
-    {{ name: 'beta19', start: '2026-02-04', end: '2026-02-24', colorType: 2 }}
-  ];
-  
-  // 两种版本颜色
-  const versionColors = {{
-    1: {{ bg: 'rgba(169, 185, 240, 0.35)', border: '#A9B9F0' }},  // 蓝紫色
-    2: {{ bg: 'rgba(124, 218, 201, 0.35)', border: '#7CDAC9' }}   // 青绿色
-  }};
-  
-  // 判断日期属于哪个版本
-  function getVersionColor(dateStr) {{
-    const date = new Date(dateStr);
-    for (const v of versionRanges) {{
-      const start = new Date(v.start);
-      const end = new Date(v.end);
-      if (date >= start && date <= end) {{
-        return versionColors[v.colorType];
-      }}
-    }}
-    return null;
-  }}
+  const versionColors = {version_colors_js};
   
   const monthMap = {{
     'January': '一月', 'February': '二月', 'March': '三月', 'April': '四月',
@@ -2898,12 +2955,13 @@ def show_homepage():
         button.disabled = true;
         button.setAttribute('aria-disabled','true');
         button.style.color = '#94a3b8';
-        button.style.backgroundColor = 'rgba(200, 162, 232, 0.15)';
+        button.style.backgroundColor = '#f1f5f9';
         button.style.cursor = 'not-allowed';
         button.style.pointerEvents = 'none';
         button.style.opacity = '0.4';
         button.classList.add('date-disabled');
         button.textContent = dayText;
+        button.title = '';
       }}else{{
         button.disabled = false;
         button.removeAttribute('aria-disabled');
@@ -2915,23 +2973,19 @@ def show_homepage():
           button.textContent = button.dataset.originalText;
           delete button.dataset.originalText;
         }}
-        
-        // 根据版本设置颜色
-        const vColor = getVersionColor(dateStr);
-        if(vColor){{
-          button.style.setProperty('background-color', vColor.bg, 'important');
-          button.style.setProperty('border-radius', '6px', 'important');
-          button.style.setProperty('color', '#1f2937', 'important');
-          button.style.setProperty('font-weight', '600', 'important');
-          // 同时设置内部div的样式
-          const innerDiv = button.querySelector('div');
-          if(innerDiv){{
-            innerDiv.style.setProperty('background-color', vColor.bg, 'important');
-          }}
+        // 版本颜色
+        const vc = versionColors[dateStr];
+        if(vc){{
+          button.style.backgroundColor = vc.bg;
+          button.style.color = vc.text;
+          button.style.fontWeight = '700';
+          button.style.borderRadius = '6px';
+          button.title = vc.version;
         }}else{{
-          button.style.removeProperty('background-color');
-          button.style.removeProperty('color');
-          button.style.removeProperty('font-weight');
+          button.style.backgroundColor = '';
+          button.style.color = '';
+          button.style.fontWeight = '';
+          button.title = '';
         }}
       }}
     }});
