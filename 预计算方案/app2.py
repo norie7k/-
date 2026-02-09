@@ -943,16 +943,18 @@ section[data-testid="stMain"] div[data-testid="stExpander"] div[role="region"]{
   margin-left: 6px;
 }
 
-/* 讨论点主标题 */
+/* 讨论点主标题（最高层级） */
 .dp-main-title{
-  background: linear-gradient(135deg, rgba(181,146,232,0.15) 0%, rgba(133,182,242,0.15) 100%);
-  border-left: 4px solid #B592E8;
-  border-radius: 0 8px 8px 0;
-  padding: 12px 16px;
-  margin-bottom: 14px;
-  color: #7c3aed;
-  font-size: 1.05rem;
-  font-weight: 700;
+  background: linear-gradient(135deg, #B592E8 0%, #9AA0F0 100%);
+  border-left: none;
+  border-radius: 10px;
+  padding: 14px 20px;
+  margin-bottom: 18px;
+  color: #ffffff;
+  font-size: 1.35rem;
+  font-weight: 800;
+  letter-spacing: 0.03em;
+  box-shadow: 0 3px 12px rgba(181,146,232,0.25);
 }
 .dp-section-title{
   font-size: 0.84rem;
