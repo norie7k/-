@@ -918,25 +918,29 @@ section[data-testid="stMain"] div[data-testid="stExpander"] div[role="region"]{
 /* ===== 讨论点直接展示样式（不折叠）===== */
 .dp-card-wrapper{
   background: #ffffff;
-  border: 1px solid rgba(133,182,242,0.3);
-  border-left: 4px solid #85B6F2;
-  border-radius: 0 10px 10px 0;
-  margin: 14px 0;
+  border: 1px solid rgba(181,146,232,0.3);
+  border-left: 5px solid #B592E8;
+  border-radius: 0 12px 12px 0;
+  margin: 18px 0;
   overflow: hidden;
+  box-shadow: 0 2px 8px rgba(181,146,232,0.08);
 }
 .dp-card-header-fixed{
-  background: linear-gradient(135deg, rgba(133,182,242,0.1) 0%, rgba(117,200,227,0.1) 100%);
+  background: linear-gradient(135deg, rgba(181,146,232,0.18) 0%, rgba(133,182,242,0.15) 100%);
   border-bottom: 1px solid rgba(133,182,242,0.3);
-  padding: 12px 16px;
+  padding: 14px 18px;
 }
 .dp-card-header-fixed .dp-title{
-  font-weight: 700;
-  font-size: 1.05rem;
-  color: #2563eb;
+  font-weight: 800;
+  font-size: 1.2rem;
+  color: #4c1d95;
+  letter-spacing: 0.02em;
 }
 .dp-content-direct{
-  background: #ffffff;
-  padding: 12px 14px;
+  background: rgba(248,249,250,0.5);
+  padding: 14px 18px 14px 22px;
+  border-left: 2px solid rgba(181,146,232,0.15);
+  margin-left: 6px;
 }
 
 /* 讨论点主标题 */
@@ -967,14 +971,14 @@ section[data-testid="stMain"] div[data-testid="stExpander"] div[role="region"]{
 }
 
 .opinion-item{
-  background: linear-gradient(135deg, rgba(169,185,240,0.15) 0%, rgba(133,182,242,0.15) 100%);
+  background: linear-gradient(135deg, rgba(169,185,240,0.10) 0%, rgba(133,182,242,0.10) 100%);
   border: none;
-  border-left: 4px solid #A9B9F0;
-  padding: 12px 16px;
-  margin: 10px 0;
+  border-left: 3px solid #A9B9F0;
+  padding: 10px 14px;
+  margin: 8px 0;
   border-radius: 0 8px 8px 0;
   color: #1f2937;
-  font-size: 0.95rem;
+  font-size: 0.92rem;
   line-height: 1.6;
   font-weight: 600;
 }
@@ -993,18 +997,18 @@ section[data-testid="stMain"] div[data-testid="stExpander"] div[role="region"]{
 
 /* ===== 新增：观点卡片样式（V2格式）===== */
 .opinion-card{
-  background: linear-gradient(135deg, rgba(169,185,240,0.18) 0%, rgba(133,182,242,0.18) 100%) !important;
-  border: 1px solid rgba(169,185,240,0.4) !important;
-  border-left: 4px solid #A9B9F0 !important;
-  border-radius: 0 10px 10px 0 !important;
-  padding: 14px 18px;
-  margin: 14px 0;
+  background: linear-gradient(135deg, rgba(169,185,240,0.10) 0%, rgba(133,182,242,0.10) 100%) !important;
+  border: 1px solid rgba(169,185,240,0.30) !important;
+  border-left: 3px solid #A9B9F0 !important;
+  border-radius: 0 8px 8px 0 !important;
+  padding: 12px 16px;
+  margin: 10px 0;
 }
 .opinion-card-header{
-  font-size: 1rem;
-  font-weight: 700;
+  font-size: 0.95rem;
+  font-weight: 600;
   color: #4f46e5 !important;
-  margin-bottom: 10px;
+  margin-bottom: 8px;
   display: flex;
   align-items: center;
   gap: 6px;
