@@ -97,25 +97,6 @@ def main():
     if req_file.exists():
         run_cmd('git add "预计算方案/requirements.txt"')
 
-    # 3.6 添加 README 与转换脚本
-    print("\n3.6 添加 README 与转换脚本到 Git...")
-    extra_paths = [
-        "预计算方案/README.md",
-        "预计算方案/convert_daily)TEST.py",
-        "预计算方案/convert_daily_from_file.py",
-        "预计算方案/convert_daily_output.py",
-        "预计算方案/convert_version_output.py",
-        "预计算方案/check_github_data.py",
-        "预计算方案/push_app2_to_github.py",
-        "预计算方案/Streamlit推送工作流打包",
-    ]
-    for rel in extra_paths:
-        target = PROJECT_ROOT / rel
-        if target.exists():
-            run_cmd(f'git add "{rel}"')
-        else:
-            print(f"  ⚠️ 跳过（不存在）: {rel}")
-
     # 4. 提交
     print("\n4. 提交更改...")
     commit_msg = f"更新app2.py和results2数据 - {datetime.now().strftime('%Y-%m-%d %H:%M')}"
