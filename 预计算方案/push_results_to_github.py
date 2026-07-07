@@ -49,13 +49,48 @@ def main():
     results_dir = PROJECT_ROOT / "预计算方案" / "results"
     if results_dir.exists():
         # 使用相对路径，避免 Windows 路径问题
+        # 添加所有文件，包括 json 和 jsonl
+        print("   添加所有 JSON 文件...")
+        run_cmd(f'git add "预计算方案/results/**/*.json"')
+        print("   添加所有 JSONL 文件...")
+        run_cmd(f'git add "预计算方案/results/**/*.jsonl"')
+        print("   添加 index.json 文件...")
+        run_cmd(f'git add "预计算方案/results/*/index.json"')
+        print("   添加整个 results 目录（确保不遗漏）...")
         run_cmd(f'git add "预计算方案/results"')
     else:
         print(f"⚠️ 目录不存在: {results_dir}")
         return
 
-    # 2. 提交（如果有更改）
-    print("\n2. 提交更改...")
+    # 2. 查看暂存的文件
+    print("\n2. 查看将要提交的文件...")
+    staged_res = subprocess.run(
+        "git diff --cached --name-only",
+        shell=True,
+        cwd=PROJECT_ROOT,
+        capture_output=True,
+        text=True,
+        encoding='utf-8',
+        errors='ignore'
+    )
+    staged_files = [line.strip() for line in staged_res.stdout.splitlines() if line.strip()]
+    
+    if staged_files:
+        print("   📄 暂存的文件：")
+        for f in staged_files:
+            if "results/" in f:
+                # 显示文件类型
+                file_type = ""
+                if f.endswith(".json"):
+                    file_type = " [JSON]"
+                elif f.endswith(".jsonl"):
+                    file_type = " [JSONL]"
+                print(f"      - {f}{file_type}")
+    else:
+        print("   ℹ️ 没有暂存的文件")
+    
+    # 3. 提交（如果有更改）
+    print("\n3. 提交更改...")
     commit_msg = f"[数据更新] 更新预计算结果 - {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
     commit_ok = run_cmd(f'git commit -m "{commit_msg}"')
 
@@ -63,8 +98,8 @@ def main():
         print("ℹ️ 没有需要提交的更改")
         return
 
-    # 3. 先拉远程
-    print("\n3. 拉取远程更改...")
+    # 4. 先拉远程
+    print("\n4. 拉取远程更改...")
     pull_ok = run_cmd("git pull --no-rebase")
 
     if not pull_ok:
@@ -77,8 +112,8 @@ def main():
         print("   5. git push")
         return
 
-    # 4. 推送
-    print("\n4. 推送到 GitHub...")
+    # 5. 推送
+    print("\n5. 推送到 GitHub...")
     push_ok = run_cmd("git push")
 
     if push_ok:

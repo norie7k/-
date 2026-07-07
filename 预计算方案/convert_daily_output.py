@@ -253,7 +253,7 @@ def main():
     
     parser = argparse.ArgumentParser(description="将每日输出格式转换为标准 JSON 格式")
     parser.add_argument("input", help="输入文件路径（包含多个 JSON 对象的文本文件）")
-    parser.add_argument("--output", "-o", help="输出文件路径（默认：预计算方案/results/group{group_id}/{date}.json）")
+    parser.add_argument("--output", "-o", help="输出文件路径（默认：预计算方案/results/group{group_id}/daily/{date}.json）")
     parser.add_argument("--group", "-g", required=True, choices=["1", "2"], help="群组ID (1 或 2)")
     parser.add_argument("--date", "-d", help="日期 (格式: YYYY-MM-DD，如果不指定会从数据中提取）")
     parser.add_argument("--name", "-n", help="群组名称（可选，默认：地球群{group_id}）")
@@ -275,7 +275,8 @@ def main():
                 print("❌ 无法确定日期，请使用 --date 参数指定")
                 return
         
-        output_path = f"预计算方案/results/group{args.group}/{args.date}.json"
+        # 使用绝对路径，确保无论从哪个目录运行都能正确输出到 daily 子目录
+        output_path = str(PROJECT_ROOT / "预计算方案" / "results" / f"group{args.group}" / "daily" / f"{args.date}.json")
     
     # 处理文件
     success = process_input_file(
